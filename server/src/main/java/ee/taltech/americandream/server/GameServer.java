@@ -19,6 +19,7 @@ public class GameServer {
         server.addListener(new Listener(){
             public void received(Connection connection, Object object) {
                 System.out.println(object);
+                connection.sendTCP("Hello Client, I received your message!");
             }
         });
     }

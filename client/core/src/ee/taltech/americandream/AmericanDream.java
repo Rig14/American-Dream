@@ -1,10 +1,13 @@
 package ee.taltech.americandream;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
 
@@ -25,6 +28,13 @@ public class AmericanDream extends ApplicationAdapter {
             throw new RuntimeException(e);
         }
         client.sendTCP("Start");
+        client.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                super.received(connection, object);
+                Gdx.app.log("From Server: ", object.toString());
+            }
+        });
     }
 
     @Override
