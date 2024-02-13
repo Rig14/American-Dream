@@ -31,6 +31,7 @@ public class AmericanDream extends ApplicationAdapter {
             throw new RuntimeException(e);
         }
         client.sendTCP("Start");
+        Gdx.audio.newSound(Gdx.files.internal("music.mp3")).play();
         client.addListener(new Listener() {
             @Override
             public void received(Connection connection, Object object) {
