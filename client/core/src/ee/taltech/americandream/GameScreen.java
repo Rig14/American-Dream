@@ -83,8 +83,12 @@ public class GameScreen extends ScreenAdapter {
      * created by players and the center point
      */
     private void cameraUpdate() {
-        // move the camera
-        camera.translate(0, 0, 0);
+        // move the camera to the center of the map
+        camera.position.set(
+                player.getBody().getPosition().x * PPM,
+                player.getBody().getPosition().y * PPM,
+                0
+        );
         // update camera
         camera.update();
     }

@@ -31,7 +31,7 @@
   <object id="1" name="platform" x="192" y="415.818" width="575.523" height="32.5909">
    <polygon points="0,0 575.523,0 575.523,32.5909 0,32.5909"/>
   </object>
-  <object id="15" name="player" x="288" y="352" width="32" height="64"/>
+  <object id="15" name="player" x="256.596" y="306.943" width="32" height="64"/>
  </objectgroup>
  <layer id="4" name="Platform" width="30" height="20">
   <data encoding="csv">

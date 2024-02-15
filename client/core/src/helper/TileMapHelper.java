@@ -24,7 +24,6 @@ public class TileMapHelper {
 
     public TileMapHelper(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
-
     }
 
     public OrthogonalTiledMapRenderer setupMap(String fileName) {
