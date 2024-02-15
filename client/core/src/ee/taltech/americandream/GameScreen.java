@@ -26,6 +26,8 @@ public class GameScreen extends ScreenAdapter {
 
     // game objects
     private Player player;
+    // center of the map
+    private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
         this.camera = camera;
@@ -85,11 +87,8 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // move the camera to the center of the map
-        camera.position.set(
-                player.getBody().getPosition().x * PPM,
-                player.getBody().getPosition().y * PPM,
-                0
-        );
+        camera.position.set(center.x, center.y, 0);
+
         // update camera
         camera.update();
     }
@@ -100,5 +99,9 @@ public class GameScreen extends ScreenAdapter {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setCenter(Vector2 vector2) {
+        this.center = vector2;
     }
 }
