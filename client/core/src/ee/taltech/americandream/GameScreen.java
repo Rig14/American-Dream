@@ -5,17 +5,27 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.TileMapHelper;
+import objects.player.Player;
 
-import static ee.taltech.americandream.helper.Constants.*;
+import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
+
+    private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
+
+    private TileMapHelper tileMapHelper;
+
+    // game objects
+    private Player player;
 
     public GameScreen(OrthographicCamera camera) {
         this.camera = camera;
@@ -24,6 +34,10 @@ public class GameScreen extends ScreenAdapter {
         // x - horizontal gravity, y - vertical gravity
         this.world = new World(new Vector2(0, GRAVITY), false);
         this.debugRenderer = new Box2DDebugRenderer();
+
+        // setting up the map
+        this.tileMapHelper = new TileMapHelper(this);
+        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
     }
 
     @Override
@@ -34,9 +48,11 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 
+        // render map before the actual game objects
+        orthogonalTiledMapRenderer.render();
+
         batch.begin();
         // object rendering goes here
-
         batch.end();
 
         // for debugging
@@ -51,6 +67,8 @@ public class GameScreen extends ScreenAdapter {
         cameraUpdate();
 
         batch.setProjectionMatrix(camera.combined);
+        // set the view of the map to the camera
+        orthogonalTiledMapRenderer.setView(camera);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -69,5 +87,13 @@ public class GameScreen extends ScreenAdapter {
         camera.translate(0, 0, 0);
         // update camera
         camera.update();
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

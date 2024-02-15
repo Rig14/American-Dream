@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="8">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="16">
  <tileset firstgid="1" source="tilesets as .tsx/test_tiles.tsx"/>
  <tileset firstgid="901" source="tilesets as .tsx/test_tiles4.tsx"/>
  <tileset firstgid="1801" source="tilesets as .tsx/test_tiles3.tsx"/>
@@ -27,8 +27,11 @@
 541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541
 </data>
  </layer>
- <objectgroup id="2" name="Platform_obj">
-  <object id="1" x="192" y="415.818" width="575.523" height="32.5909"/>
+ <objectgroup id="2" name="platform">
+  <object id="1" name="platform" x="192" y="415.818" width="575.523" height="32.5909">
+   <polygon points="0,0 575.523,0 575.523,32.5909 0,32.5909"/>
+  </object>
+  <object id="15" name="player" x="288" y="352" width="32" height="64"/>
  </objectgroup>
  <layer id="4" name="Platform" width="30" height="20">
   <data encoding="csv">
@@ -54,18 +57,6 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="5" name="border-left">
-  <object id="3" x="0.0078125" y="-0.0078125" width="32.6172" height="639.57"/>
- </objectgroup>
- <objectgroup id="6" name="border_right">
-  <object id="5" x="929" y="0" width="31" height="641"/>
- </objectgroup>
- <objectgroup id="7" name="border_top">
-  <object id="6" x="37" y="0.5" width="891" height="31"/>
- </objectgroup>
- <objectgroup id="8" name="border_bottom">
-  <object id="7" x="34" y="608" width="894.5" height="32.5"/>
- </objectgroup>
  <layer id="11" name="Decorations2" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
