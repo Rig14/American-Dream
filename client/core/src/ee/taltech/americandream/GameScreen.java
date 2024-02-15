@@ -99,7 +99,6 @@ public class GameScreen extends ScreenAdapter {
         Vector2 vector = new Vector2(player.getPosition().x - center.x, player.getPosition().y - center.y);
         camera.position.x = center.x + vector.x / CAMERA_SPEED;
         camera.position.y = center.y + vector.y / CAMERA_SPEED;
-
         // update the camera
         camera.update();
     }
