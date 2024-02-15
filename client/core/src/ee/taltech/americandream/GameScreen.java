@@ -88,7 +88,7 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.isOutOfBounds(center)) {
+        if (player.getPosition().y < BOUNDS) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();
