@@ -21,6 +21,7 @@ public class BodyHelperService {
         // fixture is a shape that is attached to the body
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
+        fixtureDef.friction = 0;
         body.createFixture(fixtureDef);
         // shape is no more needed
         shape.dispose();

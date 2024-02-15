@@ -69,6 +69,7 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
+        player.update();
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
