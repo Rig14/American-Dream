@@ -61,4 +61,8 @@ public class Player extends GameEntity {
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
+
+    public boolean isOutOfBounds(Vector2 center) {
+        return Math.abs(center.x - x) > BOUNDS || Math.abs(center.y - y) > BOUNDS;
+    }
 }

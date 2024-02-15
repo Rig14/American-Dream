@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
@@ -86,12 +87,20 @@ public class GameScreen extends ScreenAdapter {
      * created by players and the center point
      */
     private void cameraUpdate() {
+        // if player is out of bound then set the camera to the center
+        if (player.isOutOfBounds(center)) {
+            // "lerp" makes the camera move smoothly back to the center point.
+            camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
+            camera.update();
+            return;
+        }
+        // make camera follow the player slowly
         // vector from center to player
         Vector2 vector = new Vector2(player.getPosition().x - center.x, player.getPosition().y - center.y);
-
         camera.position.x = center.x + vector.x / CAMERA_SPEED;
         camera.position.y = center.y + vector.y / CAMERA_SPEED;
 
+        // update the camera
         camera.update();
     }
 
