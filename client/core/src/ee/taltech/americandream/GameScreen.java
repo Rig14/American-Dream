@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
@@ -26,6 +27,8 @@ public class GameScreen extends ScreenAdapter {
 
     // game objects
     private Player player;
+    // center of the map
+    private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
         this.camera = camera;
@@ -84,13 +87,19 @@ public class GameScreen extends ScreenAdapter {
      * created by players and the center point
      */
     private void cameraUpdate() {
-        // move the camera to the center of the map
-        camera.position.set(
-                player.getBody().getPosition().x * PPM,
-                player.getBody().getPosition().y * PPM,
-                0
-        );
-        // update camera
+        // if player is out of bound then set the camera to the center
+        if (player.getPosition().y < BOUNDS) {
+            // "lerp" makes the camera move smoothly back to the center point.
+            camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
+            camera.update();
+            return;
+        }
+        // make camera follow the player slowly
+        // vector from center to player
+        Vector2 vector = new Vector2(player.getPosition().x - center.x, player.getPosition().y - center.y);
+        camera.position.x = center.x + vector.x / CAMERA_SPEED;
+        camera.position.y = center.y + vector.y / CAMERA_SPEED;
+        // update the camera
         camera.update();
     }
 
@@ -100,5 +109,9 @@ public class GameScreen extends ScreenAdapter {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setCenter(Vector2 vector2) {
+        this.center = vector2;
     }
 }

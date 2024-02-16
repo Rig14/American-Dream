@@ -57,4 +57,8 @@ public class Player extends GameEntity {
     public void render(SpriteBatch batch) {
 
     }
+
+    public Vector2 getPosition() {
+        return body.getPosition().scl(PPM);
+    }
 }

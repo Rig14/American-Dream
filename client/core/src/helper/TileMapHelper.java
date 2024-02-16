@@ -56,6 +56,11 @@ public class TileMapHelper {
                     gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
                 }
             }
+            if (mapObject.getName().equals("Center")) {
+                // get the point
+                Rectangle point = ((RectangleMapObject) mapObject).getRectangle();
+                gameScreen.setCenter(new Vector2(point.x, point.y));
+            }
         }
     }
 

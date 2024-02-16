@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+import static helper.Constants.CAMERA_ZOOM;
+
 public class AmericanDream extends Game {
     public static AmericanDream INSTANCE;
     private OrthographicCamera camera;
@@ -22,7 +24,7 @@ public class AmericanDream extends Game {
         // setting up camera
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, screenWidth, screenHeight);
-
+        this.camera.zoom = CAMERA_ZOOM;
         // navigating to the starting screen
         setScreen(new GameScreen(this.camera));
     }
