@@ -15,49 +15,42 @@ import helper.packet.PlayerPositionMessage;
 import static helper.Constants.*;
 
 public class AmericanDream extends Game {
-    public static AmericanDream INSTANCE;
+    // static variables, you can access these
+    // from literally anywhere in the code
     public static Client client;
     public static int id;
-    private OrthographicCamera camera;
-    private int screenWidth, screenHeight;
 
-    public AmericanDream() {
-        INSTANCE = this;
-    }
-
+    /*
+     * This method is called when the game is created.
+     * e.g. when user opens the game.
+     */
     @Override
     public void create() {
-        // getting screen size
-        this.screenWidth = Gdx.graphics.getWidth();
-        this.screenHeight = Gdx.graphics.getHeight();
+        setupConnection();
 
-        // set up server connection
-        client = new Client();
-        registerClasses();
-        client.start();
-        try {
-            client.connect(5000, IP_ADDRESS, PORTS[0], PORTS[1]);
-        } catch (Exception e) {
-            Gdx.app.log("Client", "Failed to connect to server");
-        }
         // listen for id message
         client.addListener(new com.esotericsoftware.kryonet.Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof IDMessage) {
                     IDMessage idMessage = (IDMessage) object;
+                    // id is used to identify the player
                     id = idMessage.id;
                 }
             }
         });
 
         // setting up camera
-        this.camera = new OrthographicCamera();
-        this.camera.setToOrtho(false, screenWidth, screenHeight);
-        this.camera.zoom = CAMERA_ZOOM;
+        OrthographicCamera camera = new OrthographicCamera();
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.zoom = CAMERA_ZOOM;
         // navigating to the starting screen
-        setScreen(new GameScreen(this.camera));
+        setScreen(new GameScreen(camera));
     }
 
+    /*
+     * This method registers classes for serialization.
+     * Classes that are sent over the network need to be registered.
+     */
     private void registerClasses() {
         // register classes for serialization
         Kryo kryo = client.getKryo();
@@ -67,5 +60,27 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
+    }
+
+    /*
+     * This method sets up the connection to the server.
+     */
+    private void setupConnection() {
+        client = new Client();
+        registerClasses();
+        client.start();
+        try {
+            client.connect(5000, IP_ADDRESS, PORTS[0], PORTS[1]);
+        } catch (Exception e) {
+            Gdx.app.log("Client", "Failed to connect to server");
+        }
+    }
+
+    /*
+     * This method is called when the game is closed.
+     */
+    @Override
+    public void dispose() {
+        client.close();
     }
 }

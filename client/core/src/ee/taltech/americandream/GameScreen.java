@@ -63,7 +63,6 @@ public class GameScreen extends ScreenAdapter {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
                 if (rp != null) {
-                    Gdx.app.log("RemotePlayer", rp.getX() + " " + rp.getY());
                     rp.render(batch, player);
                 }
             }
