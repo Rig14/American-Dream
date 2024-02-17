@@ -19,12 +19,11 @@ import java.util.ArrayList;
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
+    ArrayList<Bullet> bullets;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
-
-    ArrayList<Bullet> bullets;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
 
     private TileMapHelper tileMapHelper;
@@ -87,7 +86,7 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
         // object rendering goes here
         remotePlayerManager.renderPlayers(batch, player.getDimensions());
-        for (Bullet bullet: bullets) {
+        for (Bullet bullet : bullets) {
             bullet.render(batch);
         }
         batch.end();
@@ -104,7 +103,7 @@ public class GameScreen extends ScreenAdapter {
 
         // update the camera position
         cameraUpdate();
-
+        
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
@@ -124,7 +123,7 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.getPosition().y < BOUNDS) {
+        if (player.getPosition().y < -BOUNDS) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();

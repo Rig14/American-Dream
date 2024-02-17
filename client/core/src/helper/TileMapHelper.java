@@ -71,6 +71,8 @@ public class TileMapHelper {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         Body body = gameScreen.getWorld().createBody(bodyDef);
+        // to get the platforms y coordinate for one-way platforms
+        body.setUserData("platform:" + polygonMapObject.getPolygon().getY());
         Shape shape = createPolygonShape(polygonMapObject);
         body.createFixture(shape, 1000);
 
