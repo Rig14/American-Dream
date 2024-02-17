@@ -32,15 +32,15 @@ public class Hud {
 
     public Hud(SpriteBatch spritebatch) {
 
-        //define our tracking variables
+        //define tracking variables
         // worldTimer can be changed while retaining correct formatting
         worldTimer = 300;
         int minutes = Math.floorDiv(worldTimer, 60);
         int seconds = worldTimer % minutes;
 
 
-        //setup the HUD viewport using a new camera separate from our main game camera
-        //define stage using that viewport and our games spritebatch
+        //setup the HUD viewport using a new camera separate from the main game camera
+        //define stage using HUD viewport and game's spritebatch
         viewport = new FitViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(), new OrthographicCamera());
         stage = new Stage(viewport, spritebatch);
 
@@ -62,7 +62,7 @@ public class Hud {
         secondPlayerLabel = new Label("BIDEN   ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         secondHealth = new Label("HP  99%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
-        //add labels to our table, padding the top, and giving them all equal width with expandX
+        //add labels to table, padding the top, and giving them all equal width with expandX
         table.add(firstPlayerLabel).expandX().padTop(10);
         table.add(timeLabel).expandX().padTop(10);
         table.add(secondPlayerLabel).expandX().padTop(10);
