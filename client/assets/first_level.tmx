@@ -27,11 +27,11 @@
 541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541,541
 </data>
  </layer>
- <objectgroup id="2" name="platform">
+ <objectgroup id="2" name="objects">
   <object id="1" name="platform" x="192" y="415.818" width="575.523" height="32.5909">
    <polygon points="0,0 575.523,0 575.523,32.5909 0,32.5909"/>
   </object>
-  <object id="15" name="player1" x="256.596" y="306.943" width="32" height="64"/>
+  <object id="15" name="player" x="256.596" y="306.943" width="32" height="64"/>
   <object id="16" name="Center" x="480" y="288">
    <point/>
   </object>

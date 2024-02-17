@@ -29,16 +29,18 @@ public class TileMapHelper {
     public OrthogonalTiledMapRenderer setupMap(String fileName) {
         // load map
         tiledMap = new TmxMapLoader().load(fileName);
-        parseMapObjects(tiledMap.getLayers().get("platform").getObjects());
+        parseMapObjects(tiledMap.getLayers().get("objects").getObjects());
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
 
     private void parseMapObjects(MapObjects mapObjects) {
         // parsing map objects
         for (MapObject mapObject : mapObjects) {
+            // these are platforms
             if (mapObject instanceof PolygonMapObject) {
                 createStaticBody((PolygonMapObject) mapObject);
             }
+            // this is for the player
             if (mapObject instanceof RectangleMapObject) {
                 Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
                 String rectangleName = mapObject.getName();
@@ -53,9 +55,7 @@ public class TileMapHelper {
                             false,
                             gameScreen.getWorld()
                     );
-                    if (rectangleName.contains("player")) {
-                        gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
-                    }
+                    gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
                 }
             }
             if (mapObject.getName().equals("Center")) {
