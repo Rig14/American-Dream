@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
 import objects.player.Player;
+import objects.player.RemotePlayerManager;
 
 import java.util.ArrayList;
 
@@ -28,9 +29,15 @@ public class GameScreen extends ScreenAdapter {
 
     private TileMapHelper tileMapHelper;
 
+    // ###################
     // game objects
+    // client player
     private Player player;
-    // center of the map
+    // remote players
+    private RemotePlayerManager remotePlayerManager;
+    // ###################
+
+    // center point of the map
     private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
@@ -45,6 +52,9 @@ public class GameScreen extends ScreenAdapter {
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+
+        // remote player manager
+        this.remotePlayerManager = new RemotePlayerManager();
     }
 
     @Override
@@ -76,6 +86,7 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
+        remotePlayerManager.renderPlayers(batch, player.getDimensions());
         for (Bullet bullet: bullets) {
             bullet.render(batch);
         }
@@ -86,6 +97,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void update() {
+        player.update();
+
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
