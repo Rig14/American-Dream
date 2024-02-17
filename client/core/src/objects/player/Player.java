@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
 import helper.packet.PlayerPositionMessage;
@@ -27,6 +28,7 @@ public class Player extends GameEntity {
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         handleInput();
+        handlePlatform();
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
@@ -62,6 +64,31 @@ public class Player extends GameEntity {
         }
 
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
+    }
+
+    /*
+     * Handle the platform.
+     * If player is below the platform, move it some random distance to the right
+     * If player is above the platform, move it back to the original position
+     * TODO: Make the logic less hacky
+     */
+    private void handlePlatform() {
+        Array<Body> bodies = new Array<Body>();
+        body.getWorld().getBodies(bodies);
+
+        for (Body b : bodies) {
+            if (b.getUserData() != null && b.getUserData().toString().contains("platform")) {
+                float height = Float.parseFloat(b.getUserData().toString().split(":")[1]);
+                height = height / PPM;
+                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000) {
+                    // bring back platform
+                    b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
+                } else if (body.getPosition().y - 2 < height && b.getPosition().x <= 2000) {
+                    // remove platform
+                    b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
+                }
+            }
+        }
     }
 
     @Override

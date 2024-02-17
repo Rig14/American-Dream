@@ -16,7 +16,7 @@ public class Constants {
 
     // the bounds of the map (for camera and player deaths)
     // higher means player can go further down
-    public static final float BOUNDS = -800f;
+    public static final float BOUNDS = 800f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
