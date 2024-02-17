@@ -9,7 +9,7 @@ import static helper.Constants.CAMERA_ZOOM;
 public class AmericanDream extends Game {
     public static AmericanDream INSTANCE;
     private OrthographicCamera camera;
-    private int screenWidth, screenHeight;
+    public int screenWidth, screenHeight;
 
     public AmericanDream() {
         INSTANCE = this;

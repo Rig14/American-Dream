@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.Hud;
 import helper.TileMapHelper;
 import objects.player.Player;
 
@@ -29,6 +30,7 @@ public class GameScreen extends ScreenAdapter {
     private Player player;
     // center of the map
     private Vector2 center;
+    private Hud hud;
 
     public GameScreen(OrthographicCamera camera) {
         this.camera = camera;
@@ -41,11 +43,18 @@ public class GameScreen extends ScreenAdapter {
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+
+        // create hud
+        this.hud = new Hud(batch);
     }
 
     @Override
     public void render(float delta) {
         this.update();
+
+        // create hud and add it to the GameScreen
+        batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
 
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
