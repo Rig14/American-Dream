@@ -74,7 +74,7 @@ public class Player extends GameEntity {
         return body.getPosition().scl(PPM);
     }
 
-    public Vector2 getDimentions() {
+    public Vector2 getDimensions() {
         return new Vector2(width, height);
     }
 }

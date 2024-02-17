@@ -10,13 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import helper.PlayerState;
 import helper.TileMapHelper;
-import helper.packet.GameStateMessage;
 import objects.player.Player;
-import objects.player.RemotePlayer;
+import objects.player.RemotePlayerManager;
 
 import static helper.Constants.*;
 
@@ -28,12 +24,15 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHelper tileMapHelper;
     // game objects
+    // ###################
+    // client player
     private Player player;
-    // center of the map
-
     // remote players
-    private RemotePlayer[] remotePlayers;
+    private RemotePlayerManager remotePlayerManager;
+    // ###################
+    // center point of the map
     private Vector2 center;
+
 
     public GameScreen(OrthographicCamera camera) {
         this.camera = camera;
@@ -46,6 +45,9 @@ public class GameScreen extends ScreenAdapter {
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+
+        // remote player manager
+        this.remotePlayerManager = new RemotePlayerManager();
     }
 
     @Override
@@ -60,13 +62,7 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
-                    rp.render(batch, player);
-                }
-            }
-        }
+        remotePlayerManager.renderPlayers(batch, player.getDimensions());
         batch.end();
 
         // for debugging
@@ -85,22 +81,6 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-
-        // get remote players data
-        AmericanDream.client.addListener(new Listener() {
-            public void received(Connection connection, Object object) {
-                if (object instanceof GameStateMessage) {
-                    GameStateMessage gameStateMessage = (GameStateMessage) object;
-                    // handle game state message
-                    remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
-                    for (PlayerState ps : gameStateMessage.playerStates) {
-                        if (ps.id != AmericanDream.id) {
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
-                        }
-                    }
-                }
-            }
-        });
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
