@@ -34,7 +34,7 @@ public class GameScreen extends ScreenAdapter {
     private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
-        this.bullets = new ArrayList<Bullet>();
+        this.bullets = new ArrayList<>();
         this.camera = camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -53,13 +53,13 @@ public class GameScreen extends ScreenAdapter {
 
         // shooting code
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            bullets.add(new Bullet(player.getPosition().x, player.getPosition().y, true));
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            bullets.add(new Bullet(player.getPosition().x, player.getPosition().y, false));
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
         }
         //update bullets
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
             bullet.update(delta);
             if (bullet.shouldRemove()) {
