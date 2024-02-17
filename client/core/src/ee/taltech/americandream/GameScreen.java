@@ -14,6 +14,8 @@ import helper.TileMapHelper;
 import objects.player.Player;
 import objects.player.RemotePlayerManager;
 
+import java.util.ArrayList;
+
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
@@ -21,9 +23,12 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
+
+    ArrayList<Bullet> bullets;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
+
     private TileMapHelper tileMapHelper;
-    
+
     // ###################
     // game objects
     // client player
@@ -35,8 +40,8 @@ public class GameScreen extends ScreenAdapter {
     // center point of the map
     private Vector2 center;
 
-
     public GameScreen(OrthographicCamera camera) {
+        this.bullets = new ArrayList<>();
         this.camera = camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -55,6 +60,23 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update();
+
+        // shooting code
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
+        }
+        //update bullets
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+        for (Bullet bullet : bullets) {
+            bullet.update(delta);
+            if (bullet.shouldRemove()) {
+                bulletsToRemove.add(bullet);
+            }
+        }
+        bullets.removeAll(bulletsToRemove);
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -65,6 +87,9 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
         // object rendering goes here
         remotePlayerManager.renderPlayers(batch, player.getDimensions());
+        for (Bullet bullet: bullets) {
+            bullet.render(batch);
+        }
         batch.end();
 
         // for debugging
@@ -83,6 +108,7 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
+        player.update();
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -120,7 +146,6 @@ public class GameScreen extends ScreenAdapter {
     public void setPlayer(Player player) {
         this.player = player;
     }
-
 
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
