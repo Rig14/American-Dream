@@ -35,7 +35,6 @@ public class Player extends GameEntity {
         positionMessage.direction = Direction.LEFT;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
-
     }
 
     private void handleInput() {
@@ -57,7 +56,7 @@ public class Player extends GameEntity {
             jumpCounter++;
         }
 
-        // reset jump counter
+        // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
             jumpCounter = 0;
         }
@@ -67,13 +66,17 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-
+        // here we can draw the player sprite eventually
     }
 
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
 
+    /*
+     * Get the dimensions of the player
+     * (width, height)
+     */
     public Vector2 getDimensions() {
         return new Vector2(width, height);
     }
