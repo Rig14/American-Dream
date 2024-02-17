@@ -58,7 +58,7 @@ public class Hud {
                 new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         // combining player name and heath label by using \n could make alignment easier
-        firstPlayerLabel = new Label("TRUMP\nddddd", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        firstPlayerLabel = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         firstHealth = new Label("  HP  16%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         secondPlayerLabel = new Label("BIDEN   ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         secondHealth = new Label("HP  99%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
@@ -75,5 +75,16 @@ public class Hud {
 
         //add table to the stage
         stage.addActor(table);
+    }
+    public void update(float deltaTime) {
+        // calculate time based on frames rendered
+        timeCount += deltaTime;
+        if (timeCount >= 1 && worldTimer >= 1) {
+            worldTimer--;
+            int minutes = Math.floorDiv(worldTimer, 60);
+            int seconds = worldTimer % 60;
+            countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
+            timeCount = 0;
+        }
     }
 }

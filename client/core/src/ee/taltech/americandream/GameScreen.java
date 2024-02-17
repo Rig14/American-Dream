@@ -51,7 +51,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        this.update();
+        this.update(delta);
 
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -72,7 +72,7 @@ public class GameScreen extends ScreenAdapter {
         hud.stage.draw();
     }
 
-    private void update() {
+    private void update(float delta) {
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
@@ -88,6 +88,7 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
+        hud.update(delta);
     }
 
     /**
