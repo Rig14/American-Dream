@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.americandream.AmericanDream;
+import com.badlogic.gdx.Gdx;
 
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
@@ -20,7 +20,6 @@ public class Hud {
     //score/time Tracking Variables
     public Integer worldTimer;
     private float timeCount;
-    private static Integer score;
 
     //labels to be displayed on the hud
     private Label countdownLabel;
@@ -42,7 +41,7 @@ public class Hud {
 
         //setup the HUD viewport using a new camera separate from our main game camera
         //define stage using that viewport and our games spritebatch
-        viewport = new FitViewport(AmericanDream.INSTANCE.screenWidth, AmericanDream.INSTANCE.screenHeight, new OrthographicCamera());
+        viewport = new FitViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(), new OrthographicCamera());
         stage = new Stage(viewport, spritebatch);
 
         //define a table used to organize the hud's labels

@@ -29,21 +29,23 @@ public class TileMapHelper {
     public OrthogonalTiledMapRenderer setupMap(String fileName) {
         // load map
         tiledMap = new TmxMapLoader().load(fileName);
-        parseMapObjects(tiledMap.getLayers().get("platform").getObjects());
+        parseMapObjects(tiledMap.getLayers().get("objects").getObjects());
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
 
     private void parseMapObjects(MapObjects mapObjects) {
         // parsing map objects
         for (MapObject mapObject : mapObjects) {
+            // these are platforms
             if (mapObject instanceof PolygonMapObject) {
                 createStaticBody((PolygonMapObject) mapObject);
             }
+            // this is for the player
             if (mapObject instanceof RectangleMapObject) {
                 Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
                 String rectangleName = mapObject.getName();
 
-                if (rectangleName.equals("player")) {
+                if (rectangleName.contains("player")) {
                     // creating player
                     Body body = BodyHelperService.createBody(
                             rectangle.getX() + rectangle.getWidth() / 2,
@@ -69,6 +71,8 @@ public class TileMapHelper {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         Body body = gameScreen.getWorld().createBody(bodyDef);
+        // to get the platforms y coordinate for one-way platforms
+        body.setUserData("platform:" + polygonMapObject.getPolygon().getY());
         Shape shape = createPolygonShape(polygonMapObject);
         body.createFixture(shape, 1000);
 

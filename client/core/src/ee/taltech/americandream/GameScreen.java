@@ -13,27 +13,37 @@ import com.badlogic.gdx.physics.box2d.World;
 import helper.Hud;
 import helper.TileMapHelper;
 import objects.player.Player;
+import objects.player.RemotePlayerManager;
+
+import java.util.ArrayList;
 
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
+    ArrayList<Bullet> bullets;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
-
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
 
     private TileMapHelper tileMapHelper;
 
+    // ###################
     // game objects
+    // client player
     private Player player;
-    // center of the map
+    // remote players
+    private RemotePlayerManager remotePlayerManager;
+    // ###################
+
+    // center point of the map
     private Vector2 center;
     // game screen overlay
     private Hud hud;
 
     public GameScreen(OrthographicCamera camera) {
+        this.bullets = new ArrayList<>();
         this.camera = camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -45,6 +55,9 @@ public class GameScreen extends ScreenAdapter {
         this.tileMapHelper = new TileMapHelper(this);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
 
+        // remote player manager
+        this.remotePlayerManager = new RemotePlayerManager();
+
         // create hud
         this.hud = new Hud(this.batch);
     }
@@ -53,6 +66,22 @@ public class GameScreen extends ScreenAdapter {
     public void render(float delta) {
         this.update(delta);
 
+        // shooting code
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
+        }
+        //update bullets
+        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+        for (Bullet bullet : bullets) {
+            bullet.update(delta);
+            if (bullet.shouldRemove()) {
+                bulletsToRemove.add(bullet);
+            }
+        }
+        bullets.removeAll(bulletsToRemove);
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -62,6 +91,10 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
+        remotePlayerManager.renderPlayers(batch, player.getDimensions());
+        for (Bullet bullet : bullets) {
+            bullet.render(batch);
+        }
         batch.end();
 
         // for debugging
@@ -73,6 +106,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void update(float delta) {
+        player.update();
+
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
@@ -99,7 +134,7 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.getPosition().y < BOUNDS) {
+        if (player.getPosition().y < -BOUNDS) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();
