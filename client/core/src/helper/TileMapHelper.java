@@ -43,7 +43,7 @@ public class TileMapHelper {
                 Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
                 String rectangleName = mapObject.getName();
 
-                if (rectangleName.equals("player")) {
+                if (rectangleName.contains("player")) {
                     // creating player
                     Body body = BodyHelperService.createBody(
                             rectangle.getX() + rectangle.getWidth() / 2,
@@ -53,7 +53,9 @@ public class TileMapHelper {
                             false,
                             gameScreen.getWorld()
                     );
-                    gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
+                    if (rectangleName.contains("player")) {
+                        gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
+                    }
                 }
             }
             if (mapObject.getName().equals("Center")) {

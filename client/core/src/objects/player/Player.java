@@ -5,6 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import ee.taltech.americandream.AmericanDream;
+import helper.Direction;
+import helper.packet.PlayerPositionMessage;
 
 import static helper.Constants.*;
 
@@ -24,6 +27,15 @@ public class Player extends GameEntity {
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         handleInput();
+
+        // construct player position message to be sent to the server
+        PlayerPositionMessage positionMessage = new PlayerPositionMessage();
+        positionMessage.x = x;
+        positionMessage.y = y;
+        positionMessage.direction = Direction.LEFT;
+        // send player position message to the server
+        AmericanDream.client.sendUDP(positionMessage);
+
     }
 
     private void handleInput() {
@@ -60,5 +72,9 @@ public class Player extends GameEntity {
 
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
+    }
+
+    public Vector2 getDimentions() {
+        return new Vector2(width, height);
     }
 }

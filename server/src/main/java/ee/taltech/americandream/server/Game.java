@@ -26,7 +26,11 @@ public class Game extends Thread {
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {
                     gameStateMessage.playerStates[i] = players[i].getState();
+                    // log game state message
+                    PlayerState ps = gameStateMessage.playerStates[i];
+                    System.out.print(ps.id + " at (" + ps.x + ", " + ps.y + "), ");
                 }
+                System.out.println();
                 // send game state message to all players
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);

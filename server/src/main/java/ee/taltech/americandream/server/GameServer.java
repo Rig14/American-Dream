@@ -4,6 +4,11 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import helper.Direction;
+import helper.PlayerState;
+import helper.packet.GameStateMessage;
+import helper.packet.IDMessage;
+import helper.packet.PlayerPositionMessage;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,14 +23,14 @@ public class GameServer {
     public GameServer() {
         // setup server and open ports
         this.server = new Server();
+        // register used classes
+        registerClasses();
         try {
             server.start();
             server.bind(PORTS[0], PORTS[1]);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        // register used classes
-        registerClasses();
 
         // add listener for new connections
         server.addListener(new Listener() {
@@ -39,6 +44,10 @@ public class GameServer {
                     // if connection is empty or not connected, add new connection
                     if (connections[i] == null || !connections[i].isConnected()) {
                         connections[i] = connection;
+                        // send id message
+                        IDMessage idMessage = new IDMessage();
+                        idMessage.id = i + 1;
+                        connection.sendTCP(idMessage);
                         break;
                     }
                 }
@@ -60,6 +69,11 @@ public class GameServer {
     private void registerClasses() {
         // register classes for serialization
         Kryo kryo = server.getKryo();
-
+        kryo.register(GameStateMessage.class);
+        kryo.register(PlayerPositionMessage.class);
+        kryo.register(PlayerState[].class);
+        kryo.register(PlayerState.class);
+        kryo.register(Direction.class);
+        kryo.register(IDMessage.class);
     }
 }

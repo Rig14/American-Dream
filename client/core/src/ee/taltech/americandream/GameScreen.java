@@ -4,13 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import helper.PlayerState;
 import helper.TileMapHelper;
+import helper.packet.GameStateMessage;
 import objects.player.Player;
 
 import static helper.Constants.*;
@@ -20,14 +25,13 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
-
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
-
     private TileMapHelper tileMapHelper;
-
     // game objects
     private Player player;
     // center of the map
+
+    private float remoteX, remoteY;
     private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
@@ -46,7 +50,6 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update();
-
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -56,6 +59,9 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
+        Texture playerTexture = new Texture("badlogic.jpg");
+        batch.draw(playerTexture, remoteX, remoteY - player.getDimentions().y / 2, player.getDimentions().x, player.getDimentions().y);
+
         batch.end();
 
         // for debugging
@@ -63,6 +69,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void update() {
+        player.update();
+
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
@@ -72,7 +80,22 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        player.update();
+
+        // get remote players data
+        AmericanDream.client.addListener(new Listener() {
+            public void received(Connection connection, Object object) {
+                if (object instanceof GameStateMessage) {
+                    GameStateMessage gameStateMessage = (GameStateMessage) object;
+                    // handle game state message
+                    for (PlayerState ps : gameStateMessage.playerStates) {
+                        if (ps.id != AmericanDream.id) {
+                            remoteX = ps.x;
+                            remoteY = ps.y;
+                        }
+                    }
+                }
+            }
+        });
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -110,6 +133,7 @@ public class GameScreen extends ScreenAdapter {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
 
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
