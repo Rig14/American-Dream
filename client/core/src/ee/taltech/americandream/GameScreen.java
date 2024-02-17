@@ -30,6 +30,7 @@ public class GameScreen extends ScreenAdapter {
     private Player player;
     // center of the map
     private Vector2 center;
+    // game screen overlay
     private Hud hud;
 
     public GameScreen(OrthographicCamera camera) {
@@ -45,16 +46,12 @@ public class GameScreen extends ScreenAdapter {
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
 
         // create hud
-        this.hud = new Hud(batch);
+        this.hud = new Hud(this.batch);
     }
 
     @Override
     public void render(float delta) {
         this.update();
-
-        // create hud and add it to the GameScreen
-        batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        hud.stage.draw();
 
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -69,6 +66,10 @@ public class GameScreen extends ScreenAdapter {
 
         // for debugging
         debugRenderer.render(world, camera.combined.scl(PPM));
+
+        // create hud and add it to the GameScreen
+        this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
     }
 
     private void update() {
