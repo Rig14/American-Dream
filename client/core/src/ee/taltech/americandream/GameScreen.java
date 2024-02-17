@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +16,7 @@ import helper.PlayerState;
 import helper.TileMapHelper;
 import helper.packet.GameStateMessage;
 import objects.player.Player;
+import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
 
@@ -31,7 +31,8 @@ public class GameScreen extends ScreenAdapter {
     private Player player;
     // center of the map
 
-    private float remoteX, remoteY;
+    // remote players
+    private RemotePlayer[] remotePlayers;
     private Vector2 center;
 
     public GameScreen(OrthographicCamera camera) {
@@ -59,9 +60,14 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        Texture playerTexture = new Texture("badlogic.jpg");
-        batch.draw(playerTexture, remoteX, remoteY - player.getDimentions().y / 2, player.getDimentions().x, player.getDimentions().y);
-
+        if (remotePlayers != null) {
+            for (RemotePlayer rp : remotePlayers) {
+                if (rp != null) {
+                    Gdx.app.log("RemotePlayer", rp.getX() + " " + rp.getY());
+                    rp.render(batch, player);
+                }
+            }
+        }
         batch.end();
 
         // for debugging
@@ -87,10 +93,10 @@ public class GameScreen extends ScreenAdapter {
                 if (object instanceof GameStateMessage) {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
                     // handle game state message
+                    remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
-                            remoteX = ps.x;
-                            remoteY = ps.y;
+                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
                 }
