@@ -23,13 +23,15 @@ public class GameScreen extends ScreenAdapter {
     private Box2DDebugRenderer debugRenderer;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHelper tileMapHelper;
-    // game objects
+    
     // ###################
+    // game objects
     // client player
     private Player player;
     // remote players
     private RemotePlayerManager remotePlayerManager;
     // ###################
+
     // center point of the map
     private Vector2 center;
 
