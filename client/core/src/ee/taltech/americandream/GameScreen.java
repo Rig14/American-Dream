@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.Hud;
 import helper.TileMapHelper;
 import objects.player.Player;
 import objects.player.RemotePlayerManager;
@@ -38,6 +39,8 @@ public class GameScreen extends ScreenAdapter {
 
     // center point of the map
     private Vector2 center;
+    // game screen overlay
+    private Hud hud;
 
     public GameScreen(OrthographicCamera camera) {
         this.bullets = new ArrayList<>();
@@ -54,11 +57,14 @@ public class GameScreen extends ScreenAdapter {
 
         // remote player manager
         this.remotePlayerManager = new RemotePlayerManager();
+
+        // create hud
+        this.hud = new Hud(this.batch);
     }
 
     @Override
     public void render(float delta) {
-        this.update();
+        this.update(delta);
 
         // shooting code
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
@@ -93,9 +99,13 @@ public class GameScreen extends ScreenAdapter {
 
         // for debugging
         debugRenderer.render(world, camera.combined.scl(PPM));
+
+        // create hud and add it to the GameScreen
+        this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
     }
 
-    private void update() {
+    private void update(float delta) {
         player.update();
 
         // updates objects in the world
@@ -103,7 +113,7 @@ public class GameScreen extends ScreenAdapter {
 
         // update the camera position
         cameraUpdate();
-        
+
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
@@ -113,6 +123,7 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
+        hud.update(delta);
     }
 
     /**
