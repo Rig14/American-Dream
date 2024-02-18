@@ -1,40 +1,79 @@
 package ee.taltech.americandream.server;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import helper.Direction;
+import helper.PlayerState;
+import helper.packet.GameStateMessage;
+import helper.packet.IDMessage;
+import helper.packet.PlayerPositionMessage;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Arrays;
+
+import static helper.Constants.LOBBY_SIZE;
+import static helper.Constants.PORTS;
 
 public class GameServer {
-    private Server server = new Server();
-
-    private Point player = new Point(0, 0);
+    private Server server;
 
     public GameServer() {
+        // setup server and open ports
         this.server = new Server();
+        // register used classes
+        registerClasses();
         try {
             server.start();
-            server.bind(8080, 8081);
+            server.bind(PORTS[0], PORTS[1]);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        server.addListener(new Listener(){
-            public void received(Connection connection, Object object) {
-                if (!(object instanceof String request)) return;
-                if (request.equals("Left")) {
-                    player.x -= 1;
+
+        // add listener for new connections
+        server.addListener(new Listener() {
+            Connection[] connections = new Connection[LOBBY_SIZE];
+
+            @Override
+            public void connected(Connection connection) {
+                super.connected(connection);
+                // loop through connections and add new connection to first empty slot
+                for (int i = 0; i < connections.length; i++) {
+                    // if connection is empty or not connected, add new connection
+                    if (connections[i] == null || !connections[i].isConnected()) {
+                        connections[i] = connection;
+                        // send id message
+                        IDMessage idMessage = new IDMessage();
+                        idMessage.id = i + 1;
+                        connection.sendTCP(idMessage);
+                        break;
+                    }
                 }
-                if (request.equals("Right")) {
-                    player.x += 1;
+                if (Arrays.stream(connections).allMatch(c -> c != null && c.isConnected())) {
+                    // if all connections are filled, start game with the connections
+                    Game game = new Game(connections);
+                    game.start();
+                    // clear connections if all are connected and game is started
+                    connections = new Connection[LOBBY_SIZE];
                 }
-                connection.sendTCP(player.x + "," + player.y);
             }
         });
     }
 
     public static void main(String[] args) {
-        GameServer gameServer = new GameServer();
+        new GameServer();
+    }
+
+    private void registerClasses() {
+        // register classes for serialization
+        Kryo kryo = server.getKryo();
+        kryo.register(GameStateMessage.class);
+        kryo.register(PlayerPositionMessage.class);
+        kryo.register(PlayerState[].class);
+        kryo.register(PlayerState.class);
+        kryo.register(Direction.class);
+        kryo.register(IDMessage.class);
     }
 }
