@@ -17,6 +17,8 @@ public class Constants {
     // the bounds of the map (for camera and player deaths)
     // higher means player can go further down
     public static final float BOUNDS = 800f;
+    // how long player must hold down the down key to fall through the platform
+    public static final float PLATFORM_DESCENT = 1f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
