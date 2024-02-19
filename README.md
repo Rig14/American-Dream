@@ -31,6 +31,14 @@ Click 'run' located in client\Tasks\other\
 
 Click 'run' again to create an additional client for the same server
 
+### Game keys
+
+* 'Left' - Shoot bullets to the left
+* 'Right' - Shoot bullets to the right
+* 'A' - Move left
+* 'D' - Move right
+* 'W' - Jump
+* 'S' (hold) - Drop through a platform
 
 ## Contributing
 
