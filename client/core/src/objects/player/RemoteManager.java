@@ -8,10 +8,10 @@ import ee.taltech.americandream.AmericanDream;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 
-public class RemotePlayerManager {
+public class RemoteManager {
     private RemotePlayer[] remotePlayers;
 
-    public RemotePlayerManager() {
+    public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
