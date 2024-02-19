@@ -96,7 +96,6 @@ public class Player extends GameEntity {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
-                Gdx.app.log("kdt", String.valueOf(keyDownTime));
             }
         }
     }
