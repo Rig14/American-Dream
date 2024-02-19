@@ -17,6 +17,8 @@ public class Player extends GameEntity {
 
     private int jumpCounter;
 
+    private float keyDownTime = 0;
+
     public Player(float width, float height, Body body) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
@@ -24,10 +26,10 @@ public class Player extends GameEntity {
     }
 
     @Override
-    public void update() {
+    public void update(float delta) {
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
-        handleInput();
+        handleInput(delta);
         handlePlatform();
 
         // construct player position message to be sent to the server
@@ -39,7 +41,7 @@ public class Player extends GameEntity {
         AmericanDream.client.sendUDP(positionMessage);
     }
 
-    private void handleInput() {
+    private void handleInput(float delta) {
         velX = 0;
         // Moving right
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -56,6 +58,13 @@ public class Player extends GameEntity {
             body.setLinearVelocity(body.getLinearVelocity().x, 0);
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
             jumpCounter++;
+        }
+
+        // key down on platform
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            keyDownTime += delta;
+        } else {
+            keyDownTime = 0;
         }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
@@ -80,10 +89,10 @@ public class Player extends GameEntity {
             if (b.getUserData() != null && b.getUserData().toString().contains("platform")) {
                 float height = Float.parseFloat(b.getUserData().toString().split(":")[1]);
                 height = height / PPM;
-                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000) {
+                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.1)) {
                     // bring back platform
                     b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
-                } else if (body.getPosition().y - 2 < height && b.getPosition().x <= 2000) {
+                } else if ((body.getPosition().y - 2 < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.1)) && b.getPosition().x <= 2000) {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
