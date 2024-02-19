@@ -63,10 +63,8 @@ public class Player extends GameEntity {
         // key down on platform
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             keyDownTime += delta;
-            if (keyDownTime > PLATFORM_DESCENT) {
-                keyDownTime = 0;
-                
-            }
+        } else {
+            keyDownTime = 0;
         }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
@@ -91,10 +89,10 @@ public class Player extends GameEntity {
             if (b.getUserData() != null && b.getUserData().toString().contains("platform")) {
                 float height = Float.parseFloat(b.getUserData().toString().split(":")[1]);
                 height = height / PPM;
-                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000) {
+                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && keyDownTime < PLATFORM_DESCENT) {
                     // bring back platform
                     b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
-                } else if (body.getPosition().y - 2 < height && b.getPosition().x <= 2000) {
+                } else if ((body.getPosition().y - 2 < height || keyDownTime >= PLATFORM_DESCENT) && b.getPosition().x <= 2000) {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
