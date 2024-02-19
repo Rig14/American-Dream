@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import helper.Direction;
+import helper.packet.BulletPositionMessage;
+import helper.packet.PlayerPositionMessage;
 
 import java.util.Vector;
 
@@ -29,7 +32,15 @@ public class Bullet {
         if (x > Gdx.graphics.getWidth() * 1.7 || x < -200 || y > Gdx.graphics.getHeight() * 1.7 || y < -200) {
             remove = true;
         }
+        // construct bullet position message to be sent to the server
+        BulletPositionMessage positionMessage = new BulletPositionMessage();
+        positionMessage.x = x;
+        positionMessage.y = y;
+        positionMessage.shootRight = false;
+        // send player bullet message to the server
+        AmericanDream.client.sendUDP(positionMessage);
     }
+
 
     public void render(SpriteBatch batch) {
         batch.draw(texture, x, y);

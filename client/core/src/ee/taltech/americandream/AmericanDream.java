@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
+import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
@@ -60,6 +62,8 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
+        kryo.register(BulletPositionMessage.class);
+        kryo.register(BulletData.class);
     }
 
     /*
