@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import helper.Hud;
 import helper.TileMapHelper;
 import objects.player.Player;
-import objects.player.RemotePlayerManager;
+import objects.player.RemoteManager;
 
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ public class GameScreen extends ScreenAdapter {
     // client player
     private Player player;
     // remote players
-    private RemotePlayerManager remotePlayerManager;
+    private RemoteManager remoteManager;
     // ###################
 
     // center point of the map
@@ -56,7 +56,7 @@ public class GameScreen extends ScreenAdapter {
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
 
         // remote player manager
-        this.remotePlayerManager = new RemotePlayerManager();
+        this.remoteManager = new RemoteManager();
 
         // create hud
         this.hud = new Hud(this.batch);
@@ -91,7 +91,7 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        remotePlayerManager.renderPlayers(batch, player.getDimensions());
+        remoteManager.renderPlayers(batch, player.getDimensions());
         for (Bullet bullet : bullets) {
             bullet.render(batch);
         }
@@ -115,7 +115,7 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        player.update(delta);
+        player.update(delta, center);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
