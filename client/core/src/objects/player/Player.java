@@ -18,6 +18,7 @@ public class Player extends GameEntity {
     private int jumpCounter;
 
     private float keyDownTime = 0;
+    private float timeTillRespawn = 0;
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
@@ -32,7 +33,7 @@ public class Player extends GameEntity {
         y = body.getPosition().y * PPM;
         handleInput(delta);
         handlePlatform();
-        handleOutOfBounds(center);
+        handleOutOfBounds(delta, center);
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
@@ -122,10 +123,18 @@ public class Player extends GameEntity {
     /*
      * Checks if player is out of bounds and handles it (respawn)
      */
-    private void handleOutOfBounds(Vector2 center) {
-        if (y < -BOUNDS * 4) {
-            body.setTransform(center.x / PPM, center.y / PPM * 4, 0);
-            body.setLinearVelocity(0, 0);
+    private void handleOutOfBounds(float delta, Vector2 center) {
+        if (y < -BOUNDS) {
+            if (timeTillRespawn <= RESPAWN_TIME) {
+                // wait for respawn time
+                timeTillRespawn += delta;
+            } else {
+                // respawn player
+                body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
+                body.setLinearVelocity(0, 0);
+                // set time till respawn to 0
+                timeTillRespawn = 0;
+            }
         }
     }
 }
