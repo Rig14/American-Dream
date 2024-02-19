@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
+import objects.bullet.RemoteBulletManager;
 import objects.player.Player;
 import objects.player.RemotePlayerManager;
 
@@ -25,6 +26,7 @@ public class GameScreen extends ScreenAdapter {
     private Box2DDebugRenderer debugRenderer;
 
     ArrayList<Bullet> bullets;
+    private RemoteBulletManager remoteBulletManager;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
 
     private TileMapHelper tileMapHelper;
@@ -36,6 +38,7 @@ public class GameScreen extends ScreenAdapter {
     // remote players
     private RemotePlayerManager remotePlayerManager;
     // ###################
+    private Vector2 bulletDimensions = new Vector2(100, 100);
 
     // center point of the map
     private Vector2 center;
@@ -55,6 +58,7 @@ public class GameScreen extends ScreenAdapter {
 
         // remote player manager
         this.remotePlayerManager = new RemotePlayerManager();
+        this.remoteBulletManager = new RemoteBulletManager();
     }
 
     @Override
@@ -87,6 +91,7 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
         // object rendering goes here
         remotePlayerManager.renderPlayers(batch, player.getDimensions());
+        remoteBulletManager.renderBullets(batch, bulletDimensions);
         for (Bullet bullet: bullets) {
             bullet.render(batch);
         }
@@ -137,6 +142,9 @@ public class GameScreen extends ScreenAdapter {
         camera.position.y = center.y + vector.y / CAMERA_SPEED;
         // update the camera
         camera.update();
+    }
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
     }
 
     public World getWorld() {

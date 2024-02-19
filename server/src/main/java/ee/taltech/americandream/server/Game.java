@@ -15,8 +15,8 @@ public class Game extends Thread {
     private Player[] players;
     private List<Bullet> bullets;
     public Game(Connection[] connections) {
-        players = new Player[connections.length];
         bullets = new ArrayList<>();
+        players = new Player[connections.length];
         // start game with connections
         // make players from connections
         for (int i = 0; i < connections.length; i++) {
@@ -29,14 +29,17 @@ public class Game extends Thread {
             try {
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
-                // Get bullet data from bullets
-                List<BulletData> bulletDataList = new ArrayList<>();
                 // Populate bullet data list
                 for (Bullet bullet : bullets) {
-                    gameStateMessage.bulletData.add(bullet.getData());
+                    gameStateMessage.bulletDataList.add(bullet.getData());
+
+                    bullet.sendGameState(gameStateMessage);
+                    System.out.println("sent gamestate bullet");
                 }
+
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {
+                    System.out.println("received gamestate player");
                     gameStateMessage.playerStates[i] = players[i].getState();
                     // log game state message
                     PlayerState ps = gameStateMessage.playerStates[i];

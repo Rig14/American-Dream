@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import helper.Constants;
 import helper.Direction;
 import helper.packet.BulletPositionMessage;
 import helper.packet.PlayerPositionMessage;
@@ -11,7 +12,7 @@ import helper.packet.PlayerPositionMessage;
 import java.util.Vector;
 
 public class Bullet {
-    private static final float SPEED = 500f; // adjust speed as needed
+    private static final float SPEED = Constants.BULLET_SPEED; // adjust speed as needed
     private static Texture texture;
     private float x, y;
     private Vector2 velocity;
@@ -26,6 +27,7 @@ public class Bullet {
         }
     }
 
+
     public void update(float deltaTime) {
         x += velocity.x * deltaTime;
         y += velocity.y * deltaTime;
@@ -36,9 +38,10 @@ public class Bullet {
         BulletPositionMessage positionMessage = new BulletPositionMessage();
         positionMessage.x = x;
         positionMessage.y = y;
-        positionMessage.shootRight = false;
+        positionMessage.speedBullet = Constants.BULLET_SPEED;
         // send player bullet message to the server
         AmericanDream.client.sendUDP(positionMessage);
+        System.out.println("sent bulletpos");
     }
 
 
