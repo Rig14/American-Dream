@@ -2,6 +2,8 @@ package objects.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -10,13 +12,14 @@ import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.Objects;
+
 import static helper.Constants.*;
 
 public class Player extends GameEntity {
     private final float speed;
-
+    private Direction direction;
     private int jumpCounter;
-
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
 
@@ -24,6 +27,7 @@ public class Player extends GameEntity {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
+        this.direction = Direction.RIGHT;
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
 
@@ -34,6 +38,7 @@ public class Player extends GameEntity {
         handleInput(delta);
         handlePlatform();
         handleOutOfBounds(delta, center);
+        direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
@@ -45,18 +50,25 @@ public class Player extends GameEntity {
     }
 
     private void handleInput(float delta) {
+        Controller controller = Controllers.getCurrent();
         velX = 0;
         // Moving right
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || (controller != null &&
+                controller.getButton(controller.getMapping().buttonDpadRight) ||
+                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
+        )) {
             velX = 1;
         }
         // Moving left
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || (controller != null &&
+                controller.getButton(controller.getMapping().buttonDpadLeft) ||
+                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f)) {
             velX = -1;
         }
 
         // Jumping
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W) && jumpCounter < JUMP_COUNT) {
+        if (jumpCounter < JUMP_COUNT && Gdx.input.isKeyJustPressed(Input.Keys.W) || (controller != null &&
+                controller.getButton(controller.getMapping().buttonA))) {
             float force = body.getMass() * JUMP_FORCE;
             body.setLinearVelocity(body.getLinearVelocity().x, 0);
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
@@ -64,7 +76,9 @@ public class Player extends GameEntity {
         }
 
         // key down on platform
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || (controller != null &&
+                controller.getButton(controller.getMapping().buttonDpadDown) ||
+                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f)) {
             keyDownTime += delta;
         } else {
             keyDownTime = 0;
@@ -136,5 +150,9 @@ public class Player extends GameEntity {
                 timeTillRespawn = 0;
             }
         }
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }
