@@ -5,11 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import helper.Constants;
-import helper.Direction;
 import helper.packet.BulletPositionMessage;
-import helper.packet.PlayerPositionMessage;
 
-import java.util.Vector;
 
 public class Bullet {
     private static final float SPEED = Constants.BULLET_SPEED; // adjust speed as needed
