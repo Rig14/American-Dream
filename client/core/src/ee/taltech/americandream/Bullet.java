@@ -38,8 +38,7 @@ public class Bullet {
         positionMessage.speedBullet = Constants.BULLET_SPEED;
         // send player bullet message to the server
         AmericanDream.client.sendUDP(positionMessage);
-        System.out.println("sent bulletpos");
-    }
+        System.out.println("Sent bullet position: " + positionMessage.x + ", " + positionMessage.y + ", " + positionMessage.speedBullet);    }
 
 
     public void render(SpriteBatch batch) {
