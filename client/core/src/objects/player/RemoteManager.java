@@ -7,13 +7,10 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
-import helper.packet.TimeMessage;
-import helper.Hud;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
-    private Hud hud = new Hud();
-
+    private int gameTime;
     public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
@@ -26,13 +23,8 @@ public class RemoteManager {
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
-                } else if (object instanceof TimeMessage) {
-                    TimeMessage timeMessage = (TimeMessage) object;
-                    int time = timeMessage.seconds;
-                    System.out.println(timeMessage.seconds);
-                    System.out.println(time);
-                    // handle time message
-                    hud.update(time);
+                    // Game duration in seconds, changes occur in server
+                    gameTime = (gameStateMessage.gameTime);
                 }
             }
         });
@@ -46,5 +38,10 @@ public class RemoteManager {
                 }
             }
         }
+    }
+
+    // mainly used to update hud time
+    public int getGameTime() {
+        return this.gameTime;
     }
 }

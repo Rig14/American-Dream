@@ -11,7 +11,6 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
-import helper.packet.TimeMessage;
 
 import static helper.Constants.*;
 
@@ -61,7 +60,6 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
-        kryo.register(TimeMessage.class);
     }
 
     /*

@@ -6,7 +6,6 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
-import helper.packet.TimeMessage;
 
 public class Player {
     private final int id;
@@ -67,9 +66,5 @@ public class Player {
     public void sendGameState(GameStateMessage gameStateMessage) {
         // send game state message
         connection.sendUDP(gameStateMessage);
-    }
-
-    public void sendTimeMessage(TimeMessage time) {
-        connection.sendTCP(time);
     }
 }

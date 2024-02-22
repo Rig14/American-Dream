@@ -121,7 +121,9 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
-        hud.update(Hud.worldTimer);
+
+        // update hud, currently used for timer
+        hud.update(remoteManager.getGameTime());
     }
 
     /**

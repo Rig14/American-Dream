@@ -17,30 +17,15 @@ public class Hud {
     public Stage stage;
     private Viewport viewport;
 
-    //score/time Tracking Variables
-    public static int worldTimer = 1;
-    private float timeCount;
-
     //labels to be displayed on the hud
     private static Label countdownLabel;
     private Label timeLabel;
-
     private Label firstPlayerLabel;
     private Label firstHealth;
     private Label secondPlayerLabel;
     private Label secondHealth;
 
-    public Hud() {
-    }
-
     public Hud(SpriteBatch spritebatch) {
-
-        //define tracking variables
-        // worldTimer can be changed while retaining correct formatting
-         worldTimer = 300;
-        int minutes = Math.floorDiv(worldTimer, 60);
-        int seconds = worldTimer % minutes;
-
 
         //setup the HUD viewport using a new camera separate from the main game camera
         //define stage using HUD viewport and game's spritebatch
@@ -56,9 +41,7 @@ public class Hud {
 
         //define labels
         timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        countdownLabel = new Label( minutes + ":" + String.format("%02d", seconds),
-                new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-
+        countdownLabel = new Label( "Waiting for other player...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         // combining player name and heath label by using \n could make alignment easier
         firstPlayerLabel = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         firstHealth = new Label("  HP  16%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
@@ -78,25 +61,13 @@ public class Hud {
         //add table to the stage
         stage.addActor(table);
     }
-    /*
-    public void update(float deltaTime) {
-        // calculate time based on frames rendered
-        timeCount += deltaTime;
-        if (timeCount >= 1 && worldTimer >= 1) {
 
-            worldTimer--;
-            int minutes = Math.floorDiv(worldTimer, 60);
-            int seconds = worldTimer % 60;
-            countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
-            timeCount = 0;
-        }
-    }
-
-     */
+    // update displayed game time
     public void update(int time) {
-        worldTimer = time;
-        int minutes = Math.floorDiv(worldTimer, 60);
-        int seconds = worldTimer % 60;
-        countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
+        if (time > 0) {
+            int minutes = Math.floorDiv(time, 60);
+            int seconds = time % 60;
+            countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
+        }
     }
 }

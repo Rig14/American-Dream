@@ -3,16 +3,18 @@ package ee.taltech.americandream.server;
 import com.esotericsoftware.kryonet.Connection;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
-import helper.packet.TimeMessage;
-import helper.Time;
 
+import static helper.Constants.GAME_DURATION;
 import static helper.Constants.TICK_RATE;
 
 public class Game extends Thread {
+
+    private float gameTime;
     private boolean running = true;
     private Player[] players;
-    private Time time = new Time();
     public Game(Connection[] connections) {
+        // set game duration
+        this.gameTime = GAME_DURATION;
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
@@ -24,18 +26,9 @@ public class Game extends Thread {
     public void run() {
         while (running) {
             try {
-                // construct time message if the time has changed
-                if (time.update((float) 1 / TICK_RATE)) {  // should be replaced with "server deltaTime"
-                    TimeMessage timeMessage = new TimeMessage();
-                    timeMessage.seconds = time.getRemainingTime();
-                    // send game time message to all players;
-                    for (Player player : players) {
-                        player.sendTimeMessage(timeMessage);
-                    }
-                    System.out.println("here");
-                }
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
+                gameStateMessage.gameTime = Math.round(gameTime);
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {
                     gameStateMessage.playerStates[i] = players[i].getState();
@@ -46,8 +39,14 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);
                 }
-                // message is sent every game tick
+                // decrement game time
+                gameTime -= 1f / TICK_RATE;
+                // end game
+                if (gameTime <= 0) {
+                    this.end();
+                }
                 Thread.sleep(1000 / TICK_RATE);
+
             } catch (InterruptedException e) {
                 running = false;
             }
