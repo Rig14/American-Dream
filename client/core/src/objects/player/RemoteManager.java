@@ -7,9 +7,12 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
+import helper.packet.TimeMessage;
+import helper.Hud;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
+    private Hud hud = new Hud();
 
     public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
@@ -23,6 +26,13 @@ public class RemoteManager {
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
+                } else if (object instanceof TimeMessage) {
+                    TimeMessage timeMessage = (TimeMessage) object;
+                    int time = timeMessage.seconds;
+                    System.out.println(timeMessage.seconds);
+                    System.out.println(time);
+                    // handle time message
+                    hud.update(time);
                 }
             }
         });

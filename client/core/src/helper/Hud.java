@@ -83,6 +83,7 @@ public class Hud {
         // calculate time based on frames rendered
         timeCount += deltaTime;
         if (timeCount >= 1 && worldTimer >= 1) {
+
             worldTimer--;
             int minutes = Math.floorDiv(worldTimer, 60);
             int seconds = worldTimer % 60;
