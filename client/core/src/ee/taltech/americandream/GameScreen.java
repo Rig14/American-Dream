@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -67,10 +68,14 @@ public class GameScreen extends ScreenAdapter {
         this.update(delta);
 
         // shooting code
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
             bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
             bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
         }
         //update bullets
