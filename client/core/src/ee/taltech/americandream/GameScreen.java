@@ -54,7 +54,7 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
 
         // remote player manager
         this.remoteManager = new RemoteManager();
@@ -139,7 +139,12 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.getPosition().y < -BOUNDS) {
+        if (
+                player.getPosition().y > center.y + BOUNDS
+                        || player.getPosition().y < center.y - BOUNDS
+                        || player.getPosition().x > center.x + BOUNDS
+                        || player.getPosition().x < center.x - BOUNDS
+        ) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();
