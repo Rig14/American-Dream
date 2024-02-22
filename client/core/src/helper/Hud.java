@@ -18,11 +18,11 @@ public class Hud {
     private Viewport viewport;
 
     //score/time Tracking Variables
-    public Integer worldTimer;
+    public static int worldTimer = 1;
     private float timeCount;
 
     //labels to be displayed on the hud
-    private Label countdownLabel;
+    private static Label countdownLabel;
     private Label timeLabel;
 
     private Label firstPlayerLabel;
@@ -30,11 +30,14 @@ public class Hud {
     private Label secondPlayerLabel;
     private Label secondHealth;
 
+    public Hud() {
+    }
+
     public Hud(SpriteBatch spritebatch) {
 
         //define tracking variables
         // worldTimer can be changed while retaining correct formatting
-        worldTimer = 300;
+         worldTimer = 300;
         int minutes = Math.floorDiv(worldTimer, 60);
         int seconds = worldTimer % minutes;
 
@@ -75,6 +78,7 @@ public class Hud {
         //add table to the stage
         stage.addActor(table);
     }
+    /*
     public void update(float deltaTime) {
         // calculate time based on frames rendered
         timeCount += deltaTime;
@@ -85,5 +89,13 @@ public class Hud {
             countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
             timeCount = 0;
         }
+    }
+
+     */
+    public void update(int time) {
+        worldTimer = time;
+        int minutes = Math.floorDiv(worldTimer, 60);
+        int seconds = worldTimer % 60;
+        countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
     }
 }

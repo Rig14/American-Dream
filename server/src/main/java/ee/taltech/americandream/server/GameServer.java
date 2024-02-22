@@ -9,6 +9,7 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
+import helper.packet.TimeMessage;
 
 import java.awt.*;
 import java.io.IOException;
@@ -75,5 +76,6 @@ public class GameServer {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
+        kryo.register(TimeMessage.class);
     }
 }
