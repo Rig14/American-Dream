@@ -4,4 +4,5 @@ import helper.PlayerState;
 
 public class GameStateMessage {
     public PlayerState[] playerStates;
+    public int gameTime;
 }

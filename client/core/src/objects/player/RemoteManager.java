@@ -10,7 +10,7 @@ import helper.packet.GameStateMessage;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
-
+    private int gameTime;
     public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
@@ -23,6 +23,8 @@ public class RemoteManager {
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
+                    // Game duration in seconds, changes occur in server
+                    gameTime = (gameStateMessage.gameTime);
                 }
             }
         });
@@ -36,5 +38,10 @@ public class RemoteManager {
                 }
             }
         }
+    }
+
+    // mainly used to update hud time
+    public int getGameTime() {
+        return this.gameTime;
     }
 }

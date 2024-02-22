@@ -4,12 +4,17 @@ import com.esotericsoftware.kryonet.Connection;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 
+import static helper.Constants.GAME_DURATION;
 import static helper.Constants.TICK_RATE;
 
 public class Game extends Thread {
+
+    private float gameTime;
     private boolean running = true;
     private Player[] players;
     public Game(Connection[] connections) {
+        // set game duration
+        this.gameTime = GAME_DURATION;
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
@@ -23,6 +28,7 @@ public class Game extends Thread {
             try {
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
+                gameStateMessage.gameTime = Math.round(gameTime);
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {
                     gameStateMessage.playerStates[i] = players[i].getState();
@@ -33,8 +39,14 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);
                 }
-                // message is sent every game tick
+                // decrement game time
+                gameTime -= 1f / TICK_RATE;
+                // end game
+                if (gameTime <= 0) {
+                    this.end();
+                }
                 Thread.sleep(1000 / TICK_RATE);
+
             } catch (InterruptedException e) {
                 running = false;
             }

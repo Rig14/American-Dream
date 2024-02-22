@@ -10,7 +10,6 @@ import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 
