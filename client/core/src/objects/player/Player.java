@@ -54,15 +54,15 @@ public class Player extends GameEntity {
         velX = 0;
         // Moving right
         if (Gdx.input.isKeyPressed(Input.Keys.D) || (controller != null &&
-                controller.getButton(controller.getMapping().buttonDpadRight) ||
-                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
-        )) {
+                (controller.getButton(controller.getMapping().buttonDpadRight) ||
+                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
+                ))) {
             velX = 1;
         }
         // Moving left
         if (Gdx.input.isKeyPressed(Input.Keys.A) || (controller != null &&
-                controller.getButton(controller.getMapping().buttonDpadLeft) ||
-                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f)) {
+                (controller.getButton(controller.getMapping().buttonDpadLeft) ||
+                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f))) {
             velX = -1;
         }
 
@@ -77,8 +77,8 @@ public class Player extends GameEntity {
 
         // key down on platform
         if (Gdx.input.isKeyPressed(Input.Keys.S) || (controller != null &&
-                controller.getButton(controller.getMapping().buttonDpadDown) ||
-                Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f)) {
+                (controller.getButton(controller.getMapping().buttonDpadDown) ||
+                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f))) {
             keyDownTime += delta;
         } else {
             keyDownTime = 0;
