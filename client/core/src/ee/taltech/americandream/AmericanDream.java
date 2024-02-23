@@ -14,6 +14,8 @@ import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.ArrayList;
+
 import static helper.Constants.*;
 
 public class AmericanDream extends Game {
@@ -64,6 +66,7 @@ public class AmericanDream extends Game {
         kryo.register(IDMessage.class);
         kryo.register(BulletPositionMessage.class);
         kryo.register(BulletData.class);
+        kryo.register(ArrayList.class);
     }
 
     /*

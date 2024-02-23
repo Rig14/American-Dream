@@ -32,6 +32,7 @@ public class RemoteBulletManager {
 
                             RemoteBullet remoteBullet = new RemoteBullet(bd.getX(), bd.getY(), bd.getSpeedBullet());
                             remoteBullets.add(remoteBullet);
+                            System.out.println("added remote bullet to list");
 
                         }
                     }

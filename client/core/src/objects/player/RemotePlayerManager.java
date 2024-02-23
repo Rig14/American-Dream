@@ -10,7 +10,6 @@ import helper.packet.GameStateMessage;
 
 public class RemotePlayerManager {
     private RemotePlayer[] remotePlayers;
-
     public RemotePlayerManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
