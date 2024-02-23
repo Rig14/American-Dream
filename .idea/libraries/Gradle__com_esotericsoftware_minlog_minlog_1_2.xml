@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.esotericsoftware.minlog:minlog:1.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.esotericsoftware.minlog" artifactId="minlog" version="1.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.esotericsoftware.minlog/minlog/1.2/59bfcd171d82f9981a5e242b9e840191f650e209/minlog-1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
