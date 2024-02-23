@@ -9,6 +9,7 @@ import helper.BulletData;
 import helper.packet.GameStateMessage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class RemoteBulletManager {
@@ -23,6 +24,7 @@ public class RemoteBulletManager {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
+                    remoteBullets.clear(); // Clear the list of remote bullets
                     // Clear the existing list of remote bullets before updating with new data
                     System.out.println("received gamestate");
                     // Retrieve bullet data from the game state message and add to the list
@@ -45,11 +47,15 @@ public class RemoteBulletManager {
 
     public void renderBullets(SpriteBatch batch, Vector2 bulletDimensions) {
         if (remoteBullets != null) {
-            for (RemoteBullet rb : remoteBullets) {
+            List<RemoteBullet> bulletsCopy = new ArrayList<>(remoteBullets); // Create a copy of the list
+            for (RemoteBullet rb : bulletsCopy) {
                 if (rb != null) {
                     rb.render(batch, bulletDimensions);
                 }
             }
         }
     }
+
 }
+
+

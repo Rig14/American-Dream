@@ -38,7 +38,7 @@ public class GameScreen extends ScreenAdapter {
     // remote players
     private RemotePlayerManager remotePlayerManager;
     // ###################
-    private Vector2 bulletDimensions = new Vector2(100, 100);
+    private Vector2 bulletDimensions = new Vector2(20, 20);
 
     // center point of the map
     private Vector2 center;
