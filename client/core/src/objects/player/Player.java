@@ -109,7 +109,7 @@ public class Player extends GameEntity {
                 if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.1)) {
                     // bring back platform
                     b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
-                } else if ((body.getPosition().y - 2 < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.1)) && b.getPosition().x <= 2000) {
+                } else if ((body.getPosition().y - this.height / PPM < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.1)) && b.getPosition().x <= 2000) {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
