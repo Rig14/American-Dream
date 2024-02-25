@@ -81,7 +81,7 @@ public class GameScreen extends ScreenAdapter {
         //update bullets
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
-            bullet.update(delta);
+            bullet.update(delta, center);
             if (bullet.shouldRemove()) {
                 bulletsToRemove.add(bullet);
             }
