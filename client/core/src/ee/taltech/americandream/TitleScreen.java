@@ -1,6 +1,7 @@
 package ee.taltech.americandream;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -74,6 +75,12 @@ public class TitleScreen extends ScreenAdapter {
 
         // draw all the buttons
         stage.draw();
+
+        // esc is pressed. "Just" is required to prevent
+        // exiting the game immediately after entering the screen
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            Gdx.app.exit();
+        }
     }
 
     @Override
