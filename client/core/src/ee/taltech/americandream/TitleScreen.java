@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class TitleScreen extends ScreenAdapter {
     private final OrthographicCamera camera;
+    private final TextButton multiplayerButton;
 
     private final Stage stage;
 
@@ -29,7 +30,7 @@ public class TitleScreen extends ScreenAdapter {
         textButtonStyle.font = new BitmapFont();
         textButtonStyle.fontColor = Color.WHITE;
 
-        TextButton multiplayerButton = new TextButton("Multiplayer", textButtonStyle);
+        multiplayerButton = new TextButton("Multiplayer", textButtonStyle);
         TextButton localButton = new TextButton("Local play", textButtonStyle);
         TextButton exitButton = new TextButton("Exit", textButtonStyle);
 
@@ -59,6 +60,15 @@ public class TitleScreen extends ScreenAdapter {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+
+        if (!AmericanDream.client.isConnected()) {
+            multiplayerButton.setDisabled(true);
+            TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+            textButtonStyle.font = new BitmapFont();
+            textButtonStyle.fontColor = Color.GRAY;
+            multiplayerButton.setStyle(textButtonStyle);
+        }
+
         stage.draw();
     }
 
