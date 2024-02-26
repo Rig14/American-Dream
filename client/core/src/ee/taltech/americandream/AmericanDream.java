@@ -19,6 +19,7 @@ public class AmericanDream extends Game {
     // from literally anywhere in the code
     public static Client client;
     public static int id;
+    public static AmericanDream instance;
 
     /*
      * This method is called when the game is created.
@@ -26,6 +27,7 @@ public class AmericanDream extends Game {
      */
     @Override
     public void create() {
+        instance = this;
         setupConnection();
 
         // listen for id message
@@ -44,7 +46,7 @@ public class AmericanDream extends Game {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = CAMERA_ZOOM;
         // navigating to the starting screen
-        setScreen(new GameScreen(camera));
+        setScreen(new TitleScreen(camera));
     }
 
     /*
