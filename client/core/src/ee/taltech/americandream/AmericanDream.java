@@ -45,7 +45,7 @@ public class AmericanDream extends Game {
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = CAMERA_ZOOM;
-        // navigating to the starting screen
+        // navigating to the title screen
         setScreen(new TitleScreen(camera));
     }
 
