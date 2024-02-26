@@ -66,4 +66,10 @@ public class TitleScreen extends ScreenAdapter {
     public void dispose() {
         super.dispose();
     }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        stage.getViewport().update(width, height, true);
+    }
 }
