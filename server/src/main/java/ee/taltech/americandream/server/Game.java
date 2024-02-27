@@ -8,6 +8,7 @@ import helper.packet.GameStateMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static helper.Constants.TICK_RATE;
 
@@ -18,7 +19,7 @@ public class Game extends Thread {
 
     public Game(Connection[] connections) {
 
-        bullets = new ArrayList<>();
+        bullets = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
@@ -37,7 +38,6 @@ public class Game extends Thread {
                 for (Bullet bullet : bullets) {
                     if (!bullet.broadcasted) {
                         gameStateMessage.bulletDataList.add(bullet.getData());
-                        System.out.println("added bulletdatalist bullet");
                         bullet.broadcasted = true; // mark the bullet as already broadcasted
                     }
                 }

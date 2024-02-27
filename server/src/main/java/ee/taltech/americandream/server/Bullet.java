@@ -31,7 +31,6 @@ public class Bullet {
 
     private void handlePositionMessage(BulletPositionMessage positionMessage) {
         if (positionMessage != null) {
-            System.out.println("Received bullet position (handler): " + positionMessage.x + ", " + positionMessage.y + ", " + positionMessage.speedBullet);
             x = positionMessage.x;
             y = positionMessage.y;
             speedBullet = positionMessage.speedBullet;
@@ -63,12 +62,10 @@ public class Bullet {
         updateMessage.x = positionMessage.x;
         updateMessage.y = positionMessage.y;
         updateMessage.speedBullet = positionMessage.speedBullet;
-        System.out.println("setting bulletpos");
         // Send the update message to all connected clients
         for (Connection clientConnection : clientConnections) {
             if (clientConnection != null) {
                 clientConnection.sendUDP(updateMessage);
-                System.out.println("BROADCASTING NEW BULLETPOS");
             }
         }
 

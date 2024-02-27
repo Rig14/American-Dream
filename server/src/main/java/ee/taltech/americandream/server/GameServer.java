@@ -77,7 +77,6 @@ public class GameServer {
                         bullet.setPosition(positionMessage.x, positionMessage.y);
                         bullet.addBullet(bullet, game.bullets);
                         bullet.broadcastBulletUpdate(positionMessage, connections);
-                        System.out.println("Received bullet position: " + positionMessage.x + ", " + positionMessage.y + ", " + positionMessage.speedBullet);
                     } else {
                         // Log an error or handle the case where game is null
                         System.err.println("Game is null, cannot create bullet.");

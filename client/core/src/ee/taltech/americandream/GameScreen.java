@@ -92,9 +92,7 @@ public class GameScreen extends ScreenAdapter {
         // object rendering goes here
         remotePlayerManager.renderPlayers(batch, player.getDimensions());
         remoteBulletManager.renderBullets(batch, bulletDimensions);
-        for (Bullet bullet: bullets) {
-            bullet.render(batch);
-        }
+
         batch.end();
 
         // for debugging
