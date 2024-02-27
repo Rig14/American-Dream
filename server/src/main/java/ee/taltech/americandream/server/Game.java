@@ -5,6 +5,10 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 
 import static helper.Constants.GAME_DURATION;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import static helper.Constants.TICK_RATE;
 
 public class Game extends Thread {
@@ -12,9 +16,13 @@ public class Game extends Thread {
     private float gameTime;
     private boolean running = true;
     private Player[] players;
+    public List<Bullet> bullets;
+
     public Game(Connection[] connections) {
         // set game duration
         this.gameTime = GAME_DURATION;
+
+        bullets = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
@@ -28,6 +36,15 @@ public class Game extends Thread {
             try {
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
+                // Populate bullet data list
+
+                for (Bullet bullet : bullets) {
+                    if (!bullet.broadcasted) {
+                        gameStateMessage.bulletDataList.add(bullet.getData());
+                        bullet.broadcasted = true; // mark the bullet as already broadcasted
+                    }
+                }
+
                 gameStateMessage.gameTime = Math.round(gameTime);
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {

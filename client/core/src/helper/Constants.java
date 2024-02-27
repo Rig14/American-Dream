@@ -24,4 +24,5 @@ public class Constants {
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
+    public static final float BULLET_SPEED = 500f;
 }

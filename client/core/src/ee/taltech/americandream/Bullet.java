@@ -1,25 +1,26 @@
 package ee.taltech.americandream;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import helper.Constants;
+import helper.packet.BulletPositionMessage;
 
 import static helper.Constants.BOUNDS;
 
 public class Bullet {
-    private static final float SPEED = 500f; // adjust speed as needed
+    private static final float SPEED = Constants.BULLET_SPEED; // adjust speed as needed
     private static Texture texture;
-    public boolean remove = false;
     private float x, y;
     private Vector2 velocity;
+    public boolean remove = false;
 
     public Bullet(float playerX, float playerY, boolean shootRight) {
         this.x = playerX;
         this.y = playerY;
         velocity = new Vector2(shootRight ? SPEED : -SPEED, 0); // adjust direction based on shootRight flag
-        if (texture == null) {
-            texture = new Texture("bullet2-transformed.png");
-        }
+
     }
 
     public void update(float deltaTime, Vector2 center) {
@@ -28,11 +29,15 @@ public class Bullet {
         if (x > center.x + BOUNDS || x < center.x - BOUNDS || y > center.y + BOUNDS || y < center.y - BOUNDS) {
             remove = true;
         }
+        // construct bullet position message to be sent to the server
+        BulletPositionMessage positionMessage = new BulletPositionMessage();
+        positionMessage.x = x;
+        positionMessage.y = y;
+        positionMessage.speedBullet = Constants.BULLET_SPEED;
+        // send player bullet message to the server
+        AmericanDream.client.sendUDP(positionMessage);
     }
 
-    public void render(SpriteBatch batch) {
-        batch.draw(texture, x, y);
-    }
 
     public boolean shouldRemove() {
         return remove;
