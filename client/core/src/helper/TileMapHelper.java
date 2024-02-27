@@ -17,6 +17,8 @@ import ee.taltech.americandream.Bullet;
 import ee.taltech.americandream.GameScreen;
 import objects.player.Player;
 
+import java.util.Objects;
+
 import static helper.Constants.PPM;
 
 public class TileMapHelper {
@@ -76,6 +78,11 @@ public class TileMapHelper {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         Body body = gameScreen.getWorld().createBody(bodyDef);
+        // only run if it's a platform
+        if (Objects.equals(polygonMapObject.getName(), "platform")) {
+            // to get the platforms y coordinate for one-way platforms
+            body.setUserData("platform:" + polygonMapObject.getPolygon().getY());
+        }
         Shape shape = createPolygonShape(polygonMapObject);
         body.createFixture(shape, 1000);
 

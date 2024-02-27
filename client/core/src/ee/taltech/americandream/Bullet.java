@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import helper.Constants;
 import helper.packet.BulletPositionMessage;
 
+import static helper.Constants.BOUNDS;
 
 public class Bullet {
     private static final float SPEED = Constants.BULLET_SPEED; // adjust speed as needed
@@ -22,11 +23,10 @@ public class Bullet {
 
     }
 
-
-    public void update(float deltaTime) {
+    public void update(float deltaTime, Vector2 center) {
         x += velocity.x * deltaTime;
         y += velocity.y * deltaTime;
-        if (x > Gdx.graphics.getWidth() * 1.7 || x < -200 || y > Gdx.graphics.getHeight() * 1.7 || y < -200) {
+        if (x > center.x + BOUNDS || x < center.x - BOUNDS || y > center.y + BOUNDS || y < center.y - BOUNDS) {
             remove = true;
         }
         // construct bullet position message to be sent to the server

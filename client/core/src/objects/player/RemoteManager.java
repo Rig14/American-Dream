@@ -8,9 +8,10 @@ import ee.taltech.americandream.AmericanDream;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 
-public class RemotePlayerManager {
+public class RemoteManager {
     private RemotePlayer[] remotePlayers;
-    public RemotePlayerManager() {
+    private int gameTime;
+    public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
@@ -22,6 +23,8 @@ public class RemotePlayerManager {
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
+                    // Game duration in seconds, changes occur in server
+                    gameTime = (gameStateMessage.gameTime);
                 }
             }
         });
@@ -35,5 +38,10 @@ public class RemotePlayerManager {
                 }
             }
         }
+    }
+
+    // mainly used to update hud time
+    public int getGameTime() {
+        return this.gameTime;
     }
 }

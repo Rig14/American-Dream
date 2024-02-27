@@ -1,10 +1,8 @@
 package ee.taltech.americandream.server;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.packet.BulletPositionMessage;
-import helper.packet.GameStateMessage;
 
 import java.util.List;
 

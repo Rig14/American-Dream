@@ -12,11 +12,9 @@ import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static helper.Constants.LOBBY_SIZE;
 import static helper.Constants.PORTS;

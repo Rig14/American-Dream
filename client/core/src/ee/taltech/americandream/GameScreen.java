@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -10,10 +11,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.Hud;
 import helper.TileMapHelper;
 import objects.bullet.RemoteBulletManager;
 import objects.player.Player;
-import objects.player.RemotePlayerManager;
+import objects.player.RemoteManager;
 
 import java.util.ArrayList;
 
@@ -36,12 +38,14 @@ public class GameScreen extends ScreenAdapter {
     // client player
     private Player player;
     // remote players
-    private RemotePlayerManager remotePlayerManager;
+    private RemoteManager remoteManager;
     // ###################
     private Vector2 bulletDimensions = new Vector2(20, 20);
 
     // center point of the map
     private Vector2 center;
+    // game screen overlay
+    private Hud hud;
 
     public GameScreen(OrthographicCamera camera) {
         this.bullets = new ArrayList<>();
@@ -54,28 +58,35 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
 
         // remote player manager
-        this.remotePlayerManager = new RemotePlayerManager();
+        this.remoteManager = new RemoteManager();
+
+        // create hud
+        this.hud = new Hud(this.batch);
         this.remoteBulletManager = new RemoteBulletManager();
     }
 
     @Override
     public void render(float delta) {
-        this.update();
+        this.update(delta);
 
         // shooting code
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
             bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
             bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
         }
         //update bullets
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
-            bullet.update(delta);
+            bullet.update(delta, center);
             if (bullet.shouldRemove()) {
                 bulletsToRemove.add(bullet);
             }
@@ -90,18 +101,21 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        remotePlayerManager.renderPlayers(batch, player.getDimensions());
+        remoteManager.renderPlayers(batch, player.getDimensions());
+
         remoteBulletManager.renderBullets(batch, bulletDimensions);
 
         batch.end();
 
         // for debugging
         debugRenderer.render(world, camera.combined.scl(PPM));
+
+        // create hud and add it to the GameScreen
+        this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
     }
 
-    private void update() {
-        player.update();
-
+    private void update(float delta) {
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
@@ -111,12 +125,15 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        player.update();
+        player.update(delta, center);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            AmericanDream.instance.setScreen(new TitleScreen(camera));
         }
+
+        // update hud, currently used for timer
+        hud.update(remoteManager.getGameTime());
     }
 
     /**
@@ -127,7 +144,12 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.getPosition().y < BOUNDS) {
+        if (
+                player.getPosition().y > center.y + BOUNDS
+                        || player.getPosition().y < center.y - BOUNDS
+                        || player.getPosition().x > center.x + BOUNDS
+                        || player.getPosition().x < center.x - BOUNDS
+        ) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();

@@ -1,6 +1,7 @@
 package objects.player;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public abstract class GameEntity {
@@ -19,7 +20,7 @@ public abstract class GameEntity {
         this.speed = 0;
     }
 
-    public abstract void update();
+    public abstract void update(float delta, Vector2 center);
 
     public abstract void render(SpriteBatch batch);
 
