@@ -124,7 +124,7 @@ public class GameScreen extends ScreenAdapter {
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            AmericanDream.instance.setScreen(new TitleScreen(camera));
         }
 
         // update hud, currently used for timer
