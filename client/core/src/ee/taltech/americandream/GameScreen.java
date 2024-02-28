@@ -11,11 +11,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.Constants;
 import helper.Hud;
 import helper.TileMapHelper;
-import objects.bullet.RemoteBulletManager;
+import objects.bullet.Bullet;
 import objects.player.Player;
-import objects.player.RemoteManager;
+import objects.RemoteManager;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,6 @@ public class GameScreen extends ScreenAdapter {
     private Box2DDebugRenderer debugRenderer;
 
     ArrayList<Bullet> bullets;
-    private RemoteBulletManager remoteBulletManager;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
 
     private TileMapHelper tileMapHelper;
@@ -40,7 +40,6 @@ public class GameScreen extends ScreenAdapter {
     // remote players
     private RemoteManager remoteManager;
     // ###################
-    private Vector2 bulletDimensions = new Vector2(20, 20);
 
     // center point of the map
     private Vector2 center;
@@ -65,7 +64,6 @@ public class GameScreen extends ScreenAdapter {
 
         // create hud
         this.hud = new Hud(this.batch);
-        this.remoteBulletManager = new RemoteBulletManager();
     }
 
     @Override
@@ -73,16 +71,7 @@ public class GameScreen extends ScreenAdapter {
         this.update(delta);
 
         // shooting code
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
-                (Controllers.getCurrent() != null &&
-                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
-            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
-                (Controllers.getCurrent() != null &&
-                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
-            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
-        }
+        player.handleBulletInput(bullets);
         //update bullets
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
@@ -103,7 +92,7 @@ public class GameScreen extends ScreenAdapter {
         // object rendering goes here
         remoteManager.renderPlayers(batch, player.getDimensions());
 
-        remoteBulletManager.renderBullets(batch, bulletDimensions);
+        remoteManager.renderBullets(batch, BULLET_DIMENSIONS);
 
         batch.end();
 

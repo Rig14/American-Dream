@@ -8,13 +8,12 @@ import java.util.List;
 
 
 public class Bullet {
-    private int id = 0;
+    private final int id = 0;
     private float x, y;
     private float speedBullet;
-    private Connection connection;
-    private Game game;
+    private final Connection connection;
+    private final Game game;
     public boolean broadcasted;
-
 
     public Bullet(Connection connection, Game game) {
         this.connection = connection;
@@ -27,13 +26,6 @@ public class Bullet {
         this.y = y;
     }
 
-    private void handlePositionMessage(BulletPositionMessage positionMessage) {
-        if (positionMessage != null) {
-            x = positionMessage.x;
-            y = positionMessage.y;
-            speedBullet = positionMessage.speedBullet;
-        }
-    }
 
     public BulletData getData() {
         // get bullet state

@@ -1,11 +1,13 @@
-package ee.taltech.americandream;
+package objects.bullet;
 
-import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import ee.taltech.americandream.AmericanDream;
 import helper.Constants;
 import helper.packet.BulletPositionMessage;
+import java.util.ArrayList;
+import java.util.List;
 
 import static helper.Constants.BOUNDS;
 
@@ -15,15 +17,21 @@ public class Bullet {
     private float x, y;
     private Vector2 velocity;
     public boolean remove = false;
+    private List<Bullet> bullets = new ArrayList<>();
+
+
 
     public Bullet(float playerX, float playerY, boolean shootRight) {
+
         this.x = playerX;
         this.y = playerY;
         velocity = new Vector2(shootRight ? SPEED : -SPEED, 0); // adjust direction based on shootRight flag
 
+
     }
 
     public void update(float deltaTime, Vector2 center) {
+
         x += velocity.x * deltaTime;
         y += velocity.y * deltaTime;
         if (x > center.x + BOUNDS || x < center.x - BOUNDS || y > center.y + BOUNDS || y < center.y - BOUNDS) {
@@ -37,6 +45,7 @@ public class Bullet {
         // send player bullet message to the server
         AmericanDream.client.sendUDP(positionMessage);
     }
+
 
 
     public boolean shouldRemove() {

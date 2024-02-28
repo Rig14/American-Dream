@@ -3,17 +3,17 @@ package objects.bullet;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import helper.Constants;
 
 public class RemoteBullet {
-    private float x, y;
-    private float SPEED;
+    private final float x, y;
+    private final float speed;
 
 
     public RemoteBullet(float x, float y, float speed) {
+        
         this.x = x;
         this.y = y;
-        this.SPEED = speed;
+        this.speed = speed;
     }
 
     public void render(SpriteBatch batch, Vector2 bulletDimensions) {
