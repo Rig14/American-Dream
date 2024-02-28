@@ -28,7 +28,10 @@
 </data>
  </layer>
  <objectgroup id="2" name="objects">
-  <object id="15" name="player" x="352" y="288" width="32" height="64"/>
+  <object id="1" name="platform" x="192" y="415.818" width="575.523" height="32.5909">
+   <polygon points="0,0 575.523,0 575.523,32.5909 0,32.5909"/>
+  </object>
+  <object id="15" name="player" x="256.596" y="306.943" width="32" height="64"/>
   <object id="16" name="Center" x="480" y="288">
    <point/>
   </object>
@@ -41,6 +44,7 @@
   <object id="26" name="platform" x="192" y="448">
    <polygon points="0,0 574.616,0 574.616,-32 0,-32"/>
   </object>
+  <object id="20" name="bulletSpawn" x="-536" y="-496" width="2088" height="1576"/>
  </objectgroup>
  <layer id="4" name="Platform" width="30" height="20">
   <data encoding="csv">

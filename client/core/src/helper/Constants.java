@@ -1,5 +1,7 @@
 package helper;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Constants {
     // pixels per meter (not sure what it does)
     public static final float PPM = 32.0f;
@@ -24,4 +26,7 @@ public class Constants {
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
+    public static final float BULLET_SPEED = 500f;
+    public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
+
 }
