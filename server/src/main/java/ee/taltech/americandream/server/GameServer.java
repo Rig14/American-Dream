@@ -76,7 +76,6 @@ public class GameServer {
                         bullet.addBullet(bullet, game.bullets);
                         bullet.broadcastBulletUpdate(positionMessage, connections);
                     } else {
-                        // Log an error or handle the case where game is null
                         System.err.println("Game is null, cannot create bullet.");
                     }
 
