@@ -122,7 +122,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         // update hud, currently used for timer
-        hud.update(remoteManager.getGameTime());
+        hud.update(remoteManager.getGameTime(), player.getLives(), remoteManager.getRemoteLives());
     }
 
     /**

@@ -24,6 +24,7 @@ public class Player extends GameEntity {
     private int jumpCounter;
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
+    private int livesCount = LIVES_COUNT    ;
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
@@ -32,7 +33,6 @@ public class Player extends GameEntity {
         this.direction = Direction.RIGHT;
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
-
     @Override
     public void update(float delta, Vector2 center) {
         x = body.getPosition().x * PPM;
@@ -47,6 +47,7 @@ public class Player extends GameEntity {
         positionMessage.x = x;
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
+        positionMessage.livesCount = livesCount;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
     }
@@ -168,6 +169,8 @@ public class Player extends GameEntity {
                 body.setLinearVelocity(0, 0);
                 // set time till respawn to 0
                 timeTillRespawn = 0;
+                // decrement lives
+                livesCount--;
             }
         }
     }
@@ -175,5 +178,9 @@ public class Player extends GameEntity {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    public Integer getLives() {
+        return this.livesCount;
     }
 }
