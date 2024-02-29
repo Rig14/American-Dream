@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
-    private int gameTime;
+    private Integer gameTime = null;
     private Integer remoteLives = null;
     private List<RemoteBullet> remoteBullets;
 
@@ -76,8 +76,11 @@ public class RemoteManager {
     }
 
     // mainly used to update hud time
-    public int getGameTime() {
-        return this.gameTime;
+    public Optional<Integer> getGameTime() {
+        if (gameTime != null) {
+            return Optional.of(gameTime);
+        }
+        return Optional.empty();
     }
 
     public Optional<Integer> getRemoteLives() {

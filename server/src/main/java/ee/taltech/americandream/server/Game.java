@@ -45,6 +45,8 @@ public class Game extends Thread {
                     if (!bullet.broadcasted) {
                         gameStateMessage.bulletDataList.add(bullet.getData());
                         bullet.broadcasted = true; // mark the bullet as already broadcasted
+                    } else {
+                        bullets.remove(bullet);
                     }
                 }
 
