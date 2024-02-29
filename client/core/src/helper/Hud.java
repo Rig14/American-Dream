@@ -12,19 +12,18 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
 
+import java.util.Optional;
+
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
-    public Stage stage2;
     private Viewport viewport;
 
     //labels to be displayed on the hud
     private static Label countdownLabel;
     private Label timeLabel;
     private Label localPlayerName;
-    private Label firstHealth;
     private Label remotePlayerName;
-    private Label secondHealth;
 
     private Label localLives;
     private Label remoteLives;
@@ -52,10 +51,10 @@ public class Hud {
 
         // combining player name and heath label by using \n could make alignment easier
         localPlayerName = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        localLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        localLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
 
-        remotePlayerName = new Label("BIDEN   ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        remoteLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        remotePlayerName = new Label("BIDEN", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        remoteLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
 
 
         //add labels to table, padding the top, and giving them all equal width with expandX
@@ -83,24 +82,24 @@ public class Hud {
 
     }
 
-    // update displayed game time
-    public void update(int time, Integer localHealth, Integer remoteHealth) {
+    // update displayed game time and lives
+    public void update(int time, Integer localHealth, Optional<Integer> remoteHealth) {
         if (time > 0) {
             int minutes = Math.floorDiv(time, 60);
             int seconds = time % 60;
             countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
         }
 
-        // update lives (spahgetti at the moment because of remoteplayer null value)
-        localLives.setText(localHealth);
-        if (remoteHealth != null) {
-            remoteLives.setText(remoteHealth);
+        // update lives
+        if (remoteHealth.isPresent()) {
+            localLives.setText(localHealth);
+            remoteLives.setText(remoteHealth.get());
 
             // display game over screen when lives reach 0
             if (localHealth == 0) {
-                gameOverLabel.setText("GAME OVER!\n You lost.");
-            } else if (remoteHealth == 0) {
-                gameOverLabel.setText("GAME OVER!\n Congratulations you won!");
+                gameOverLabel.setText("GAME OVER!\nYou lost.");
+            } else if (remoteHealth.get() == 0) {
+                gameOverLabel.setText("Congratulations you won!");
             }
         }
     }

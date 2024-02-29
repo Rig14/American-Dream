@@ -7,11 +7,15 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
+import static helper.Constants.PLAYER_LIVES;
+
 public class Player {
     private final int id;
     private float x;
     private float y;
     private Direction direction;
+
+    private int livesCount = PLAYER_LIVES;
 
     private final Game game;
     private final Connection connection;
@@ -51,6 +55,7 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+        livesCount = positionMessage.livesCount;
     }
 
     public PlayerState getState() {
@@ -60,6 +65,7 @@ public class Player {
         state.x = x;
         state.y = y;
         state.direction = direction;
+        state.livesCount = livesCount;
         return state;
     }
 

@@ -13,10 +13,12 @@ import objects.player.RemotePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private int gameTime;
+    private Integer remoteLives = null;
     private List<RemoteBullet> remoteBullets;
 
     public RemoteManager() {
@@ -41,7 +43,8 @@ public class RemoteManager {
                     }
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y, ps.livesCount);
+                            remoteLives = ps.livesCount;
+                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -77,15 +80,10 @@ public class RemoteManager {
         return this.gameTime;
     }
 
-    // ei saanud remote playerite listist lõpuni aru
-    public Integer getRemoteLives() {
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
-                    return rp.getLivesCount();
-                }
-            }
+    public Optional<Integer> getRemoteLives() {
+        if (remoteLives != null) {
+            return Optional.of(remoteLives);
         }
-        return null;
+        return Optional.empty();
     }
 }
