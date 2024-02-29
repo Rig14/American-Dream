@@ -17,4 +17,5 @@ public class RemotePlayer {
         Texture playerTexture = new Texture("badlogic.jpg");
         batch.draw(playerTexture, x - playerDimensions.x / 2, y - playerDimensions.y / 2, playerDimensions.x, playerDimensions.y);
     }
+
 }

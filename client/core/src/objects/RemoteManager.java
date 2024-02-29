@@ -13,10 +13,12 @@ import objects.player.RemotePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private int gameTime;
+    private Integer remoteLives = null;
     private List<RemoteBullet> remoteBullets;
 
     public RemoteManager() {
@@ -30,7 +32,6 @@ public class RemoteManager {
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
                     remoteBullets.clear();
                     // Clear the existing list of remote bullets before updating with new data
-                    System.out.println("received gamestate");
                     // retrieve bullet data from the game state message and add to the list
                     List<BulletData> bulletDataList = gameStateMessage.getBulletDataList();
                     if (bulletDataList != null) {
@@ -38,12 +39,11 @@ public class RemoteManager {
 
                             RemoteBullet remoteBullet = new RemoteBullet(bd.getX(), bd.getY(), bd.getSpeedBullet());
                             remoteBullets.add(remoteBullet);
-                            System.out.println("added remote bullet to list");
-
                         }
                     }
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
+                            remoteLives = ps.livesCount;
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
                         }
                     }
@@ -75,9 +75,15 @@ public class RemoteManager {
         }
     }
 
-
     // mainly used to update hud time
     public int getGameTime() {
         return this.gameTime;
+    }
+
+    public Optional<Integer> getRemoteLives() {
+        if (remoteLives != null) {
+            return Optional.of(remoteLives);
+        }
+        return Optional.empty();
     }
 }

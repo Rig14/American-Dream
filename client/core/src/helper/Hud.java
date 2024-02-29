@@ -12,6 +12,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
 
+import java.util.Optional;
+
+import static helper.Constants.LIVES_COUNT;
+
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
@@ -20,10 +24,14 @@ public class Hud {
     //labels to be displayed on the hud
     private static Label countdownLabel;
     private Label timeLabel;
-    private Label firstPlayerLabel;
-    private Label firstHealth;
-    private Label secondPlayerLabel;
-    private Label secondHealth;
+    private Label localPlayerName;
+    private Label remotePlayerName;
+
+    private Label localLives;
+    private Label remoteLives;
+
+    private Label placeHolder;
+    private Label gameOverLabel;
 
     public Hud(SpriteBatch spritebatch) {
 
@@ -42,32 +50,64 @@ public class Hud {
         //define labels
         timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         countdownLabel = new Label( "Waiting for other player...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+
         // combining player name and heath label by using \n could make alignment easier
-        firstPlayerLabel = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        firstHealth = new Label("  HP  16%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        secondPlayerLabel = new Label("BIDEN   ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        secondHealth = new Label("HP  99%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        localPlayerName = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        localLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
+
+        remotePlayerName = new Label("BIDEN", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        remoteLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
+
 
         //add labels to table, padding the top, and giving them all equal width with expandX
-        table.add(firstPlayerLabel).expandX().padTop(10);
+        table.add(localPlayerName).expandX().padTop(10);
         table.add(timeLabel).expandX().padTop(10);
-        table.add(secondPlayerLabel).expandX().padTop(10);
+        table.add(remotePlayerName).expandX().padTop(10);
+
         //add a second row to the table
         table.row();
-        table.add(firstHealth).expandX();
+        table.add(localLives).expandX();
         table.add(countdownLabel).expandX();
-        table.add(secondHealth).expandX();
+        table.add(remoteLives).expandX();
+
+        // third row
+        table.row();
+        placeHolder = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        gameOverLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        table.add(placeHolder);
+        table.add(gameOverLabel).padTop(150);
 
         //add table to the stage
         stage.addActor(table);
+
+
+
     }
 
-    // update displayed game time
-    public void update(int time) {
+    // update displayed game time and lives
+    public void update(int time, Integer localHealth, Optional<Integer> remoteHealth) {
         if (time > 0) {
             int minutes = Math.floorDiv(time, 60);
             int seconds = time % 60;
             countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
+        }
+
+        // update lives
+        if (remoteHealth.isPresent()) {
+            localLives.setText(localHealth);
+            remoteLives.setText(remoteHealth.get());
+
+            // display game over screen when lives reach 0
+            if (localHealth == 0) {
+                gameOverLabel.setText("GAME OVER!\nYou lost.");
+                gameOverLabel.setColor(Color.RED);
+            } else if (remoteHealth.get() == 0) {
+                gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setColor(Color.GREEN);
+            }
+        } else {
+            localLives.setText(LIVES_COUNT);
+            remoteLives.setText(LIVES_COUNT);
         }
     }
 }

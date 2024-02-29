@@ -13,6 +13,8 @@ public class Player {
     private float y;
     private Direction direction;
 
+    private Integer livesCount;
+
     private final Game game;
     private final Connection connection;
     public Player(Connection connection, Game game, int id) {
@@ -51,6 +53,7 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+        livesCount = positionMessage.livesCount;
     }
 
     public PlayerState getState() {
@@ -60,6 +63,7 @@ public class Player {
         state.x = x;
         state.y = y;
         state.direction = direction;
+        state.livesCount = livesCount;
         return state;
     }
 
