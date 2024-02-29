@@ -24,7 +24,7 @@ public class Player extends GameEntity {
     private int jumpCounter;
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
-    private int livesCount = LIVES_COUNT    ;
+    private Integer livesCount = LIVES_COUNT;
 
     public Player(float width, float height, Body body) {
         super(width, height, body);

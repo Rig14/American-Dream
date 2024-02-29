@@ -7,15 +7,13 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
-import static helper.Constants.PLAYER_LIVES;
-
 public class Player {
     private final int id;
     private float x;
     private float y;
     private Direction direction;
 
-    private int livesCount = PLAYER_LIVES;
+    private Integer livesCount;
 
     private final Game game;
     private final Connection connection;

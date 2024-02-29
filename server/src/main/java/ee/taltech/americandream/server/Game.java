@@ -65,10 +65,10 @@ public class Game extends Thread {
                 if (bothJoinedMultiplayer) {
                     gameTime -= 1f / TICK_RATE;
                 } else if (!Arrays.stream(gameStateMessage.playerStates).map(x -> x.direction).toList().contains(null)) {
-                    bothJoinedMultiplayer = true;  // true when both players start sending not null position data
+                    bothJoinedMultiplayer = true;  // true when both players start sending non-null position data
                 }
 
-                // end game when    time ends || one player has 0 lives
+                // end game when      time ends  ||  one player has 0 lives
                 if (gameTime <= 0
                         || Arrays.stream(gameStateMessage.playerStates).map(x -> x.livesCount).toList().contains(0)) {
                     this.end();

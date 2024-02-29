@@ -14,6 +14,8 @@ import com.badlogic.gdx.Gdx;
 
 import java.util.Optional;
 
+import static helper.Constants.LIVES_COUNT;
+
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
@@ -98,9 +100,14 @@ public class Hud {
             // display game over screen when lives reach 0
             if (localHealth == 0) {
                 gameOverLabel.setText("GAME OVER!\nYou lost.");
+                gameOverLabel.setColor(Color.RED);
             } else if (remoteHealth.get() == 0) {
                 gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setColor(Color.GREEN);
             }
+        } else {
+            localLives.setText(LIVES_COUNT);
+            remoteLives.setText(LIVES_COUNT);
         }
     }
 }
