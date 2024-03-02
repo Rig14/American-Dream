@@ -30,4 +30,8 @@ public class Constants {
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static int LIVES_COUNT = 3;
 
+    // Used for calculating off-screen indicator
+    public static final int OFFSCREEN_Y = 400;
+    public static final int OFFSCREEN_Y_NEG = -400;
+
 }

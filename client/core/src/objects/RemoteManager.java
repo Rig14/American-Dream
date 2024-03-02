@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static helper.Constants.BULLET_DIMENSIONS;
+import static helper.Constants.OFFSCREEN_Y;
+import static helper.Constants.OFFSCREEN_Y_NEG;
 import static helper.Textures.bulletTexture;
-import static helper.Textures.playerTexture;
 
 public class RemoteManager {
-    public static final int OFFSCREEN_Y = 400;
-    public static final int OFFSCREEN_Y_NEG = -400;
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
     private Integer remoteLives = null;
