@@ -18,4 +18,12 @@ public class RemotePlayer {
         batch.draw(playerTexture, x - playerDimensions.x / 2, y - playerDimensions.y / 2, playerDimensions.x, playerDimensions.y);
     }
 
+    public float getX() {
+        return this.x;
+    }
+
+    public float getY() {
+        return this.y;
+    }
+
 }
