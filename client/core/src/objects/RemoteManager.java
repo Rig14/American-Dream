@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static helper.Constants.BULLET_DIMENSIONS;
 import static helper.Constants.OFFSCREEN_Y;
 import static helper.Constants.OFFSCREEN_Y_NEG;
-import static helper.Textures.bulletTexture;
+import static helper.Textures.BULLET_TEXTURE;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
