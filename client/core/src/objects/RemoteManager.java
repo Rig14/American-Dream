@@ -7,40 +7,33 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
+import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
+import objects.bullet.Bullet;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
     private Integer remoteLives = null;
-    private List<RemoteBullet> remoteBullets;
+    private List<BulletData> remoteBullets;
 
     public RemoteManager() {
-        this.remoteBullets = new ArrayList<>();
-
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
                     // handle game state message
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
-                    remoteBullets.clear();
-                    // Clear the existing list of remote bullets before updating with new data
-                    // retrieve bullet data from the game state message and add to the list
-                    List<BulletData> bulletDataList = gameStateMessage.getBulletDataList();
-                    if (bulletDataList != null) {
-                        for (BulletData bd : bulletDataList) {
 
-                            RemoteBullet remoteBullet = new RemoteBullet(bd.getX(), bd.getY(), bd.getSpeedBullet());
-                            remoteBullets.add(remoteBullet);
-                        }
-                    }
+                    // overwrite the remote bullets list with new data
+                    remoteBullets = gameStateMessage.bulletData;
+
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
                             remoteLives = ps.livesCount;
@@ -64,13 +57,10 @@ public class RemoteManager {
         }
     }
 
-    public void renderBullets(SpriteBatch batch, Vector2 bulletDimensions) {
+    public void renderBullets(SpriteBatch batch) {
         if (remoteBullets != null) {
-            List<RemoteBullet> bulletsCopy = new ArrayList<>(remoteBullets); // create a copy of the list
-            for (RemoteBullet rb : bulletsCopy) {
-                if (rb != null) {
-                    rb.render(batch, bulletDimensions);
-                }
+            for (BulletData bullet : remoteBullets) {
+                RemoteBullet.render(batch, bullet.x, bullet.y);
             }
         }
     }
@@ -88,5 +78,11 @@ public class RemoteManager {
             return Optional.of(remoteLives);
         }
         return Optional.empty();
+    }
+
+    public void sendBullets(List<Bullet> bullets) {
+        BulletPositionMessage bulletPositionMessage = new BulletPositionMessage();
+        bulletPositionMessage.playerBullets = bullets.stream().map(Bullet::toBulletData).collect(Collectors.toList());
+        AmericanDream.client.sendUDP(bulletPositionMessage);
     }
 }

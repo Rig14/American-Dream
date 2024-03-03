@@ -6,6 +6,7 @@ import helper.packet.GameStateMessage;
 
 import static helper.Constants.GAME_DURATION;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,6 +44,7 @@ public class Game extends Thread {
                     // add player states to the game state message (like position)
                     gameStateMessage.playerStates[i] = players[i].getState();
                     // add bullets to the game state message
+                    gameStateMessage.bulletData = new ArrayList<>();
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
 

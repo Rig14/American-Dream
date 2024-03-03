@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import objects.bullet.Bullet;
 import ee.taltech.americandream.GameScreen;
 import objects.player.Player;
 
@@ -59,10 +58,6 @@ public class TileMapHelper {
                             gameScreen.getWorld()
                     );
                     gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
-                } else if (rectangleName.contains("bulletSpawn")) {
-                    // Create a new bullet at the spawn point
-                    Bullet bullet = new Bullet(rectangle.getX(), rectangle.getY(), false);
-                    gameScreen.addBullet(bullet); // Add the bullet to the game screen
                 }
             }
             if (mapObject.getName().equals("Center")) {

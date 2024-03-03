@@ -9,6 +9,7 @@ import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
@@ -27,6 +28,7 @@ public class Player {
         this.id = id;
         this.game = game;
         this.connection = connection;
+        this.playerBullets = new ArrayList<>();
         // send id to client
         connection.sendTCP("id:" + id);
         // add listeners
