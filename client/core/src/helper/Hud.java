@@ -85,10 +85,10 @@ public class Hud {
     }
 
     // update displayed game time and lives
-    public void update(int time, Integer localHealth, Optional<Integer> remoteHealth) {
-        if (time > 0) {
-            int minutes = Math.floorDiv(time, 60);
-            int seconds = time % 60;
+    public void update(Optional<Integer> time, Integer localHealth, Optional<Integer> remoteHealth) {
+        if (time.isPresent()) {
+            int minutes = Math.floorDiv(time.get(), 60);
+            int seconds = time.get() % 60;
             countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
         }
 
