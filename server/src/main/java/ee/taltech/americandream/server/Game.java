@@ -17,15 +17,12 @@ public class Game extends Thread {
     private float gameTime;
     private boolean running = true;
     private Player[] players;
-    public List<Bullet> bullets;
-
     private boolean bothJoinedMultiplayer = false;
 
     public Game(Connection[] connections) {
         // set game duration
         this.gameTime = GAME_DURATION;
 
-        bullets = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
@@ -39,24 +36,16 @@ public class Game extends Thread {
             try {
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
-                // Populate bullet data list
-
-                for (Bullet bullet : bullets) {
-                    if (!bullet.broadcasted) {
-                        gameStateMessage.bulletDataList.add(bullet.getData());
-                        bullet.broadcasted = true; // mark the bullet as already broadcasted
-                    } else {
-                        bullets.remove(bullet);
-                    }
-                }
 
                 gameStateMessage.gameTime = Math.round(gameTime);
                 gameStateMessage.playerStates = new PlayerState[players.length];
                 for (int i = 0; i < players.length; i++) {
+                    // add player states to the game state message (like position)
                     gameStateMessage.playerStates[i] = players[i].getState();
-                    // log game state message
-                    PlayerState ps = gameStateMessage.playerStates[i];
+                    // add bullets to the game state message
+                    gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
+
                 // send game state message to all players
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);
