@@ -12,32 +12,28 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
 
+import java.util.Optional;
+
+import static helper.Constants.LIVES_COUNT;
+
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
     private Viewport viewport;
 
-    //score/time Tracking Variables
-    public Integer worldTimer;
-    private float timeCount;
-
     //labels to be displayed on the hud
-    private Label countdownLabel;
+    private static Label countdownLabel;
     private Label timeLabel;
+    private Label localPlayerName;
+    private Label remotePlayerName;
 
-    private Label firstPlayerLabel;
-    private Label firstHealth;
-    private Label secondPlayerLabel;
-    private Label secondHealth;
+    private Label localLives;
+    private Label remoteLives;
+
+    private Label placeHolder;
+    private Label gameOverLabel;
 
     public Hud(SpriteBatch spritebatch) {
-
-        //define tracking variables
-        // worldTimer can be changed while retaining correct formatting
-        worldTimer = 300;
-        int minutes = Math.floorDiv(worldTimer, 60);
-        int seconds = worldTimer % minutes;
-
 
         //setup the HUD viewport using a new camera separate from the main game camera
         //define stage using HUD viewport and game's spritebatch
@@ -53,37 +49,65 @@ public class Hud {
 
         //define labels
         timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        countdownLabel = new Label( minutes + ":" + String.format("%02d", seconds),
-                new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        countdownLabel = new Label( "Waiting for other player...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         // combining player name and heath label by using \n could make alignment easier
-        firstPlayerLabel = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        firstHealth = new Label("  HP  16%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        secondPlayerLabel = new Label("BIDEN   ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        secondHealth = new Label("HP  99%", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        localPlayerName = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        localLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
+
+        remotePlayerName = new Label("BIDEN", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        remoteLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
+
 
         //add labels to table, padding the top, and giving them all equal width with expandX
-        table.add(firstPlayerLabel).expandX().padTop(10);
+        table.add(localPlayerName).expandX().padTop(10);
         table.add(timeLabel).expandX().padTop(10);
-        table.add(secondPlayerLabel).expandX().padTop(10);
+        table.add(remotePlayerName).expandX().padTop(10);
+
         //add a second row to the table
         table.row();
-        table.add(firstHealth).expandX();
+        table.add(localLives).expandX();
         table.add(countdownLabel).expandX();
-        table.add(secondHealth).expandX();
+        table.add(remoteLives).expandX();
+
+        // third row
+        table.row();
+        placeHolder = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        gameOverLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        table.add(placeHolder);
+        table.add(gameOverLabel).padTop(150);
 
         //add table to the stage
         stage.addActor(table);
+
+
+
     }
-    public void update(float deltaTime) {
-        // calculate time based on frames rendered
-        timeCount += deltaTime;
-        if (timeCount >= 1 && worldTimer >= 1) {
-            worldTimer--;
-            int minutes = Math.floorDiv(worldTimer, 60);
-            int seconds = worldTimer % 60;
+
+    // update displayed game time and lives
+    public void update(Optional<Integer> time, Integer localHealth, Optional<Integer> remoteHealth) {
+        if (time.isPresent()) {
+            int minutes = Math.floorDiv(time.get(), 60);
+            int seconds = time.get() % 60;
             countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
-            timeCount = 0;
+        }
+
+        // update lives
+        if (remoteHealth.isPresent()) {
+            localLives.setText(localHealth);
+            remoteLives.setText(remoteHealth.get());
+
+            // display game over screen when lives reach 0
+            if (localHealth == 0) {
+                gameOverLabel.setText("GAME OVER!\nYou lost.");
+                gameOverLabel.setColor(Color.RED);
+            } else if (remoteHealth.get() == 0) {
+                gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setColor(Color.GREEN);
+            }
+        } else {
+            localLives.setText(LIVES_COUNT);
+            remoteLives.setText(LIVES_COUNT);
         }
     }
 }

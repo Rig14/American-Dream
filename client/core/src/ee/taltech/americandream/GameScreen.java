@@ -12,15 +12,18 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.Hud;
 import helper.TileMapHelper;
+import objects.RemoteManager;
+import objects.bullet.Bullet;
 import objects.player.Player;
-import objects.player.RemotePlayerManager;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static helper.Constants.*;
+import static helper.Textures.TRUMP_TEXTURE;
 
 public class GameScreen extends ScreenAdapter {
-    ArrayList<Bullet> bullets;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
@@ -33,8 +36,10 @@ public class GameScreen extends ScreenAdapter {
     // game objects
     // client player
     private Player player;
+    // bullets
+    private List<Bullet> bullets;
     // remote players
-    private RemotePlayerManager remotePlayerManager;
+    private RemoteManager remoteManager;
     // ###################
 
     // center point of the map
@@ -53,10 +58,12 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
 
         // remote player manager
-        this.remotePlayerManager = new RemotePlayerManager();
+        this.remoteManager = new RemoteManager();
+
+        this.bullets = new ArrayList<>();
 
         // create hud
         this.hud = new Hud(this.batch);
@@ -65,23 +72,9 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update(delta);
-
         // shooting code
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, true));
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            bullets.add(new Bullet(player.getPosition().x - 20, player.getPosition().y, false));
-        }
-        //update bullets
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
-        for (Bullet bullet : bullets) {
-            bullet.update(delta);
-            if (bullet.shouldRemove()) {
-                bulletsToRemove.add(bullet);
-            }
-        }
-        bullets.removeAll(bulletsToRemove);
+        player.handleBulletInput(bullets);
+
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -91,10 +84,14 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        remotePlayerManager.renderPlayers(batch, player.getDimensions());
-        for (Bullet bullet : bullets) {
-            bullet.render(batch);
-        }
+        // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
+        batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
+                player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
+
+        remoteManager.renderPlayers(batch, player.getDimensions());
+        remoteManager.renderBullets(batch);
+        remoteManager.renderIndicator(batch, camera.position.x, camera.position.y, player.getDimensions());
+
         batch.end();
 
         // for debugging
@@ -106,24 +103,32 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void update(float delta) {
-        player.update();
-
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
 
         // update the camera position
         cameraUpdate();
 
+        //update bullets
+        bullets.forEach(bullet -> bullet.update(delta));
+        // remove out of bound bullets
+        bullets = bullets.stream().filter(b -> !b.shouldRemove(center)).collect(Collectors.toList());
+
+        // send bullets to server
+        remoteManager.sendBullets(bullets);
+
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        player.update();
+        player.update(delta, center);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            AmericanDream.instance.setScreen(new TitleScreen(camera));
         }
-        hud.update(delta);
+
+        // update hud, currently used for timer
+        hud.update(remoteManager.getGameTime(), player.getLives(), remoteManager.getRemoteLives());
     }
 
     /**
@@ -134,7 +139,12 @@ public class GameScreen extends ScreenAdapter {
      */
     private void cameraUpdate() {
         // if player is out of bound then set the camera to the center
-        if (player.getPosition().y < -BOUNDS) {
+        if (
+                player.getPosition().y > center.y + BOUNDS
+                        || player.getPosition().y < center.y - BOUNDS
+                        || player.getPosition().x > center.x + BOUNDS
+                        || player.getPosition().x < center.x - BOUNDS
+        ) {
             // "lerp" makes the camera move smoothly back to the center point.
             camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
             camera.update();

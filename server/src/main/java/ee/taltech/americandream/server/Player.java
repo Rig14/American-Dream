@@ -2,16 +2,24 @@ package ee.taltech.americandream.server;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private final int id;
+    private List<BulletData> playerBullets;
     private float x;
     private float y;
     private Direction direction;
+
+    private Integer livesCount;
 
     private final Game game;
     private final Connection connection;
@@ -20,6 +28,7 @@ public class Player {
         this.id = id;
         this.game = game;
         this.connection = connection;
+        this.playerBullets = new ArrayList<>();
         // send id to client
         connection.sendTCP("id:" + id);
         // add listeners
@@ -36,8 +45,19 @@ public class Player {
                     // handle position message
                     handlePositionMessage(positionMessage);
                 }
+
+                // handle bullet position message
+                if (object instanceof BulletPositionMessage bulletPositionMessage) {
+                    // handle bullet position message
+                    handleBullets(bulletPositionMessage);
+                }
             }
         });
+    }
+
+    private void handleBullets(BulletPositionMessage bulletPositionMessage) {
+        // handle bullet position message
+        playerBullets = bulletPositionMessage.playerBullets;
     }
 
     private void onDisconnect() {
@@ -51,6 +71,7 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+        livesCount = positionMessage.livesCount;
     }
 
     public PlayerState getState() {
@@ -60,7 +81,12 @@ public class Player {
         state.x = x;
         state.y = y;
         state.direction = direction;
+        state.livesCount = livesCount;
         return state;
+    }
+
+    public List<BulletData> getPlayerBullets() {
+        return playerBullets;
     }
 
     public void sendGameState(GameStateMessage gameStateMessage) {

@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
+import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
+
+import java.util.ArrayList;
 
 import static helper.Constants.*;
 
@@ -19,6 +23,7 @@ public class AmericanDream extends Game {
     // from literally anywhere in the code
     public static Client client;
     public static int id;
+    public static AmericanDream instance;
 
     /*
      * This method is called when the game is created.
@@ -26,6 +31,7 @@ public class AmericanDream extends Game {
      */
     @Override
     public void create() {
+        instance = this;
         setupConnection();
 
         // listen for id message
@@ -43,8 +49,8 @@ public class AmericanDream extends Game {
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = CAMERA_ZOOM;
-        // navigating to the starting screen
-        setScreen(new GameScreen(camera));
+        // navigating to the title screen
+        setScreen(new TitleScreen(camera));
     }
 
     /*
@@ -60,6 +66,9 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
+        kryo.register(BulletPositionMessage.class);
+        kryo.register(BulletData.class);
+        kryo.register(ArrayList.class);
     }
 
     /*

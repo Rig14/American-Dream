@@ -4,25 +4,28 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
-import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static helper.Constants.LOBBY_SIZE;
 import static helper.Constants.PORTS;
 
 public class GameServer {
-    private Server server;
+    private final Server server;
 
     public GameServer() {
         // setup server and open ports
         this.server = new Server();
+
         // register used classes
         registerClasses();
         try {
@@ -75,5 +78,8 @@ public class GameServer {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
+        kryo.register(BulletPositionMessage.class);
+        kryo.register(BulletData.class);
+        kryo.register(ArrayList.class);
     }
 }
