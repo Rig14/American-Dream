@@ -20,7 +20,7 @@ import static helper.Constants.LOBBY_SIZE;
 import static helper.Constants.PORTS;
 
 public class GameServer {
-    private Server server;
+    private final Server server;
 
     public GameServer() {
         // setup server and open ports

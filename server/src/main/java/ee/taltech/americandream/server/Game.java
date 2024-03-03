@@ -40,11 +40,11 @@ public class Game extends Thread {
 
                 gameStateMessage.gameTime = Math.round(gameTime);
                 gameStateMessage.playerStates = new PlayerState[players.length];
+                gameStateMessage.bulletData = new ArrayList<>();
                 for (int i = 0; i < players.length; i++) {
                     // add player states to the game state message (like position)
                     gameStateMessage.playerStates[i] = players[i].getState();
                     // add bullets to the game state message
-                    gameStateMessage.bulletData = new ArrayList<>();
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
 

@@ -112,8 +112,6 @@ public class Player extends GameEntity {
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
             bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, -BULLET_SPEED));
         }
-
-        Gdx.app.log("Bullets", "Bullets: " + bullets.toString());
     }
 
     /*
