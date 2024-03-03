@@ -30,6 +30,6 @@ public class Bullet {
     }
 
     public boolean shouldRemove(Vector2 center) {
-        return center.x + x > BOUNDS || center.x + x < -BOUNDS || center.y + y > BOUNDS || center.y + y < -BOUNDS;
+        return x > center.x + BOUNDS || x < center.x - BOUNDS || y > center.y + BOUNDS || y < center.y - BOUNDS;
     }
 }
