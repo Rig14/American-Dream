@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static helper.Constants.*;
+import static helper.Textures.TRUMP_TEXTURE;
 
 public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
@@ -83,9 +84,13 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        remoteManager.renderPlayers(batch, player.getDimensions());
+        // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
+        batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
+                player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
 
+        remoteManager.renderPlayers(batch, player.getDimensions());
         remoteManager.renderBullets(batch);
+        remoteManager.renderIndicator(batch, camera.position.x, camera.position.y, player.getDimensions());
 
         batch.end();
 
