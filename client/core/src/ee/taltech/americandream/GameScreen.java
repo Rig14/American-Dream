@@ -3,7 +3,6 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -11,14 +10,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import helper.Constants;
 import helper.Hud;
 import helper.TileMapHelper;
+import objects.RemoteManager;
 import objects.bullet.Bullet;
 import objects.player.Player;
-import objects.RemoteManager;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static helper.Constants.*;
 
@@ -27,8 +27,6 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
-
-    ArrayList<Bullet> bullets;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
 
     private TileMapHelper tileMapHelper;
@@ -37,6 +35,8 @@ public class GameScreen extends ScreenAdapter {
     // game objects
     // client player
     private Player player;
+    // bullets
+    private List<Bullet> bullets;
     // remote players
     private RemoteManager remoteManager;
     // ###################
@@ -62,6 +62,8 @@ public class GameScreen extends ScreenAdapter {
         // remote player manager
         this.remoteManager = new RemoteManager();
 
+        this.bullets = new ArrayList<>();
+
         // create hud
         this.hud = new Hud(this.batch);
     }
@@ -69,18 +71,9 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update(delta);
-
         // shooting code
         player.handleBulletInput(bullets);
-        //update bullets
-        ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
-        for (Bullet bullet : bullets) {
-            bullet.update(delta, center);
-            if (bullet.shouldRemove()) {
-                bulletsToRemove.add(bullet);
-            }
-        }
-        bullets.removeAll(bulletsToRemove);
+
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -92,7 +85,7 @@ public class GameScreen extends ScreenAdapter {
         // object rendering goes here
         remoteManager.renderPlayers(batch, player.getDimensions());
 
-        remoteManager.renderBullets(batch, BULLET_DIMENSIONS);
+        remoteManager.renderBullets(batch);
 
         batch.end();
 
@@ -110,6 +103,14 @@ public class GameScreen extends ScreenAdapter {
 
         // update the camera position
         cameraUpdate();
+
+        //update bullets
+        bullets.forEach(bullet -> bullet.update(delta));
+        // remove out of bound bullets
+        bullets = bullets.stream().filter(b -> !b.shouldRemove(center)).collect(Collectors.toList());
+
+        // send bullets to server
+        remoteManager.sendBullets(bullets);
 
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
@@ -151,9 +152,6 @@ public class GameScreen extends ScreenAdapter {
         camera.position.y = center.y + vector.y / CAMERA_SPEED;
         // update the camera
         camera.update();
-    }
-    public void addBullet(Bullet bullet) {
-        bullets.add(bullet);
     }
 
     public World getWorld() {

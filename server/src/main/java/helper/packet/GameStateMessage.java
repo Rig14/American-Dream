@@ -8,9 +8,6 @@ import java.util.List;
 
 public class GameStateMessage {
     public PlayerState[] playerStates;
-    public List<BulletData> bulletDataList = new ArrayList<>();
-
+    public List<BulletData> bulletData;
     public int gameTime;
-
-
-    }
+}

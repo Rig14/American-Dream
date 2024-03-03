@@ -1,6 +1,9 @@
 package helper.packet;
 
+import helper.BulletData;
+
+import java.util.List;
+
 public class BulletPositionMessage {
-    public float x, y;
-    public float speedBullet;
+    public List<BulletData> playerBullets;
 }

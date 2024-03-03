@@ -33,6 +33,7 @@ public class Player extends GameEntity {
         this.direction = Direction.RIGHT;
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
+
     @Override
     public void update(float delta, Vector2 center) {
         x = body.getPosition().x * PPM;
@@ -93,23 +94,23 @@ public class Player extends GameEntity {
         }
 
 
-
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
 
     }
+
     public void handleBulletInput(List<Bullet> bullets) {
         // shooting code
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, true));
+            bullets.add(new Bullet(this.getPosition().x + 20, this.getPosition().y, BULLET_SPEED));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, false));
+            bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, -BULLET_SPEED));
         }
     }
 
