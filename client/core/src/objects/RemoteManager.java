@@ -1,5 +1,6 @@
 package objects;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
@@ -17,8 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static helper.Constants.BULLET_DIMENSIONS;
-import static helper.Constants.CAMERA_ZOOM;
 import static helper.Constants.OFFSCREEN_X;
 import static helper.Constants.OFFSCREEN_X_NEG;
 import static helper.Constants.OFFSCREEN_Y;
@@ -73,44 +72,49 @@ public class RemoteManager {
         }
     }
 
-    // Render indicator when remote player is off-screen
+    // Render indicator when remote player is off-screen, can handle zoom and replacing with other similar size texture
     public void renderIndicator(SpriteBatch batch, float cameraX, float cameraY, Vector2 playerDimensions) {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
-                if (rp != null && CAMERA_ZOOM == 1.5f) { // Changing zoom level will stop rendering the indicator
+                if (rp != null) {
                     // Check if remote player is off-screen and handle corners "FizzBuzz" style
                     float cameraDeltaX = rp.getX() - cameraX;
                     float cameraDeltaY = rp.getY() - cameraY;
+                    Texture indicator = BULLET_TEXTURE;
 
                     // right
                     if (cameraDeltaX > OFFSCREEN_X) {
-                        if (cameraDeltaY > OFFSCREEN_Y) {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415, cameraY + 325); // up right
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415, cameraY - 350); // down right
-                        } else {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415,
-                                    rp.getY() - playerDimensions.y / 2 + BULLET_DIMENSIONS.y / 2);
+                        if (cameraDeltaY > OFFSCREEN_Y) { // up right
+                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
+                                    cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
+                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) { // down right
+                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
+                                    cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
+                        } else { // right
+                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
+                                    rp.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
                         }
 
                     // left
                     } else if (cameraDeltaX < OFFSCREEN_X_NEG) {
-                        if (cameraDeltaY > OFFSCREEN_Y) {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475, cameraY + 325); // up left
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475, cameraY - 350); // down left
-                        } else {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475,
-                                    rp.getY() - playerDimensions.y / 2 + BULLET_DIMENSIONS.y / 2);
+                        if (cameraDeltaY > OFFSCREEN_Y) { // up left
+                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
+                                    cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
+                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) { // down left
+                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
+                                    cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
+                        } else { // left
+                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
+                                    rp.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
                         }
 
                     // up
-                    } else if (cameraDeltaY > OFFSCREEN_Y) {  // subtracting magic number 15 just works
-                        batch.draw(BULLET_TEXTURE, rp.getX() - playerDimensions.x / 2 - 15, cameraY + 325);
+                    } else if (cameraDeltaY > OFFSCREEN_Y) {
+                        batch.draw(indicator, rp.getX() - playerDimensions.x / 2 - 15, cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
 
                     // down
-                    } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {  // subtracting magic number 15 just works
-                        batch.draw(BULLET_TEXTURE, rp.getX() - playerDimensions.x / 2 - 15, cameraY - 350);
+                    } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
+                        batch.draw(indicator, rp.getX() - playerDimensions.x / 2 - 15, cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
                     }
                 }
             }
