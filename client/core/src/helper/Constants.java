@@ -30,12 +30,4 @@ public class Constants {
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static int LIVES_COUNT = 3;
 
-    // Used for calculating off-screen indicator
-    public static final float PLAYER_BARELY_VISIBLE = 5 * CAMERA_ZOOM;  // Indicator appears before player goes off-screen
-    // Could 266 and 333 somehow be tied to map size or tilemap?
-    public static final float OFFSCREEN_Y = 266.6f * CAMERA_ZOOM - PLAYER_BARELY_VISIBLE;
-    public static final float OFFSCREEN_Y_NEG = -266.6f * CAMERA_ZOOM + PLAYER_BARELY_VISIBLE;
-    public static final float OFFSCREEN_X = 333.3f * CAMERA_ZOOM - PLAYER_BARELY_VISIBLE;
-    public static final float OFFSCREEN_X_NEG = -333.3f * CAMERA_ZOOM + PLAYER_BARELY_VISIBLE;
-
 }

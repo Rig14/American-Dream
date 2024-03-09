@@ -1,6 +1,5 @@
 package objects;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
@@ -14,15 +13,10 @@ import objects.bullet.Bullet;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static helper.Constants.OFFSCREEN_X;
-import static helper.Constants.OFFSCREEN_X_NEG;
-import static helper.Constants.OFFSCREEN_Y;
-import static helper.Constants.OFFSCREEN_Y_NEG;
-import static helper.Textures.BULLET_TEXTURE;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
@@ -75,56 +69,6 @@ public class RemoteManager {
         }
     }
 
-    // Render indicator when remote player is off-screen, can handle zoom and replacing with other similar size texture
-    public void renderIndicator(SpriteBatch batch, float cameraX, float cameraY, Vector2 playerDimensions) {
-        if (allPlayerStates != null) {
-            for (PlayerState player : allPlayerStates) {
-                if (player != null) {
-                    // Check if remote player is off-screen and handle corners "FizzBuzz" style
-                    float cameraDeltaX = player.getX() - cameraX;
-                    float cameraDeltaY = player.getY() - cameraY;
-                    Texture indicator = BULLET_TEXTURE;
-
-                    // right
-                    if (cameraDeltaX > OFFSCREEN_X) {
-                        if (cameraDeltaY > OFFSCREEN_Y) { // up right
-                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
-                                    cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) { // down right
-                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
-                                    cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
-                        } else { // right
-                            batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
-                                    player.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
-                        }
-
-                    // left
-                    } else if (cameraDeltaX < OFFSCREEN_X_NEG) {
-                        if (cameraDeltaY > OFFSCREEN_Y) { // up left
-                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
-                                    cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) { // down left
-                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
-                                    cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
-                        } else { // left
-                            batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
-                                    player.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
-                        }
-
-                    // connecting playerDimensions and texture.getWidth() is likely impossible without magic numbers and weird logic
-                    // up
-                    } else if (cameraDeltaY > OFFSCREEN_Y) {
-                        batch.draw(indicator, player.getX() - playerDimensions.x / 2 - 15, cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
-
-                    // down
-                    } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                        batch.draw(indicator, player.getX() - playerDimensions.x / 2 - 15, cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
-                    }
-                }
-            }
-        }
-    }
-
     // mainly used to update hud time
     public Optional<Integer> getGameTime() {
         if (gameTime != null) {
@@ -145,4 +89,15 @@ public class RemoteManager {
         bulletPositionMessage.playerBullets = bullets.stream().map(Bullet::toBulletData).collect(Collectors.toList());
         AmericanDream.client.sendUDP(bulletPositionMessage);
     }
+
+    // used for off-screen indicator rendering for all players
+    public Optional<PlayerState[]> getAllPlayerStates() {
+        // does not contain null
+        if (allPlayerStates != null
+                && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
+            return Optional.of(allPlayerStates);
+        }
+        return Optional.empty();
+    }
+
 }
