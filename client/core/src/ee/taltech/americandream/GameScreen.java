@@ -14,12 +14,7 @@ import helper.TileMapHelper;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
-import objects.bullet.Bullet;
 import objects.player.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static helper.Constants.*;
 import static helper.Textures.TRUMP_TEXTURE;
@@ -37,8 +32,6 @@ public class GameScreen extends ScreenAdapter {
     // game objects
     // client player
     private Player player;
-    // bullets
-    private List<Bullet> bullets;
     // remote players
     private RemoteManager remoteManager;
     // ###################
@@ -50,7 +43,6 @@ public class GameScreen extends ScreenAdapter {
     private OffScreenIndicator offScreenIndicator;
 
     public GameScreen(OrthographicCamera camera) {
-        this.bullets = new ArrayList<>();
         this.camera = camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -65,8 +57,6 @@ public class GameScreen extends ScreenAdapter {
         // remote player manager
         this.remoteManager = new RemoteManager();
 
-        this.bullets = new ArrayList<>();
-
         // visual info for player
         this.hud = new Hud(this.batch);
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
@@ -75,8 +65,6 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         this.update(delta);
-        // shooting code
-        player.handleBulletInput(bullets);
 
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -112,14 +100,6 @@ public class GameScreen extends ScreenAdapter {
 
         // update the camera position
         cameraUpdate();
-
-        //update bullets
-        bullets.forEach(bullet -> bullet.update(delta));
-        // remove out of bound bullets
-        bullets = bullets.stream().filter(b -> !b.shouldRemove(center)).collect(Collectors.toList());
-
-        // send bullets to server
-        remoteManager.sendBullets(bullets);
 
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera

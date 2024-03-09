@@ -10,10 +10,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
+import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
-import objects.bullet.Bullet;
 
-import java.util.List;
 import java.util.Objects;
 
 import static helper.Constants.*;
@@ -96,22 +95,24 @@ public class Player extends GameEntity {
 
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
-
+        // shooting
+        shootInput();
     }
 
-    public void handleBulletInput(List<Bullet> bullets) {
+    public void shootInput() {
         // shooting code
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
+        BulletMessage bulletMessage = new BulletMessage();
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x + 20, this.getPosition().y, BULLET_SPEED));
+            bulletMessage.direction = Direction.RIGHT;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, -BULLET_SPEED));
+            bulletMessage.direction = Direction.LEFT;
         }
+        AmericanDream.client.sendTCP(bulletMessage);
     }
 
     /*

@@ -7,7 +7,7 @@ import com.esotericsoftware.kryonet.Server;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.BulletPositionMessage;
+import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
@@ -78,7 +78,7 @@ public class GameServer {
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
         kryo.register(IDMessage.class);
-        kryo.register(BulletPositionMessage.class);
+        kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);
     }

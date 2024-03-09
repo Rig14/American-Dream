@@ -8,8 +8,6 @@ import static helper.Constants.GAME_DURATION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static helper.Constants.TICK_RATE;
 
@@ -35,6 +33,10 @@ public class Game extends Thread {
     public void run() {
         while (running) {
             try {
+                // update players
+                for (Player player : players) {
+                    player.update(1000f / TICK_RATE / 1000f);
+                }
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
 
