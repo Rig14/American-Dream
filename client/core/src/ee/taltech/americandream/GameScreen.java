@@ -106,6 +106,8 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
 
+        remoteManager.testForHit(player);
+
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));

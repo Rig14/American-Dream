@@ -1,15 +1,16 @@
 package ee.taltech.americandream.server;
 
 import com.esotericsoftware.kryonet.Connection;
+import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 
-import static helper.Constants.GAME_DURATION;
-
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import static helper.Constants.TICK_RATE;
+import static helper.Constants.*;
 
 public class Game extends Thread {
 
@@ -49,6 +50,9 @@ public class Game extends Thread {
                     // add bullets to the game state message
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
+                
+                // handle bullets hitting players
+                handleBulletHits(gameStateMessage);
 
                 // send game state message to all players
                 for (Player player : players) {
@@ -73,6 +77,37 @@ public class Game extends Thread {
 
             } catch (InterruptedException e) {
                 running = false;
+            }
+        }
+    }
+
+    private void handleBulletHits(GameStateMessage gameStateMessage) {
+        List<BulletData> bullets = gameStateMessage.bulletData;
+        PlayerState[] players = gameStateMessage.playerStates;
+
+        // construct rectangles for players
+        Rectangle[] playerHitboxes = new Rectangle[players.length];
+        for (int i = 0; i < players.length; i++) {
+            playerHitboxes[i] = new Rectangle((int) players[i].x, (int) players[i].y, PLAYER_WIDTH, PLAYER_HEIGHT);
+        }
+
+        // check if bullets hit players
+        for (BulletData bullet: bullets) {
+            // construct bullet hitbox
+            Rectangle bulletHitbox = new Rectangle((int) bullet.x, (int) bullet.y, BULLET_HITBOX, BULLET_HITBOX);
+            // check if bullet hit any player
+            for (int i = 0; i < playerHitboxes.length; i++) {
+                if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
+                                && !bullet.isDisabled // has already hit
+                        && bullet.id != players[i].id // is not the player who shot the bullet
+                ) {
+                    // remove bullet
+                    bullet.isDisabled = true;
+                    // calculate force to apply to player
+                    float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
+                    // apply force to player
+                    players[i].applyForce = force;
+                }
             }
         }
     }

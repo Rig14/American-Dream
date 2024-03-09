@@ -9,6 +9,7 @@ import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
+import objects.player.Player;
 import objects.player.RemotePlayer;
 
 import java.util.Arrays;
@@ -21,6 +22,7 @@ public class RemoteManager {
     private Integer remoteLives = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
+    private float onHitForce;
 
 
     public RemoteManager() {
@@ -39,6 +41,10 @@ public class RemoteManager {
                         if (ps.id != AmericanDream.id) {
                             remoteLives = ps.livesCount;
                             remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
+                        } else {
+                            // current player
+                            // get the force of the hit
+                            onHitForce = ps.applyForce;
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -61,6 +67,8 @@ public class RemoteManager {
     public void renderBullets(SpriteBatch batch) {
         if (remoteBullets != null) {
             for (BulletData bullet : remoteBullets) {
+                if (bullet.isDisabled) continue;
+
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
         }
@@ -91,4 +99,12 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+
+    public void testForHit(Player player) {
+        if (onHitForce != 0) {
+            // TODO figure out a way to apply force to the player
+
+            onHitForce = 0;
+        }
+    }
 }
