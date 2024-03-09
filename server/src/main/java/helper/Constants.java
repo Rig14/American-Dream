@@ -5,5 +5,7 @@ public class Constants {
     public static final int LOBBY_SIZE = 2;
     public static final int TICK_RATE = 60;
     public static final int GAME_DURATION = 300;
-    public static final float SPEED_BULLET = 500f;
+    public static final float BOUNDS = 1000f;
+    public static final float SHOOT_DELAY = 1f;
+    public static final float PISTOL_BULLET_SPEED = 5;
 }

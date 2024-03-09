@@ -7,16 +7,13 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
-import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
-import objects.bullet.Bullet;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
@@ -82,12 +79,6 @@ public class RemoteManager {
             return Optional.of(remoteLives);
         }
         return Optional.empty();
-    }
-
-    public void sendBullets(List<Bullet> bullets) {
-        BulletPositionMessage bulletPositionMessage = new BulletPositionMessage();
-        bulletPositionMessage.playerBullets = bullets.stream().map(Bullet::toBulletData).collect(Collectors.toList());
-        AmericanDream.client.sendUDP(bulletPositionMessage);
     }
 
     // used for off-screen indicator rendering for all players

@@ -5,12 +5,14 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.BulletPositionMessage;
+import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static helper.Constants.*;
 
 public class Player {
     private final int id;
@@ -22,6 +24,8 @@ public class Player {
     private Integer livesCount;
 
     private final Game game;
+    private BulletData nextBullet;
+    private float bulletTimeout;
     private final Connection connection;
     public Player(Connection connection, Game game, int id) {
         // create player
@@ -29,6 +33,7 @@ public class Player {
         this.game = game;
         this.connection = connection;
         this.playerBullets = new ArrayList<>();
+        this.bulletTimeout = 0;
         // send id to client
         connection.sendTCP("id:" + id);
         // add listeners
@@ -47,17 +52,39 @@ public class Player {
                 }
 
                 // handle bullet position message
-                if (object instanceof BulletPositionMessage bulletPositionMessage) {
+                if (object instanceof BulletMessage bulletMessage) {
                     // handle bullet position message
-                    handleBullets(bulletPositionMessage);
+                    handleBullets(bulletMessage);
                 }
             }
         });
     }
 
-    private void handleBullets(BulletPositionMessage bulletPositionMessage) {
-        // handle bullet position message
-        playerBullets = bulletPositionMessage.playerBullets;
+    private void handleBullets(BulletMessage bulletMessage) {
+        // handle bullet message
+        BulletData bulletData = new BulletData();
+        bulletData.x = x + (bulletMessage.direction == Direction.LEFT ? -1 : 1) * 20;
+        bulletData.y = y;
+        bulletData.speedBullet = PISTOL_BULLET_SPEED * (bulletMessage.direction == Direction.LEFT ? -1 : 1);
+        nextBullet = bulletData;
+    }
+
+    public void update(float delta) {
+        // update player
+        // will shoot a bullet if the bulletTimeout is 0
+        if (nextBullet != null && bulletTimeout >= SHOOT_DELAY) {
+            playerBullets.add(nextBullet);
+            bulletTimeout = 0;
+            nextBullet = null;
+        }
+        bulletTimeout += delta;
+
+        // remove bullets that are out of bounds
+        playerBullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);
+        // move bullets
+        for (BulletData bullet : playerBullets) {
+            bullet.x += bullet.speedBullet;
+        }
     }
 
     private void onDisconnect() {
