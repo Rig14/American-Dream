@@ -14,7 +14,7 @@ public class Constants {
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
-    public static final float CAMERA_ZOOM = 1.5f;
+    public static final float CAMERA_ZOOM = 0.5f;
 
     // the bounds of the map (for camera and player deaths)
     // higher means player can go further down

@@ -10,9 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import helper.TileMapHelper;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
-import helper.TileMapHelper;
 import objects.RemoteManager;
 import objects.bullet.Bullet;
 import objects.player.Player;
@@ -94,7 +94,7 @@ public class GameScreen extends ScreenAdapter {
 
         remoteManager.renderPlayers(batch, player.getDimensions());
         remoteManager.renderBullets(batch);
-        offScreenIndicator.renderIndicators(batch, camera.position, remoteManager.getAllPlayerStates());
+        offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
 
         batch.end();
 
@@ -173,5 +173,11 @@ public class GameScreen extends ScreenAdapter {
 
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        camera.setToOrtho(false, width, height);
     }
 }
