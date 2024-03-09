@@ -24,7 +24,7 @@ public class Player {
     private Integer livesCount;
 
     private final Game game;
-    private BulletData nextBullet;
+    private Direction nextBulletDirection;
     private float bulletTimeout;
     private final Connection connection;
     public Player(Connection connection, Game game, int id) {
@@ -62,20 +62,23 @@ public class Player {
 
     private void handleBullets(BulletMessage bulletMessage) {
         // handle bullet message
-        BulletData bulletData = new BulletData();
-        bulletData.x = x + (bulletMessage.direction == Direction.LEFT ? -1 : 1) * 20;
-        bulletData.y = y;
-        bulletData.speedBullet = PISTOL_BULLET_SPEED * (bulletMessage.direction == Direction.LEFT ? -1 : 1);
-        nextBullet = bulletData;
+        nextBulletDirection = bulletMessage.direction;
     }
 
     public void update(float delta) {
         // update player
         // will shoot a bullet if the bulletTimeout is 0
-        if (nextBullet != null && bulletTimeout >= SHOOT_DELAY) {
-            playerBullets.add(nextBullet);
+        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY) {
+            // construct the bullet to be shot
+            BulletData bulletData = new BulletData();
+            bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
+            bulletData.y = y;
+            bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
+            playerBullets.add(bulletData);
+
+            // reset timer and bullet shooting direction
             bulletTimeout = 0;
-            nextBullet = null;
+            nextBulletDirection = null;
         }
         bulletTimeout += delta;
 

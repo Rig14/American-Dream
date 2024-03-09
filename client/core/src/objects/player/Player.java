@@ -102,18 +102,17 @@ public class Player extends GameEntity {
     public void shootInput() {
         // shooting code
         BulletMessage bulletMessage = new BulletMessage();
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
             bulletMessage.direction = Direction.RIGHT;
-            AmericanDream.client.sendTCP(bulletMessage);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
             bulletMessage.direction = Direction.LEFT;
-            AmericanDream.client.sendTCP(bulletMessage);
         }
+        AmericanDream.client.sendTCP(bulletMessage);
     }
 
     /*

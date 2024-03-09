@@ -35,7 +35,7 @@ public class Game extends Thread {
             try {
                 // update players
                 for (Player player : players) {
-                    player.update(1000f / TICK_RATE);
+                    player.update(1000f / TICK_RATE / 1000f);
                 }
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
