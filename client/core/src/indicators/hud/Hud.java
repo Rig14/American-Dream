@@ -1,4 +1,4 @@
-package helper;
+package indicators.hud;
 
 
 import com.badlogic.gdx.graphics.Color;

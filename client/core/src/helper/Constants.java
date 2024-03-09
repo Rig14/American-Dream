@@ -14,7 +14,7 @@ public class Constants {
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
-    public static final float CAMERA_ZOOM = 1.5f; // Changing this will currently break off-screen indicator
+    public static final float CAMERA_ZOOM = 1.5f;
 
     // the bounds of the map (for camera and player deaths)
     // higher means player can go further down
@@ -29,11 +29,5 @@ public class Constants {
     public static final float BULLET_SPEED = 500f;
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static int LIVES_COUNT = 3;
-
-    // Used for calculating off-screen indicator
-    public static final int OFFSCREEN_Y = 400;
-    public static final int OFFSCREEN_Y_NEG = -400;
-    public static final int OFFSCREEN_X_NEG = -495;
-    public static final int OFFSCREEN_X = 495;
 
 }

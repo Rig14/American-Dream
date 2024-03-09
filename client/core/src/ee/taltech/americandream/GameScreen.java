@@ -10,7 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import helper.Hud;
+import indicators.OffScreenIndicator;
+import indicators.hud.Hud;
 import helper.TileMapHelper;
 import objects.RemoteManager;
 import objects.bullet.Bullet;
@@ -46,6 +47,7 @@ public class GameScreen extends ScreenAdapter {
     private Vector2 center;
     // game screen overlay
     private Hud hud;
+    private OffScreenIndicator offScreenIndicator;
 
     public GameScreen(OrthographicCamera camera) {
         this.bullets = new ArrayList<>();
@@ -65,8 +67,9 @@ public class GameScreen extends ScreenAdapter {
 
         this.bullets = new ArrayList<>();
 
-        // create hud
+        // visual info for player
         this.hud = new Hud(this.batch);
+        this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
     }
 
     @Override
@@ -84,13 +87,14 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
+
         // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
         batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
                 player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
 
         remoteManager.renderPlayers(batch, player.getDimensions());
         remoteManager.renderBullets(batch);
-        remoteManager.renderIndicator(batch, camera.position.x, camera.position.y, player.getDimensions());
+        offScreenIndicator.renderIndicators(batch, camera.position, remoteManager.getAllPlayerStates());
 
         batch.end();
 
