@@ -29,12 +29,15 @@ public class RemoteManager {
     private Integer gameTime = null;
     private Integer remoteLives = null;
     private List<BulletData> remoteBullets;
+    private PlayerState[] allPlayerStates;
+
 
     public RemoteManager() {
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
+                    allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
 
@@ -74,12 +77,12 @@ public class RemoteManager {
 
     // Render indicator when remote player is off-screen, can handle zoom and replacing with other similar size texture
     public void renderIndicator(SpriteBatch batch, float cameraX, float cameraY, Vector2 playerDimensions) {
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
+        if (allPlayerStates != null) {
+            for (PlayerState player : allPlayerStates) {
+                if (player != null) {
                     // Check if remote player is off-screen and handle corners "FizzBuzz" style
-                    float cameraDeltaX = rp.getX() - cameraX;
-                    float cameraDeltaY = rp.getY() - cameraY;
+                    float cameraDeltaX = player.getX() - cameraX;
+                    float cameraDeltaY = player.getY() - cameraY;
                     Texture indicator = BULLET_TEXTURE;
 
                     // right
@@ -92,7 +95,7 @@ public class RemoteManager {
                                     cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
                         } else { // right
                             batch.draw(indicator, cameraX + OFFSCREEN_X - indicator.getWidth() * 1.25f,
-                                    rp.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
+                                    player.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
                         }
 
                     // left
@@ -105,16 +108,17 @@ public class RemoteManager {
                                     cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
                         } else { // left
                             batch.draw(indicator, cameraX - OFFSCREEN_X + indicator.getWidth() * 0.25f,
-                                    rp.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
+                                    player.getY() - playerDimensions.y / 2 + indicator.getHeight() / 2f);
                         }
 
+                    // connecting playerDimensions and texture.getWidth() is likely impossible without magic numbers and weird logic
                     // up
                     } else if (cameraDeltaY > OFFSCREEN_Y) {
-                        batch.draw(indicator, rp.getX() - playerDimensions.x / 2 - 15, cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
+                        batch.draw(indicator, player.getX() - playerDimensions.x / 2 - 15, cameraY + OFFSCREEN_Y - indicator.getHeight() * 2.5f);
 
                     // down
                     } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                        batch.draw(indicator, rp.getX() - playerDimensions.x / 2 - 15, cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
+                        batch.draw(indicator, player.getX() - playerDimensions.x / 2 - 15, cameraY - OFFSCREEN_Y + indicator.getHeight() * 1.5f);
                     }
                 }
             }
