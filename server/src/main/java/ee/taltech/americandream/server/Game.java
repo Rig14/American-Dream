@@ -94,7 +94,7 @@ public class Game extends Thread {
         // check if bullets hit players
         for (BulletData bullet: bullets) {
             // construct bullet hitbox
-            Rectangle bulletHitbox = new Rectangle((int) bullet.x, (int) bullet.y, BULLET_HITBOX, BULLET_HITBOX);
+            Rectangle bulletHitbox = new Rectangle((int) bullet.x - BULLET_HITBOX / 2, (int) bullet.y - BULLET_HITBOX / 2, BULLET_HITBOX, BULLET_HITBOX);
             // check if bullet hit any player
             for (int i = 0; i < playerHitboxes.length; i++) {
                 if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
