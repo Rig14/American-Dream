@@ -87,7 +87,9 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
 
         // for debugging
-        debugRenderer.render(world, camera.combined.scl(PPM));
+        if (DEBUG) {
+            debugRenderer.render(world, camera.combined.scl(PPM));
+        }
 
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
