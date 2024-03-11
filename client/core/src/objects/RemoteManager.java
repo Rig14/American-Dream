@@ -105,6 +105,11 @@ public class RemoteManager {
 
 
     public void testForHit(World world) {
+        // currently the force is applied like so:
+        // make the horizontal gravity equal to the force
+        // and then make the force smaller over time
+        // until it is small enough to reset the gravity
+        
         if (onHitForce != 0) {
             world.setGravity(new Vector2(onHitForce, GRAVITY));
 
@@ -112,7 +117,7 @@ public class RemoteManager {
             onHitForce *= 0.9f;
         }
         // reset gravity if hit force is small enough
-        if (Math.abs(onHitForce) < 0.1) {
+        if (Math.abs(onHitForce) < 2) {
             world.setGravity(new Vector2(0, GRAVITY));
             onHitForce = 0;
         }
