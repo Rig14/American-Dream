@@ -2,6 +2,7 @@ package objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
@@ -9,12 +10,13 @@ import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
-import objects.player.Player;
 import objects.player.RemotePlayer;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
@@ -44,7 +46,9 @@ public class RemoteManager {
                         } else {
                             // current player
                             // get the force of the hit
-                            onHitForce = ps.applyForce;
+                            if (ps.applyForce != 0) {
+                                onHitForce = ps.applyForce;
+                            }
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -100,10 +104,16 @@ public class RemoteManager {
     }
 
 
-    public void testForHit(Player player) {
+    public void testForHit(World world) {
         if (onHitForce != 0) {
-            // TODO figure out a way to apply force to the player
+            world.setGravity(new Vector2(onHitForce, GRAVITY));
 
+            // make on hit force smaller
+            onHitForce *= 0.9f;
+        }
+        // reset gravity if hit force is small enough
+        if (Math.abs(onHitForce) < 0.1) {
+            world.setGravity(new Vector2(0, GRAVITY));
             onHitForce = 0;
         }
     }

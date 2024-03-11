@@ -106,7 +106,7 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
 
-        remoteManager.testForHit(player);
+        remoteManager.testForHit(world);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
