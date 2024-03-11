@@ -88,7 +88,7 @@ public class Game extends Thread {
         // construct rectangles for players
         Rectangle[] playerHitboxes = new Rectangle[players.length];
         for (int i = 0; i < players.length; i++) {
-            playerHitboxes[i] = new Rectangle((int) players[i].x, (int) players[i].y, PLAYER_WIDTH, PLAYER_HEIGHT);
+            playerHitboxes[i] = new Rectangle((int) players[i].x - PLAYER_WIDTH / 2, (int) players[i].y - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT);
         }
 
         // check if bullets hit players
