@@ -6,6 +6,11 @@ public class Constants {
     public static final int TICK_RATE = 60;
     public static final int GAME_DURATION = 300;
     public static final float BOUNDS = 1000f;
-    public static final float SHOOT_DELAY = 0.5f;
+    public static final float SHOOT_DELAY = 0.3f;
     public static final float PISTOL_BULLET_SPEED = 5;
+    public static final int PLAYER_HEIGHT = 64;
+    public static final int PLAYER_WIDTH = 32;
+    // should be the same as the bullet texture size in the client
+    public static final int BULLET_HITBOX = 20;
+    public static final float PISTOL_BULLET_FORCE = 1000;
 }

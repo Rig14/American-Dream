@@ -5,5 +5,5 @@ public class BulletData {
     public float x, y;
 
     public float speedBullet;
-
+    public boolean isDisabled;
 }

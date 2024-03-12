@@ -87,7 +87,9 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
 
         // for debugging
-        debugRenderer.render(world, camera.combined.scl(PPM));
+        if (DEBUG) {
+            debugRenderer.render(world, camera.combined.scl(PPM));
+        }
 
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -105,6 +107,8 @@ public class GameScreen extends ScreenAdapter {
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
+
+        remoteManager.testForHit(world);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {

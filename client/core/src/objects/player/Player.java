@@ -142,7 +142,7 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        // here we can draw the player sprite eventually
+        // here we can draw the player sprite eventuallyq
     }
 
     public Vector2 getPosition() {

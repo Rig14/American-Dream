@@ -72,10 +72,10 @@ public class Player {
             // construct the bullet to be shot
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
+            bulletData.id = id;
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);
-
             // reset timer and bullet shooting direction
             bulletTimeout = 0;
             nextBulletDirection = null;
