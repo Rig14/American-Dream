@@ -89,7 +89,7 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
 
         // for debugging
-        if (DEBUG) {
+        if (GAMEPLAY_DEBUG) {
             debugRenderer.render(world, camera.combined.scl(PPM));
         }
 

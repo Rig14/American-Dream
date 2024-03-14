@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Constants {
     // debug mode
-    public static final boolean DEBUG = false;
+    public static final boolean GAMEPLAY_DEBUG = true;
     // pixels per meter (not sure what it does)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
@@ -30,5 +30,4 @@ public class Constants {
     public static final String IP_ADDRESS = "localhost";
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static final int LIVES_COUNT = 3;
-    public static final int LOBBY_REFRESH_RATE_IN_SECONDS = 1;
 }
