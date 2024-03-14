@@ -8,26 +8,34 @@ import com.badlogic.gdx.utils.Array;
 import org.w3c.dom.Text;
 
 public class PlayerAnimations {
-    private TextureAtlas textureAtlas;
-    private Animation<TextureRegion> walkAnimation;
-    private Animation<TextureRegion> idleAnimation;
+    private final TextureAtlas textureAtlas;
+    private final Animation<TextureRegion> walkAnimation;
+    private final Animation<TextureRegion> walkLeftAnimation;
+    private final Animation<TextureRegion> idleAnimation;
 
     public PlayerAnimations() {
         textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
         walkAnimation = createAnimation("soldier-walk", 1f, Animation.PlayMode.LOOP);
-        walkAnimation = createAnimation("soldier-walk", 1f, Animation.PlayMode.LOOP);
+        walkLeftAnimation = generateWalkLeftAnimation();
         idleAnimation = createAnimation("soldier-idle", 1f, Animation.PlayMode.LOOP);
     }
 
     public Animation<TextureRegion> getWalkAnimation() {
         return walkAnimation;
     }
-    public Animation<TextureRegion> getWalkLeftAnimation() {
+    public Animation<TextureRegion> generateWalkLeftAnimation() {
         Array<TextureAtlas.AtlasRegion> frames = textureAtlas.findRegions("soldier-walk");
+        Array<TextureAtlas.AtlasRegion> flippedFrames = new Array<>();
+
         for (TextureAtlas.AtlasRegion region : frames) {
-            region.flip(true, false);
+            TextureAtlas.AtlasRegion flippedRegion = new TextureAtlas.AtlasRegion(region);
+            flippedRegion.flip(true, false);
+            flippedFrames.add(flippedRegion);
         }
-        Animation<TextureRegion> walkLeftAnimation = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
+
+        return new Animation<>(1f, flippedFrames, Animation.PlayMode.LOOP);
+    }
+    public Animation<TextureRegion> getWalkLeftAnimation() {
         return walkLeftAnimation;
     }
 

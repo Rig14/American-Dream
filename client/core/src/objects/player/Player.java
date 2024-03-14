@@ -30,7 +30,7 @@ public class Player extends GameEntity {
     private Integer livesCount = LIVES_COUNT;
     private Animation<TextureRegion> walkAnimation;
     private Animation<TextureRegion> currentAnimation;
-    private PlayerAnimations playerAnimations;
+    private final PlayerAnimations playerAnimations;
 
 
     public Player(float width, float height, Body body) {
@@ -38,6 +38,7 @@ public class Player extends GameEntity {
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
+        this.playerAnimations = new PlayerAnimations();
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
@@ -156,7 +157,10 @@ public class Player extends GameEntity {
     public void render(SpriteBatch batch) {
         if (velX > 0) {
             setCurrentAnimation(playerAnimations.getWalkAnimation());
+        } else {
+            setCurrentAnimation(playerAnimations.getIdleAnimation());
         }
+        batch.draw(currentAnimation.getKeyFrame(0.5f, true), x, y, width, height);
     }
 
     public Vector2 getPosition() {
