@@ -1,6 +1,8 @@
 package ee.taltech.americandream.server;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import helper.packet.GameLeaveMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,18 @@ public class Lobby {
 
     public void addConnection(Connection connection) {
         removeDisconnected();
+
+        // check for game leave message
+        connection.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                super.received(connection, object);
+                if (object instanceof GameLeaveMessage) {
+                    // remove connection from lobby
+                    connections.remove(connection);
+                }
+            }
+        });
 
         // check if lobby is full
         if (connections.size() >= lobbySize) return;

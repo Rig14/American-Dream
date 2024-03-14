@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
+import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
@@ -114,6 +115,9 @@ public class GameScreen extends ScreenAdapter {
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));
+
+            // send message to server to remove player from lobby
+            AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
 
         // update hud, currently used for timer

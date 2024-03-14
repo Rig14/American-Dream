@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import helper.packet.GameLeaveMessage;
 
 public class LobbyScreen extends ScreenAdapter {
     private final TextButton startGameButton;
@@ -60,6 +61,8 @@ public class LobbyScreen extends ScreenAdapter {
         // pressing ESC
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
+            // send message to server to remove player from lobby
+            AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
     }
 

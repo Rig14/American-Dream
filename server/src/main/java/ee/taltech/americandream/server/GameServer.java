@@ -83,6 +83,7 @@ public class GameServer extends Thread {
         kryo.register(LobbyDataMessage.class);
         kryo.register(HashMap.class);
         kryo.register(JoinLobbyMessage.class);
+        kryo.register(GameLeaveMessage.class);
     }
 
 

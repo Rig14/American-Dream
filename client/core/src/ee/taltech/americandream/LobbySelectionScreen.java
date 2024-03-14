@@ -45,6 +45,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         // buttons style
         buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont();
+        buttonStyle.font.getData().setScale(3);
         buttonStyle.fontColor = Color.WHITE;
 
         // to update lobby on load
