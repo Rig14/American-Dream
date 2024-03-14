@@ -10,9 +10,11 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
+import helper.packet.LobbyDataMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static helper.Constants.*;
 
@@ -60,6 +62,8 @@ public class AmericanDream extends Game {
         kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);
+        kryo.register(LobbyDataMessage.class);
+        kryo.register(HashMap.class);
     }
 
     /*

@@ -9,6 +9,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import helper.packet.LobbyDataMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static helper.Constants.LOBBY_REFRESH_RATE_IN_SECONDS;
 
@@ -18,11 +24,13 @@ public class LobbySelectionScreen extends ScreenAdapter {
     private final Table table;
     private final Label.LabelStyle titleStyle;
     private float timeSinceLastUpdate = 0;
+    private Map<Integer, String> lobbyData;
 
     public LobbySelectionScreen(Camera camera) {
         this.camera = camera;
         this.stage = new Stage();
         this.table = new Table();
+        this.lobbyData = new HashMap<>();
 
         // title text style
         BitmapFont titleFont = new BitmapFont();
@@ -31,6 +39,18 @@ public class LobbySelectionScreen extends ScreenAdapter {
 
         // to update lobby on load
         this.timeSinceLastUpdate = LOBBY_REFRESH_RATE_IN_SECONDS + 1;
+
+        // add listener for lobby data messages
+        AmericanDream.client.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                if (object instanceof LobbyDataMessage) {
+                    LobbyDataMessage lobbyDataMessage = (LobbyDataMessage) object;
+                    lobbyData = lobbyDataMessage.lobbies;
+                    System.out.println("Received lobby data: " + lobbyData);
+                }
+            }
+        });
 
         Gdx.input.setInputProcessor(stage);
 

@@ -47,4 +47,12 @@ public class Lobby {
         Game game = new Game(connections.toArray(new Connection[0]));
         game.start();
     }
+
+    public int getId() {
+        return lobbyId;
+    }
+
+    public String getStatus() {
+        return name + " " + connections.size() + "/" + lobbySize;
+    }
 }

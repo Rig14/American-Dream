@@ -9,17 +9,18 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
+import helper.packet.LobbyDataMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-import static helper.Constants.LOBBY_SIZE;
-import static helper.Constants.PORTS;
+import static helper.Constants.*;
 
-public class GameServer {
+public class GameServer extends Thread {
     private final Server server;
     private final List<Lobby> lobbies;
 
@@ -57,7 +58,8 @@ public class GameServer {
     }
 
     public static void main(String[] args) {
-        new GameServer();
+        GameServer gameServer = new GameServer();
+        gameServer.start();
     }
 
     private void registerClasses() {
@@ -71,5 +73,27 @@ public class GameServer {
         kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);
+        kryo.register(LobbyDataMessage.class);
+        kryo.register(HashMap.class);
+    }
+
+
+    @Override
+    public void run() {
+        super.run();
+        try {
+            while (true) {
+                // send lobby data message to all clients
+                LobbyDataMessage lobbyDataMessage = new LobbyDataMessage();
+                lobbyDataMessage.lobbies = new HashMap<>();
+                lobbies.forEach((l) -> lobbyDataMessage.lobbies.put(l.getId(), l.getStatus()));
+                server.sendToAllTCP(lobbyDataMessage);
+
+                Thread.sleep(LOBBY_UPDATE_RATE_IN_SECONDS * 1000);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
