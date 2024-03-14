@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -42,8 +43,8 @@ public class GameScreen extends ScreenAdapter {
     private Hud hud;
     private OffScreenIndicator offScreenIndicator;
 
-    public GameScreen(OrthographicCamera camera) {
-        this.camera = camera;
+    public GameScreen(Camera camera) {
+        this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity

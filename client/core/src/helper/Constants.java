@@ -30,6 +30,6 @@ public class Constants {
     public static final String IP_ADDRESS = "localhost";
     public static final float BULLET_SPEED = 500f;
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
-    public static int LIVES_COUNT = 3;
-
+    public static final int LIVES_COUNT = 3;
+    public static final int LOBBY_REFRESH_RATE_IN_SECONDS = 5;
 }

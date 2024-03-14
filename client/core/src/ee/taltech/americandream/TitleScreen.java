@@ -3,8 +3,8 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,7 +18,7 @@ public class TitleScreen extends ScreenAdapter {
 
     private final Stage stage;
 
-    public TitleScreen(OrthographicCamera camera) {
+    public TitleScreen(Camera camera) {
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
@@ -49,8 +49,8 @@ public class TitleScreen extends ScreenAdapter {
         multiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                // navigate to multiplayer screen
-                AmericanDream.instance.setScreen(new GameScreen(camera));
+                // navigate to lobby screen
+                AmericanDream.instance.setScreen(new LobbyScreen(camera));
             }
         });
 
