@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Constants {
     // debug mode
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     // pixels per meter (not sure what it does)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
@@ -16,7 +16,7 @@ public class Constants {
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
-    public static final float CAMERA_ZOOM = 0.5f;
+    public static final float CAMERA_ZOOM = 1.5f;
 
     // the bounds of the map (for camera and player deaths)
     // higher means player can go further down

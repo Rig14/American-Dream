@@ -158,10 +158,4 @@ public class GameScreen extends ScreenAdapter {
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
     }
-
-    @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        camera.setToOrtho(false, width, height);
-    }
 }
