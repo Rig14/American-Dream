@@ -98,8 +98,10 @@ public class GameServer extends Thread {
                     lobbyDataMessage.lobbies.put(l.getId(), l.getStatus());
                     l.removeDisconnected();
 
-                    // start a game if lobby is full
-                    l.startGame();
+                    if (l.canStartGame()) {
+                        // start a game if lobby is full
+                        l.startGame();
+                    }
                 });
                 server.sendToAllTCP(lobbyDataMessage);
 

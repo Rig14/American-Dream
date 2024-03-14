@@ -41,19 +41,13 @@ public class Lobby {
     }
 
     public void startGame() {
-        // check if lobby is full
-        if (connections.size() < lobbySize) return;
+        // create array of connections
+        Connection[] connectionArray = new Connection[connections.size()];
+        connectionArray = connections.toArray(connectionArray);
 
-        // start game if game is null
-        if (game == null) {
-            // create a array of connections
-            Connection[] connectionArray = new Connection[connections.size()];
-            connectionArray = connections.toArray(connectionArray);
-
-            // create a new game
-            game = new Game(connectionArray);
-            game.start();
-        }
+        // create a new game and start it
+        game = new Game(connectionArray);
+        game.start();
     }
 
     public int getId() {
@@ -62,5 +56,10 @@ public class Lobby {
 
     public String getStatus() {
         return name + " " + connections.size() + "/" + lobbySize;
+    }
+
+    public boolean canStartGame() {
+        removeDisconnected();
+        return connections.size() >= lobbySize && game == null;
     }
 }

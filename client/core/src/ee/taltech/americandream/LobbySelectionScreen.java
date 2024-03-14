@@ -83,7 +83,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         stage.draw();
 
         // ESC navigate to title screen
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));
         }
     }
@@ -115,7 +115,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
                     AmericanDream.client.sendTCP(joinLobbyMessage);
 
                     // navigate to lobby screen
-                    AmericanDream.instance.setScreen(new GameScreen(camera));
+                    AmericanDream.instance.setScreen(new LobbyScreen(camera));
                 }
             });
 
@@ -131,5 +131,11 @@ public class LobbySelectionScreen extends ScreenAdapter {
     public void dispose() {
         super.dispose();
         stage.dispose();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        stage.getViewport().update(width, height, true);
     }
 }
