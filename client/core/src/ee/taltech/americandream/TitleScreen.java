@@ -50,7 +50,7 @@ public class TitleScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 // navigate to lobby screen
-                AmericanDream.instance.setScreen(new LobbyScreen(camera));
+                AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             }
         });
 

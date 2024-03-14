@@ -12,14 +12,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import static helper.Constants.LOBBY_REFRESH_RATE_IN_SECONDS;
 
-public class LobbyScreen extends ScreenAdapter {
+public class LobbySelectionScreen extends ScreenAdapter {
     private final Camera camera;
     private final Stage stage;
     private final Table table;
     private final Label.LabelStyle titleStyle;
     private float timeSinceLastUpdate = 0;
 
-    public LobbyScreen(Camera camera) {
+    public LobbySelectionScreen(Camera camera) {
         this.camera = camera;
         this.stage = new Stage();
         this.table = new Table();
