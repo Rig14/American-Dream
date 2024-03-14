@@ -46,7 +46,7 @@ public class Lobby {
         connectionArray = connections.toArray(connectionArray);
 
         // create a new game and start it
-        game = new Game(connectionArray);
+        game = new Game(connectionArray, this);
         game.start();
     }
 
@@ -61,5 +61,10 @@ public class Lobby {
     public boolean canStartGame() {
         removeDisconnected();
         return connections.size() >= lobbySize && game == null;
+    }
+
+    public void clearLobby() {
+        connections.clear();
+        game = null;
     }
 }

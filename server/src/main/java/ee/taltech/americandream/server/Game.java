@@ -18,16 +18,18 @@ public class Game extends Thread {
     private boolean running = true;
     private Player[] players;
     private boolean bothJoinedMultiplayer = false;
+    private final Lobby lobby;
 
-    public Game(Connection[] connections) {
+    public Game(Connection[] connections, Lobby lobby) {
         // set game duration
         this.gameTime = GAME_DURATION;
+        this.lobby = lobby;
 
         players = new Player[connections.length];
         // start game with connections
         // make players from connections
         for (int i = 0; i < connections.length; i++) {
-            players[i] = new Player(connections[i], this, i+1);
+            players[i] = new Player(connections[i], this, connections[i].getID());
         }
     }
 
@@ -114,5 +116,6 @@ public class Game extends Thread {
 
     public void end() {
         running = false;
+        lobby.clearLobby();
     }
 }
