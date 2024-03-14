@@ -43,6 +43,7 @@ public class GameScreen extends ScreenAdapter {
     private OffScreenIndicator offScreenIndicator;
 
     public GameScreen(OrthographicCamera camera) {
+
         this.camera = camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants

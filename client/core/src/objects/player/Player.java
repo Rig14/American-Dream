@@ -1,6 +1,5 @@
 package objects.player;
 
-import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
@@ -17,11 +16,14 @@ import helper.Direction;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.io.CharArrayWriter;
 import java.util.Objects;
 
 import static helper.Constants.*;
 
 public class Player extends GameEntity {
+
+    public enum State { WALKING, IDLE, JUMPING }
     private final float speed;
     private Direction direction;
     private int jumpCounter;
@@ -30,7 +32,12 @@ public class Player extends GameEntity {
     private Integer livesCount = LIVES_COUNT;
     private Animation<TextureRegion> walkAnimation;
     private Animation<TextureRegion> currentAnimation;
-    private final PlayerAnimations playerAnimations;
+    private Animation<TextureRegion> walk;
+    private final TextureAtlas textureAtlas;
+    private State currentState;
+    private State previousState;
+    private float stateTimer;
+    private final TextureRegion idle;
 
 
     public Player(float width, float height, Body body) {
@@ -38,7 +45,18 @@ public class Player extends GameEntity {
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
-        this.playerAnimations = new PlayerAnimations();
+        currentState = State.IDLE;
+        previousState = State.IDLE;
+        stateTimer = 0;
+        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSpriteWalk"));
+        idle = new TextureRegion(textureAtlas.findRegion("soldier-idle").getTexture(), 0, 0, 128, 128);
+
+        Array<TextureRegion> frames = new Array<>();
+        for (int i = 0; i < 8; i++) {
+            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk").getTexture(), i * 16, 0, 16, 16));
+        }
+        walk = new Animation<>(0.1f, frames);
+        frames.clear();
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
@@ -51,7 +69,6 @@ public class Player extends GameEntity {
         handlePlatform();
         handleOutOfBounds(delta, center);
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
-
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
         positionMessage.x = x;
@@ -60,6 +77,32 @@ public class Player extends GameEntity {
         positionMessage.livesCount = livesCount;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
+    }
+    public TextureRegion getFrame(float delta) {
+        currentState = getState();
+        TextureRegion region;
+        if (currentState == State.WALKING) {
+            region = walk.getKeyFrame(stateTimer);
+        } else {
+            region = idle;
+        }
+        if (velX < 0 && !region.isFlipX()) {
+            region.flip(true, false);
+        } else if (velX > 0 && region.isFlipX()) {
+            region.flip(true, false);
+        }
+        stateTimer = currentState == previousState ? stateTimer + delta : 0;
+        previousState = currentState;
+        return region;
+    }
+    public State getState() {
+        if (velX < 0 || velX > 0) {
+            return State.WALKING;
+        } else if (velY > 0 || velY < 0 && previousState == State.JUMPING) {
+            return State.JUMPING;
+        } else {
+            return State.IDLE;
+        }
     }
 
     public void setCurrentAnimation(Animation<TextureRegion> animation) {
@@ -155,12 +198,6 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        if (velX > 0) {
-            setCurrentAnimation(playerAnimations.getWalkAnimation());
-        } else {
-            setCurrentAnimation(playerAnimations.getIdleAnimation());
-        }
-        batch.draw(currentAnimation.getKeyFrame(0.5f, true), x, y, width, height);
     }
 
     public Vector2 getPosition() {
