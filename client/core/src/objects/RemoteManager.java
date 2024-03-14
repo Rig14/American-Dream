@@ -39,10 +39,12 @@ public class RemoteManager {
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
 
-                    for (PlayerState ps : gameStateMessage.playerStates) {
+                    for (int i = 0; i < gameStateMessage.playerStates.length; i++) {
+                        PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
+                            // not current client
                             remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y);
                         } else {
                             // current player
                             // get the force of the hit
@@ -51,6 +53,7 @@ public class RemoteManager {
                             }
                         }
                     }
+                    
                     // Game duration in seconds, changes occur in server
                     gameTime = (gameStateMessage.gameTime);
                 }
