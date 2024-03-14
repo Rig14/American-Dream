@@ -6,11 +6,15 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import helper.packet.JoinLobbyMessage;
 import helper.packet.LobbyDataMessage;
 
 import java.util.HashMap;
@@ -23,6 +27,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
     private final Stage stage;
     private final Table table;
     private final Label.LabelStyle titleStyle;
+    private final TextButton.TextButtonStyle buttonStyle;
     private float timeSinceLastUpdate = 0;
     private Map<Integer, String> lobbyData;
 
@@ -37,8 +42,13 @@ public class LobbySelectionScreen extends ScreenAdapter {
         titleFont.getData().setScale(5);
         this.titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
 
+        // buttons style
+        buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = new BitmapFont();
+        buttonStyle.fontColor = Color.WHITE;
+
         // to update lobby on load
-        this.timeSinceLastUpdate = LOBBY_REFRESH_RATE_IN_SECONDS + 1;
+        this.timeSinceLastUpdate = LOBBY_REFRESH_RATE_IN_SECONDS - 0.5f;
 
         // add listener for lobby data messages
         AmericanDream.client.addListener(new Listener() {
@@ -47,7 +57,6 @@ public class LobbySelectionScreen extends ScreenAdapter {
                 if (object instanceof LobbyDataMessage) {
                     LobbyDataMessage lobbyDataMessage = (LobbyDataMessage) object;
                     lobbyData = lobbyDataMessage.lobbies;
-                    System.out.println("Received lobby data: " + lobbyData);
                 }
             }
         });
@@ -88,7 +97,39 @@ public class LobbySelectionScreen extends ScreenAdapter {
         // title text
         table.add(new Label("Choose a lobby", titleStyle)).row();
 
+        // add lobbies to table
+        lobbyData.forEach((id, status) -> {
+            // add button for each lobby
+            TextButton button = new TextButton(status, buttonStyle);
+
+            // add listener to button
+            button.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent changeEvent, Actor actor) {
+                    // if button clicked join the lobby
+                    // construct message
+                    JoinLobbyMessage joinLobbyMessage = new JoinLobbyMessage();
+                    joinLobbyMessage.lobbyId = id;
+
+                    // send message to server
+                    AmericanDream.client.sendTCP(joinLobbyMessage);
+
+                    // navigate to lobby screen
+                    AmericanDream.instance.setScreen(new GameScreen(camera));
+                }
+            });
+
+            // add button to table
+            table.add(button).row();
+        });
+
         // reset time since last update
         timeSinceLastUpdate = 0;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        stage.dispose();
     }
 }

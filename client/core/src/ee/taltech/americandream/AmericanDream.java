@@ -8,10 +8,7 @@ import com.esotericsoftware.kryonet.Client;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.BulletMessage;
-import helper.packet.GameStateMessage;
-import helper.packet.LobbyDataMessage;
-import helper.packet.PlayerPositionMessage;
+import helper.packet.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +61,7 @@ public class AmericanDream extends Game {
         kryo.register(ArrayList.class);
         kryo.register(LobbyDataMessage.class);
         kryo.register(HashMap.class);
+        kryo.register(JoinLobbyMessage.class);
     }
 
     /*

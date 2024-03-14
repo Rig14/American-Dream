@@ -10,6 +10,7 @@ public class Lobby {
     private final String name;
     private static int id = 1;
     private final int lobbyId;
+    private Game game;
     private final List<Connection> connections;
 
     public Lobby(String name, int lobbySize) {
@@ -22,7 +23,7 @@ public class Lobby {
         id++;
     }
 
-    private void removeDisconnected() {
+    public void removeDisconnected() {
         connections.removeIf(connection -> !connection.isConnected());
     }
 
@@ -43,9 +44,16 @@ public class Lobby {
         // check if lobby is full
         if (connections.size() < lobbySize) return;
 
-        // start game
-        Game game = new Game(connections.toArray(new Connection[0]));
-        game.start();
+        // start game if game is null
+        if (game == null) {
+            // create a array of connections
+            Connection[] connectionArray = new Connection[connections.size()];
+            connectionArray = connections.toArray(connectionArray);
+
+            // create a new game
+            game = new Game(connectionArray);
+            game.start();
+        }
     }
 
     public int getId() {

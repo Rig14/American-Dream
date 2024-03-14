@@ -7,10 +7,7 @@ import com.esotericsoftware.kryonet.Server;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.BulletMessage;
-import helper.packet.GameStateMessage;
-import helper.packet.LobbyDataMessage;
-import helper.packet.PlayerPositionMessage;
+import helper.packet.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,11 +45,21 @@ public class GameServer extends Thread {
         // add listener for new connections
         server.addListener(new Listener() {
             @Override
-            public void connected(Connection connection) {
-                super.connected(connection);
-                lobbies.get(0).addConnection(connection);
-                // try to start game
-                lobbies.get(0).startGame();
+            public void received(Connection connection, Object object) {
+                super.received(connection, object);
+                // handle join lobby message
+                if (object instanceof JoinLobbyMessage) {
+                    JoinLobbyMessage joinLobbyMessage = (JoinLobbyMessage) object;
+                    // get lobby id
+                    int lobbyId = joinLobbyMessage.lobbyId;
+
+                    // find lobby by id and join
+                    lobbies.forEach(l -> {
+                        if (l.getId() == lobbyId) {
+                            l.addConnection(connection);
+                        }
+                    });
+                }
             }
         });
     }
@@ -75,6 +82,7 @@ public class GameServer extends Thread {
         kryo.register(ArrayList.class);
         kryo.register(LobbyDataMessage.class);
         kryo.register(HashMap.class);
+        kryo.register(JoinLobbyMessage.class);
     }
 
 
@@ -86,7 +94,13 @@ public class GameServer extends Thread {
                 // send lobby data message to all clients
                 LobbyDataMessage lobbyDataMessage = new LobbyDataMessage();
                 lobbyDataMessage.lobbies = new HashMap<>();
-                lobbies.forEach((l) -> lobbyDataMessage.lobbies.put(l.getId(), l.getStatus()));
+                lobbies.forEach((l) -> {
+                    lobbyDataMessage.lobbies.put(l.getId(), l.getStatus());
+                    l.removeDisconnected();
+
+                    // start a game if lobby is full
+                    l.startGame();
+                });
                 server.sendToAllTCP(lobbyDataMessage);
 
                 Thread.sleep(LOBBY_UPDATE_RATE_IN_SECONDS * 1000);

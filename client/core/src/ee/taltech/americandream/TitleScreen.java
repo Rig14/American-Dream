@@ -86,6 +86,7 @@ public class TitleScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         super.dispose();
+        stage.dispose();
     }
 
     @Override
