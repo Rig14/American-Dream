@@ -1,10 +1,14 @@
 package objects.player;
 
+import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
@@ -24,12 +28,17 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private Animation<TextureRegion> walkAnimation;
+    private Animation<TextureRegion> currentAnimation;
+    private PlayerAnimations playerAnimations;
+
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
+
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
 
@@ -52,6 +61,9 @@ public class Player extends GameEntity {
         AmericanDream.client.sendUDP(positionMessage);
     }
 
+    public void setCurrentAnimation(Animation<TextureRegion> animation) {
+        this.currentAnimation = animation;
+    }
     private void handleInput(float delta) {
         Controller controller = Controllers.getCurrent();
         velX = 0;
@@ -142,7 +154,9 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        // here we can draw the player sprite eventually
+        if (velX > 0) {
+            setCurrentAnimation(playerAnimations.getWalkAnimation());
+        }
     }
 
     public Vector2 getPosition() {
