@@ -5,13 +5,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
-import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
@@ -33,17 +31,6 @@ public class AmericanDream extends Game {
     public void create() {
         instance = this;
         setupConnection();
-
-        // listen for id message
-        client.addListener(new com.esotericsoftware.kryonet.Listener() {
-            public void received(Connection connection, Object object) {
-                if (object instanceof IDMessage) {
-                    IDMessage idMessage = (IDMessage) object;
-                    // id is used to identify the player
-                    id = idMessage.id;
-                }
-            }
-        });
 
         // setting up camera
         OrthographicCamera camera = new OrthographicCamera();
@@ -70,7 +57,6 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState[].class);
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
-        kryo.register(IDMessage.class);
         kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);
@@ -88,6 +74,8 @@ public class AmericanDream extends Game {
         } catch (Exception e) {
             Gdx.app.log("Client", "Failed to connect to server");
         }
+
+        id = client.getID();
     }
 
     /*

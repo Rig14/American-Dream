@@ -9,7 +9,6 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
-import helper.packet.IDMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.io.IOException;
@@ -47,10 +46,6 @@ public class GameServer {
                     // if connection is empty or not connected, add new connection
                     if (connections[i] == null || !connections[i].isConnected()) {
                         connections[i] = connection;
-                        // send id message
-                        IDMessage idMessage = new IDMessage();
-                        idMessage.id = i + 1;
-                        connection.sendTCP(idMessage);
                         break;
                     }
                 }
@@ -77,7 +72,6 @@ public class GameServer {
         kryo.register(PlayerState[].class);
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
-        kryo.register(IDMessage.class);
         kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);

@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Constants {
     // debug mode
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     // pixels per meter (not sure what it does)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
