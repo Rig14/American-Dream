@@ -18,6 +18,7 @@ import helper.packet.JoinLobbyMessage;
 import helper.packet.LobbyDataMessage;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class LobbySelectionScreen extends ScreenAdapter {
     private final Camera camera;
@@ -25,6 +26,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
     private final Table table;
     private final Label.LabelStyle titleStyle;
     private final TextButton.TextButtonStyle buttonStyle;
+    private final TextButton.TextButtonStyle disabledButtonStyle;
 
     public LobbySelectionScreen(Camera camera) {
         this.camera = camera;
@@ -41,6 +43,12 @@ public class LobbySelectionScreen extends ScreenAdapter {
         buttonStyle.font = new BitmapFont();
         buttonStyle.font.getData().setScale(3);
         buttonStyle.fontColor = Color.WHITE;
+
+        // disabled button style
+        disabledButtonStyle = new TextButton.TextButtonStyle();
+        disabledButtonStyle.font = new BitmapFont();
+        disabledButtonStyle.font.getData().setScale(3);
+        disabledButtonStyle.fontColor = Color.GRAY;
 
         // add listener for lobby data messages
         AmericanDream.client.addListener(new Listener() {
@@ -60,22 +68,31 @@ public class LobbySelectionScreen extends ScreenAdapter {
                         // add button for each lobby
                         TextButton button = new TextButton(status, buttonStyle);
 
-                        // add listener to button
-                        button.addListener(new ChangeListener() {
-                            @Override
-                            public void changed(ChangeEvent changeEvent, Actor actor) {
-                                // if button clicked join the lobby
-                                // construct message
-                                JoinLobbyMessage joinLobbyMessage = new JoinLobbyMessage();
-                                joinLobbyMessage.lobbyId = id;
+                        // if game is full don't add a listener because the button
+                        // can't be clicked
+                        String players = status.split(" ")[status.split(" ").length - 1];
+                        if (!Objects.equals(players.split("/")[0], players.split("/")[1])) {
+                            // add listener to button
+                            button.addListener(new ChangeListener() {
+                                @Override
+                                public void changed(ChangeEvent changeEvent, Actor actor) {
+                                    // if button clicked join the lobby
+                                    // construct message
+                                    JoinLobbyMessage joinLobbyMessage = new JoinLobbyMessage();
+                                    joinLobbyMessage.lobbyId = id;
 
-                                // send message to server
-                                AmericanDream.client.sendTCP(joinLobbyMessage);
+                                    // send message to server
+                                    AmericanDream.client.sendTCP(joinLobbyMessage);
 
-                                // navigate to lobby screen
-                                AmericanDream.instance.setScreen(new LobbyScreen(camera));
-                            }
-                        });
+                                    // navigate to lobby screen
+                                    AmericanDream.instance.setScreen(new LobbyScreen(camera));
+                                }
+                            });
+                        } else {
+                            // disable button
+                            button.setDisabled(true);
+                            button.setStyle(disabledButtonStyle);
+                        }
 
                         // add button to table
                         table.add(button).row();
