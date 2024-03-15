@@ -1,5 +1,6 @@
 package objects.player;
 
+import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
@@ -12,12 +13,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
-import helper.Constants;
 import helper.Direction;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
-import java.io.CharArrayWriter;
 import java.util.Objects;
 
 import static helper.Constants.*;
@@ -31,13 +30,9 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
-    private Animation<TextureRegion> walkAnimation;
-    private Animation<TextureRegion> currentAnimation;
     private final TextureAtlas textureAtlas;
-    private State currentState;
-    private State previousState;
-    private float stateTimer;
-    private final Animation<TextureRegion> idleAnimation;
+    private final PlayerAnimations playerAnimations;
+
 
 
     public Player(float width, float height, Body body) {
@@ -45,13 +40,10 @@ public class Player extends GameEntity {
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
-        currentState = State.IDLE;
-        previousState = State.IDLE;
-        stateTimer = 0;
         textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
+        this.playerAnimations = new PlayerAnimations(textureAtlas);
         // animations
-        walkAnimation = createWalkAnimation();
-        idleAnimation = createIdleAnimation();
+
         Array<TextureRegion> frames = new Array<>();
         for (int i = 0; i < 8; i++) {
             frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk").getTexture(), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
@@ -60,20 +52,6 @@ public class Player extends GameEntity {
         frames.clear();
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
-    }
-    private Animation<TextureRegion> createWalkAnimation() {
-        Array<TextureRegion> frames = new Array<>();
-        for (int i = 0; i < 7; i++) {
-            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk"), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
-        }
-        return new Animation<>(FRAME_DURATION, frames, Animation.PlayMode.LOOP);
-    }
-    private Animation<TextureRegion> createIdleAnimation() {
-        Array<TextureRegion> frames = new Array<>();
-        for (int i = 0; i < 7; i++) {
-            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-idle"), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
-        }
-        return new Animation<>(FRAME_DURATION, frames, Animation.PlayMode.LOOP);
     }
 
     @Override
@@ -93,44 +71,10 @@ public class Player extends GameEntity {
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
 
-        currentState = getState();
-        if (currentState != previousState) {
-            stateTimer = 0;
-            previousState = currentState;
-        } else {
-            stateTimer += delta;
-        }
-    }
-    public TextureRegion getFrame(float delta) {
-        currentState = getState();
-        TextureRegion region;
-        if (currentState == State.WALKING) {
-            region = walkAnimation.getKeyFrame(stateTimer);
-        } else {
-            region = idleAnimation.getKeyFrame(stateTimer);
-        }
-        if (velX < 0 && !region.isFlipX()) {
-            region.flip(true, false);
-        } else if (velX > 0 && region.isFlipX()) {
-            region.flip(true, false);
-        }
-        stateTimer = currentState == previousState ? stateTimer + delta : 0;
-        previousState = currentState;
-        return region;
-    }
-    public State getState() {
-        if (velX < 0 || velX > 0) {
-            return State.WALKING;
-        } else if (velY > 0 || velY < 0 && previousState == State.JUMPING) {
-            return State.JUMPING;
-        } else {
-            return State.IDLE;
-        }
+        playerAnimations.update(delta, this);
+
     }
 
-    public void setCurrentAnimation(Animation<TextureRegion> animation) {
-        this.currentAnimation = animation;
-    }
     private void handleInput(float delta) {
         Controller controller = Controllers.getCurrent();
         velX = 0;
@@ -221,7 +165,7 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = getFrame(Gdx.graphics.getDeltaTime());
+        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
         batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
     }
 
@@ -264,5 +208,11 @@ public class Player extends GameEntity {
 
     public Integer getLives() {
         return this.livesCount;
+    }
+    public float getVelX() {
+        return velX;
+    }
+    public float getVelY() {
+        return velY;
     }
 }
