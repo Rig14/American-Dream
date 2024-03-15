@@ -78,6 +78,7 @@ public class GameScreen extends ScreenAdapter {
         // object rendering goes here
 
         // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
+        player.render(batch);
         batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
                 player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
         player.render(batch);

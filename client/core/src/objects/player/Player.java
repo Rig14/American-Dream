@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
+import helper.Constants;
 import helper.Direction;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
@@ -32,12 +33,11 @@ public class Player extends GameEntity {
     private Integer livesCount = LIVES_COUNT;
     private Animation<TextureRegion> walkAnimation;
     private Animation<TextureRegion> currentAnimation;
-    private Animation<TextureRegion> walk;
     private final TextureAtlas textureAtlas;
     private State currentState;
     private State previousState;
     private float stateTimer;
-    private final TextureRegion idle;
+    private final Animation<TextureRegion> idleAnimation;
 
 
     public Player(float width, float height, Body body) {
@@ -48,17 +48,32 @@ public class Player extends GameEntity {
         currentState = State.IDLE;
         previousState = State.IDLE;
         stateTimer = 0;
-        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSpriteWalk"));
-        idle = new TextureRegion(textureAtlas.findRegion("soldier-idle").getTexture(), 0, 0, 128, 128);
-
+        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
+        // animations
+        walkAnimation = createWalkAnimation();
+        idleAnimation = createIdleAnimation();
         Array<TextureRegion> frames = new Array<>();
         for (int i = 0; i < 8; i++) {
-            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk").getTexture(), i * 16, 0, 16, 16));
+            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk").getTexture(), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
+            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-idle").getTexture(), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
         }
-        walk = new Animation<>(0.1f, frames);
         frames.clear();
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
+    }
+    private Animation<TextureRegion> createWalkAnimation() {
+        Array<TextureRegion> frames = new Array<>();
+        for (int i = 0; i < 7; i++) {
+            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk"), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
+        }
+        return new Animation<>(FRAME_DURATION, frames, Animation.PlayMode.LOOP);
+    }
+    private Animation<TextureRegion> createIdleAnimation() {
+        Array<TextureRegion> frames = new Array<>();
+        for (int i = 0; i < 7; i++) {
+            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-idle"), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
+        }
+        return new Animation<>(FRAME_DURATION, frames, Animation.PlayMode.LOOP);
     }
 
     @Override
@@ -77,14 +92,22 @@ public class Player extends GameEntity {
         positionMessage.livesCount = livesCount;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
+
+        currentState = getState();
+        if (currentState != previousState) {
+            stateTimer = 0;
+            previousState = currentState;
+        } else {
+            stateTimer += delta;
+        }
     }
     public TextureRegion getFrame(float delta) {
         currentState = getState();
         TextureRegion region;
         if (currentState == State.WALKING) {
-            region = walk.getKeyFrame(stateTimer);
+            region = walkAnimation.getKeyFrame(stateTimer);
         } else {
-            region = idle;
+            region = idleAnimation.getKeyFrame(stateTimer);
         }
         if (velX < 0 && !region.isFlipX()) {
             region.flip(true, false);
@@ -198,6 +221,8 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
+        TextureRegion currentFrame = getFrame(Gdx.graphics.getDeltaTime());
+        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
     }
 
     public Vector2 getPosition() {

@@ -29,5 +29,8 @@ public class Constants {
     public static final float BULLET_SPEED = 500f;
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static int LIVES_COUNT = 3;
+    public static final int FRAME_WIDTH = 64;
+    public static final int FRAME_HEIGHT = 74;
+    public static final float FRAME_DURATION = 0.2f;
 
 }
