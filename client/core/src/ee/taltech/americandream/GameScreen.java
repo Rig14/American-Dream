@@ -163,4 +163,12 @@ public class GameScreen extends ScreenAdapter {
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        world.dispose();
+        batch.dispose();
+        debugRenderer.dispose();
+    }
 }
