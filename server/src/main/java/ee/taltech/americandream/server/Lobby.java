@@ -38,8 +38,11 @@ public class Lobby {
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
                 if (object instanceof GameLeaveMessage) {
-                    // remove connection from lobby
+                    // remove connection from lobby and restart game if needed
                     connections.remove(connection);
+                    if (game != null) {
+                        game = null;
+                    }
                 }
             }
         });
