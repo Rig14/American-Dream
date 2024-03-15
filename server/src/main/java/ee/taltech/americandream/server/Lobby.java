@@ -41,7 +41,7 @@ public class Lobby {
                     // remove connection from lobby and restart game if needed
                     connections.remove(connection);
                     if (game != null) {
-                        game = null;
+                        game.end();
                     }
                 }
             }
@@ -81,7 +81,6 @@ public class Lobby {
     }
 
     public void clearLobby() {
-        connections.clear();
         game = null;
     }
 }
