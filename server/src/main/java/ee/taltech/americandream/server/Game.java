@@ -9,6 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static helper.Constants.*;
 
@@ -60,6 +61,7 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);
                 }
+                System.out.println(Stream.of(players).map(x -> x.getState().id).toList());
 
                 // Start decrementing time when both players have joined the level
                 // Fixes countdown starting too early while in title screen
@@ -85,12 +87,12 @@ public class Game extends Thread {
 
     private void handleBulletHits(GameStateMessage gameStateMessage) {
         List<BulletData> bullets = gameStateMessage.bulletData;
-        PlayerState[] players = gameStateMessage.playerStates;
+        PlayerState[] playerStates = gameStateMessage.playerStates;
 
         // construct rectangles for players
-        Rectangle[] playerHitboxes = new Rectangle[players.length];
-        for (int i = 0; i < players.length; i++) {
-            playerHitboxes[i] = new Rectangle((int) players[i].x - PLAYER_WIDTH / 2, (int) players[i].y - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT);
+        Rectangle[] playerHitboxes = new Rectangle[playerStates.length];
+        for (int i = 0; i < playerStates.length; i++) {
+            playerHitboxes[i] = new Rectangle((int) playerStates[i].x - PLAYER_WIDTH / 2, (int) playerStates[i].y - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT);
         }
 
         // check if bullets hit players
@@ -101,14 +103,19 @@ public class Game extends Thread {
             for (int i = 0; i < playerHitboxes.length; i++) {
                 if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
                                 && !bullet.isDisabled // has already hit
-                        && bullet.id != players[i].id // is not the player who shot the bullet
+                        && bullet.id != playerStates[i].id // is not the player who shot the bullet
                 ) {
                     // remove bullet
                     bullet.isDisabled = true;
-                    // calculate force to apply to player
-                    float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
-                    // apply force to player
-                    players[i].applyForce = force;
+
+                    // find player with corresponding id
+                    for (Player player : players) {
+                        if (player.getId() == playerStates[i].id) {
+                            // register being hit, increment damage and calculate force
+                            // apply force to player (state)
+                            playerStates[i].applyForce = player.handleBeingHit(bullet);  // returns force
+                        }
+                    }
                 }
             }
         }

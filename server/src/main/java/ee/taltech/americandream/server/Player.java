@@ -22,6 +22,7 @@ public class Player {
     private Direction direction;
 
     private Integer livesCount;
+    private int damage = 0;
 
     private final Game game;
     private Direction nextBulletDirection;
@@ -103,6 +104,15 @@ public class Player {
         livesCount = positionMessage.livesCount;
     }
 
+    public float handleBeingHit(BulletData bullet) {
+        this.damage += 2;
+        // calculate force to apply to player and bullet moving direction
+        float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
+        // damage increases force exponentially, at 100% damage the force is 4x stronger than at 0%
+        force *= (1 + (float) damage / 10);
+        return force;
+    }
+
     public PlayerState getState() {
         // get player state
         PlayerState state = new PlayerState();
@@ -111,6 +121,7 @@ public class Player {
         state.y = y;
         state.direction = direction;
         state.livesCount = livesCount;
+        state.damage = damage;
         return state;
     }
 
@@ -122,4 +133,9 @@ public class Player {
         // send game state message
         connection.sendUDP(gameStateMessage);
     }
+
+    public int getId() {
+        return this.id;
+    }
+
 }
