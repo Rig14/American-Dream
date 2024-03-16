@@ -19,6 +19,7 @@ public class PlayerState {
         return this.y;
     }
 
+    // custom client-side getter to prevent nullPointerException in Hud.update()
     public int getLivesCount() {
         if (livesCount == null) {
             return LIVES_COUNT;
