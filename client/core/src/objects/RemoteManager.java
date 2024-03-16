@@ -90,7 +90,7 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    // used for off-screen indicator and hud
+    // used for off-screen indicator
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null

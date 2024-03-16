@@ -43,8 +43,6 @@ public class Hud {
     private Label placeHolder;
     private Label gameOverLabel;
 
-
-
     public Hud(SpriteBatch spritebatch) {
 
         // set up the HUD viewport using a new camera separate from the main game camera
@@ -56,10 +54,11 @@ public class Hud {
         table.top();                // Top-Align table
         table.setFillParent(true);  // make the table fill the entire stage
 
-        // define labels
+        // define label styles
         Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
         Label.LabelStyle redDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.RED);
 
+        // define labels
         timeTextLabel = new Label("TIME", whiteDefaultStyle);
         timeCountdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
 
@@ -89,7 +88,6 @@ public class Hud {
 
         table.row();
         table.add(localHealthTable).expandX();
-        // table.add(localLives).expandX();
         table.add(timeCountdownLabel).expandX();
         table.add(remoteHealthTable).expandX();
 
