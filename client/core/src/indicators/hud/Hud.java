@@ -17,12 +17,17 @@ import helper.PlayerState;
 import java.util.Optional;
 
 import static helper.Constants.LIVES_COUNT;
+import static helper.Textures.BLACK_HEART_TEXTURE;
 import static helper.Textures.HEALTH_TEXTURE;
 
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
     private Viewport viewport;
+
+    // Player names
+    private String localName = "loading...";
+    private String remoteName = "loading...";
 
     //Player lives to register changes and update healthTables
     private int localLives = LIVES_COUNT;
@@ -63,14 +68,14 @@ public class Hud {
         timeCountdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
 
 
-        localPlayerName = new Label("TRUMP", whiteDefaultStyle);
+        localPlayerName = new Label(localName, whiteDefaultStyle);
         for (int i = 0; i < LIVES_COUNT; i++) {
             localHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
         }
         localDamage = new Label("0 %", redDefaultStyle);
 
 
-        remotePlayerName = new Label("BIDEN", whiteDefaultStyle);
+        remotePlayerName = new Label(remoteName, whiteDefaultStyle);
         for (int i = 0; i < LIVES_COUNT; i++) {
             remoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
         }
@@ -87,9 +92,9 @@ public class Hud {
         table.add(remotePlayerName).expandX().padTop(10);
 
         table.row();
-        table.add(localHealthTable).expandX();
-        table.add(timeCountdownLabel).expandX();
-        table.add(remoteHealthTable).expandX();
+        table.add(localHealthTable).expandX().padTop(5);
+        table.add(timeCountdownLabel).expandX().padTop(5);
+        table.add(remoteHealthTable).expandX().padTop(5);
 
         table.row();
         table.add(localDamage);
@@ -111,6 +116,14 @@ public class Hud {
             PlayerState remotePlayer = remote.get();
             PlayerState localPlayer = local.get();
 
+            // Initialize names
+            if (localName.equals("loading...") && localPlayer.name != null && remotePlayer.name != null) {
+                localName = localPlayer.name;
+                remoteName = remotePlayer.name;
+                localPlayerName.setText(localName);
+                remotePlayerName.setText(remoteName);
+            }
+
             localDamage.setText(localPlayer.damage + " %");
             remoteDamage.setText(remotePlayer.damage + " %");
 
@@ -125,10 +138,10 @@ public class Hud {
 
             // display game over screen when lives reach 0
             if (localPlayer.getLivesCount() == 0) {
-                gameOverLabel.setText("GAME OVER!\nYou lost.");
+                gameOverLabel.setText("GAME OVER!\n" + localName + " lost.");
                 gameOverLabel.setColor(Color.RED);
             } else if (remotePlayer.getLivesCount() == 0) {
-                gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setText("Congratulations " + localName + " won!");
                 gameOverLabel.setColor(Color.GREEN);
             }
         }
@@ -136,6 +149,11 @@ public class Hud {
 
     public void updateLivesTable(int newLivesAmount, Table table) {
         table.clear();
+        // lost lives
+        for(int i = 0; i < LIVES_COUNT - newLivesAmount; i++) {
+            table.add(new Image(BLACK_HEART_TEXTURE)).width(20).height(20);
+        }
+        // remaining lives
         for(int i = 0; i < newLivesAmount; i++) {
             table.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
         }

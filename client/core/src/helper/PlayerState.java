@@ -4,6 +4,7 @@ import static helper.Constants.LIVES_COUNT;
 
 public class PlayerState {
     public int id;
+    public String name;
     public float x;
     public float y;
     public Direction direction;

@@ -45,7 +45,7 @@ public class RemoteManager {
                         if (ps.id != AmericanDream.id) {
                             // not current client
                             remotePlayerState = ps;
-                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y);
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name);
                         } else {
                             // current client
                             localPlayerState = ps;
