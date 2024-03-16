@@ -11,6 +11,7 @@ import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static helper.Constants.*;
 
@@ -101,6 +102,11 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+
+        // reset damage after respawning
+        if (livesCount != null && !Objects.equals(positionMessage.livesCount, livesCount)) {
+            damage = 0;
+        }
         livesCount = positionMessage.livesCount;
     }
 

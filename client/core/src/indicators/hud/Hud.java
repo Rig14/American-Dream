@@ -52,19 +52,22 @@ public class Hud {
         table.setFillParent(true);
 
         //define labels
-        timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        countdownLabel = new Label( "Waiting for other player...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
+        Label.LabelStyle redDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.RED);
 
-        localPlayerName = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        localLives = new Label(String.valueOf(LIVES_COUNT), new Label.LabelStyle(new BitmapFont(), Color.RED));
-        localDamage = new Label("0%", new Label.LabelStyle(new BitmapFont(), Color.RED));
+        timeLabel = new Label("TIME", whiteDefaultStyle);
+        countdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
 
-        remotePlayerName = new Label("BIDEN", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        remoteLives = new Label(String.valueOf(LIVES_COUNT), new Label.LabelStyle(new BitmapFont(), Color.RED));
-        remoteDamage = new Label("0%", new Label.LabelStyle(new BitmapFont(), Color.RED));
+        localPlayerName = new Label("TRUMP", whiteDefaultStyle);
+        localLives = new Label(String.valueOf(LIVES_COUNT), redDefaultStyle);
+        localDamage = new Label("0%", redDefaultStyle);
 
-        placeHolder = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        gameOverLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        remotePlayerName = new Label("BIDEN", whiteDefaultStyle);
+        remoteLives = new Label(String.valueOf(LIVES_COUNT), redDefaultStyle);
+        remoteDamage = new Label("0%", redDefaultStyle);
+
+        placeHolder = new Label("", whiteDefaultStyle);
+        gameOverLabel = new Label("", whiteDefaultStyle);
 
         //add labels to table
         table.add(localPlayerName).expandX().padTop(10);
@@ -78,6 +81,7 @@ public class Hud {
 
         table.row();
         table.add(localDamage);
+        table.add(placeHolder);
         table.add(remoteDamage);
 
         table.row();
