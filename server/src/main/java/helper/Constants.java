@@ -15,4 +15,9 @@ public class Constants {
     public static final float PISTOL_BULLET_FORCE = 1000;
     // will send lobby data to clients every N seconds
     public static final int LOBBY_UPDATE_RATE_IN_SECONDS = 1;
+
+    // lower value = more pushback; higher value = less pushback
+    // optimal range 20-50 (10 for testing)
+    // force *= 1 + (damage / x)
+    public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 10;
 }

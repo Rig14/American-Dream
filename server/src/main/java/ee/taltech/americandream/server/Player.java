@@ -109,7 +109,7 @@ public class Player {
         // calculate force to apply to player and bullet moving direction
         float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
         // damage increases force exponentially, at 100% damage the force is 4x stronger than at 0%
-        force *= (1 + (float) damage / 10);
+        force *= (1 + (float) damage / DAMAGE_INCREASES_PUSHBACK_COEFFICIENT);
         return force;
     }
 

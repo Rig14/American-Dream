@@ -61,7 +61,6 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.sendGameState(gameStateMessage);
                 }
-                System.out.println(Stream.of(players).map(x -> x.getState().id).toList());
 
                 // Start decrementing time when both players have joined the level
                 // Fixes countdown starting too early while in title screen
