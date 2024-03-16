@@ -105,16 +105,16 @@ public class Hud {
             PlayerState remotePlayer = remote.get();
             PlayerState localPlayer = local.get();
 
-            localLives.setText(localPlayer.livesCount);
+            localLives.setText(localPlayer.getLivesCount());
             localDamage.setText(localPlayer.damage + "%");
-            remoteLives.setText(remotePlayer.livesCount);
+            remoteLives.setText(remotePlayer.getLivesCount());
             remoteDamage.setText(remotePlayer.damage + "%");
 
             // display game over screen when lives reach 0
-            if (localPlayer.livesCount == 0) {
+            if (localPlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("GAME OVER!\nYou lost.");
                 gameOverLabel.setColor(Color.RED);
-            } else if (remotePlayer.livesCount == 0) {
+            } else if (remotePlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("Congratulations you won!");
                 gameOverLabel.setColor(Color.GREEN);
             }
