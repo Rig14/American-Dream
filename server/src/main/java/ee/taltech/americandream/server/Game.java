@@ -9,7 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static helper.Constants.*;
 
@@ -106,8 +105,8 @@ public class Game extends Thread {
                 ) {
                     // remove bullet
                     bullet.isDisabled = true;
-
                     // find player with corresponding id
+
                     for (Player player : players) {
                         if (player.getId() == playerStates[i].id) {
                             // register being hit, increment damage and calculate force
