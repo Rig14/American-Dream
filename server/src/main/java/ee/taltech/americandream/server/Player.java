@@ -34,8 +34,7 @@ public class Player {
         this.connection = connection;
         this.playerBullets = new ArrayList<>();
         this.bulletTimeout = 0;
-        // send id to client
-        connection.sendTCP("id:" + id);
+
         // add listeners
         connection.addListener(new Listener() {
             @Override

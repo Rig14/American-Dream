@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
+import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
@@ -42,8 +44,8 @@ public class GameScreen extends ScreenAdapter {
     private Hud hud;
     private OffScreenIndicator offScreenIndicator;
 
-    public GameScreen(OrthographicCamera camera) {
-        this.camera = camera;
+    public GameScreen(Camera camera) {
+        this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity
@@ -87,7 +89,7 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
 
         // for debugging
-        if (DEBUG) {
+        if (GAMEPLAY_DEBUG) {
             debugRenderer.render(world, camera.combined.scl(PPM));
         }
 
@@ -113,6 +115,9 @@ public class GameScreen extends ScreenAdapter {
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));
+
+            // send message to server to remove player from lobby
+            AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
 
         // update hud, currently used for timer
@@ -160,8 +165,10 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        camera.setToOrtho(false, width, height);
+    public void dispose() {
+        super.dispose();
+        world.dispose();
+        batch.dispose();
+        debugRenderer.dispose();
     }
 }

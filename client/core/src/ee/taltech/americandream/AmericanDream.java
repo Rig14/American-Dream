@@ -5,16 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.BulletMessage;
-import helper.packet.GameStateMessage;
-import helper.packet.IDMessage;
-import helper.packet.PlayerPositionMessage;
+import helper.packet.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static helper.Constants.*;
 
@@ -34,28 +31,12 @@ public class AmericanDream extends Game {
         instance = this;
         setupConnection();
 
-        // listen for id message
-        client.addListener(new com.esotericsoftware.kryonet.Listener() {
-            public void received(Connection connection, Object object) {
-                if (object instanceof IDMessage) {
-                    IDMessage idMessage = (IDMessage) object;
-                    // id is used to identify the player
-                    id = idMessage.id;
-                }
-            }
-        });
-
         // setting up camera
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.zoom = CAMERA_ZOOM;
-        // move to the game if debug is enabled
-        if (DEBUG) {
-            setScreen(new GameScreen(camera));
-        } else {
-            // navigating to the title screen
-            setScreen(new TitleScreen(camera));
-        }
+        // navigating to the title screen
+        setScreen(new TitleScreen(camera));
     }
 
     /*
@@ -70,10 +51,13 @@ public class AmericanDream extends Game {
         kryo.register(PlayerState[].class);
         kryo.register(PlayerState.class);
         kryo.register(Direction.class);
-        kryo.register(IDMessage.class);
         kryo.register(BulletMessage.class);
         kryo.register(BulletData.class);
         kryo.register(ArrayList.class);
+        kryo.register(LobbyDataMessage.class);
+        kryo.register(HashMap.class);
+        kryo.register(JoinLobbyMessage.class);
+        kryo.register(GameLeaveMessage.class);
     }
 
     /*
@@ -88,6 +72,8 @@ public class AmericanDream extends Game {
         } catch (Exception e) {
             Gdx.app.log("Client", "Failed to connect to server");
         }
+
+        id = client.getID();
     }
 
     /*

@@ -13,4 +13,6 @@ public class Constants {
     // should be the same as the bullet texture size in the client
     public static final int BULLET_HITBOX = 20;
     public static final float PISTOL_BULLET_FORCE = 1000;
+    // will send lobby data to clients every N seconds
+    public static final int LOBBY_UPDATE_RATE_IN_SECONDS = 1;
 }

@@ -39,10 +39,12 @@ public class RemoteManager {
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
 
-                    for (PlayerState ps : gameStateMessage.playerStates) {
+                    for (int i = 0; i < gameStateMessage.playerStates.length; i++) {
+                        PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
+                            // not current client
                             remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y);
                         } else {
                             // current player
                             // get the force of the hit
@@ -51,6 +53,7 @@ public class RemoteManager {
                             }
                         }
                     }
+                    
                     // Game duration in seconds, changes occur in server
                     gameTime = (gameStateMessage.gameTime);
                 }
@@ -109,7 +112,7 @@ public class RemoteManager {
         // make the horizontal gravity equal to the force
         // and then make the force smaller over time
         // until it is small enough to reset the gravity
-        
+
         if (onHitForce != 0) {
             world.setGravity(new Vector2(onHitForce, GRAVITY));
 
@@ -117,7 +120,7 @@ public class RemoteManager {
             onHitForce *= 0.9f;
         }
         // reset gravity if hit force is small enough
-        if (Math.abs(onHitForce) < 2) {
+        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
             world.setGravity(new Vector2(0, GRAVITY));
             onHitForce = 0;
         }
