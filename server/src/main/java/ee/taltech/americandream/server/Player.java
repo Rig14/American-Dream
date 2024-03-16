@@ -11,6 +11,7 @@ import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static helper.Constants.*;
 
@@ -22,6 +23,7 @@ public class Player {
     private Direction direction;
 
     private Integer livesCount;
+    private int damage = 0;
 
     private final Game game;
     private Direction nextBulletDirection;
@@ -100,7 +102,21 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+
+        // reset damage after respawning
+        if (livesCount != null && !Objects.equals(positionMessage.livesCount, livesCount)) {
+            damage = 0;
+        }
         livesCount = positionMessage.livesCount;
+    }
+
+    public float handleBeingHit(BulletData bullet) {
+        this.damage += 2;
+        // calculate force to apply to player and bullet moving direction
+        float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
+        // damage increases force exponentially, at 100% damage the force is 4x stronger than at 0%
+        force *= (1 + (float) damage / DAMAGE_INCREASES_PUSHBACK_COEFFICIENT);
+        return force;
     }
 
     public PlayerState getState() {
@@ -111,6 +127,7 @@ public class Player {
         state.y = y;
         state.direction = direction;
         state.livesCount = livesCount;
+        state.damage = damage;
         return state;
     }
 
@@ -122,4 +139,9 @@ public class Player {
         // send game state message
         connection.sendUDP(gameStateMessage);
     }
+
+    public int getId() {
+        return this.id;
+    }
+
 }

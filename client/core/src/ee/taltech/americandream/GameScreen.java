@@ -120,8 +120,8 @@ public class GameScreen extends ScreenAdapter {
             AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
 
-        // update hud, currently used for timer
-        hud.update(remoteManager.getGameTime(), player.getLives(), remoteManager.getRemoteLives());
+        // update hud
+        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
     }
 
     /**

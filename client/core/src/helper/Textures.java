@@ -1,5 +1,6 @@
 package helper;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
 public class Textures {
@@ -8,5 +9,8 @@ public class Textures {
     public final static Texture PLAYER_TEXTURE = new Texture("badlogic.jpg");
     public final static Texture TRUMP_TEXTURE = new Texture("trump.jpg");
     public final static Texture BIDEN_TEXTURE = new Texture("biden.jpg");
+    // Heart png (8bit) is from this website: https://www.pngwing.com/en/free-png-nymsb
+    // Should find a similar black "lost life" heart
+    public final static Texture HEALTH_TEXTURE = new Texture(Gdx.files.internal("heart.png"));
 
 }

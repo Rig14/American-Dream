@@ -6,108 +6,146 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
+import helper.PlayerState;
 
 import java.util.Optional;
 
 import static helper.Constants.LIVES_COUNT;
+import static helper.Textures.HEALTH_TEXTURE;
 
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
     private Viewport viewport;
 
-    //labels to be displayed on the hud
-    private static Label countdownLabel;
-    private Label timeLabel;
-    private Label localPlayerName;
-    private Label remotePlayerName;
+    //Player lives to register changes and update healthTables
+    private int localLives = LIVES_COUNT;
+    private int remoteLives = LIVES_COUNT;
 
-    private Label localLives;
-    private Label remoteLives;
+    //labels to be displayed on the hud
+    private Label timeTextLabel;
+    private Label timeCountdownLabel;
+
+    private Label localPlayerName;
+    private Table localHealthTable = new Table();
+    private Label localDamage;
+
+    private Label remotePlayerName;
+    private Table remoteHealthTable = new Table();
+    private Label remoteDamage;
 
     private Label placeHolder;
     private Label gameOverLabel;
 
     public Hud(SpriteBatch spritebatch) {
 
-        //setup the HUD viewport using a new camera separate from the main game camera
-        //define stage using HUD viewport and game's spritebatch
+        // set up the HUD viewport using a new camera separate from the main game camera
+        // define stage using HUD viewport and game's spritebatch
         viewport = new FitViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(), new OrthographicCamera());
         stage = new Stage(viewport, spritebatch);
 
-        //define a table used to organize the hud's labels
-        Table table = new Table();
-        //Top-Align table
-        table.top();
-        //make the table fill the entire stage
-        table.setFillParent(true);
+        Table table = new Table();  // define a table used to organize the hud's labels
+        table.top();                // Top-Align table
+        table.setFillParent(true);  // make the table fill the entire stage
 
-        //define labels
-        timeLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        countdownLabel = new Label( "Waiting for other player...", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        // define label styles
+        Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
+        Label.LabelStyle redDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.RED);
 
-        // combining player name and heath label by using \n could make alignment easier
-        localPlayerName = new Label("TRUMP", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        localLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
-
-        remotePlayerName = new Label("BIDEN", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        remoteLives = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.RED));
+        // define labels
+        timeTextLabel = new Label("TIME", whiteDefaultStyle);
+        timeCountdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
 
 
-        //add labels to table, padding the top, and giving them all equal width with expandX
+        localPlayerName = new Label("TRUMP", whiteDefaultStyle);
+        for (int i = 0; i < LIVES_COUNT; i++) {
+            localHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+        }
+        localDamage = new Label("0 %", redDefaultStyle);
+
+
+        remotePlayerName = new Label("BIDEN", whiteDefaultStyle);
+        for (int i = 0; i < LIVES_COUNT; i++) {
+            remoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+        }
+        remoteDamage = new Label("0 %", redDefaultStyle);
+
+
+        placeHolder = new Label("", whiteDefaultStyle);
+        gameOverLabel = new Label("", whiteDefaultStyle);
+
+
+        //add labels to table
         table.add(localPlayerName).expandX().padTop(10);
-        table.add(timeLabel).expandX().padTop(10);
+        table.add(timeTextLabel).expandX().padTop(10);
         table.add(remotePlayerName).expandX().padTop(10);
 
-        //add a second row to the table
         table.row();
-        table.add(localLives).expandX();
-        table.add(countdownLabel).expandX();
-        table.add(remoteLives).expandX();
+        table.add(localHealthTable).expandX();
+        table.add(timeCountdownLabel).expandX();
+        table.add(remoteHealthTable).expandX();
 
-        // third row
         table.row();
-        placeHolder = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        gameOverLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        table.add(localDamage);
+        table.add(placeHolder);
+        table.add(remoteDamage);
+
+        table.row();
         table.add(placeHolder);
         table.add(gameOverLabel).padTop(150);
 
         //add table to the stage
         stage.addActor(table);
-
-
-
     }
 
-    // update displayed game time and lives
-    public void update(Optional<Integer> time, Integer localHealth, Optional<Integer> remoteHealth) {
-        if (time.isPresent()) {
-            int minutes = Math.floorDiv(time.get(), 60);
-            int seconds = time.get() % 60;
-            countdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
-        }
+    public void update(Optional<Integer> time, Optional<PlayerState> local, Optional<PlayerState> remote) {
+        updateTime(time);
+        // update lives, health, damage
+        if (local.isPresent() && remote.isPresent()) {
+            PlayerState remotePlayer = remote.get();
+            PlayerState localPlayer = local.get();
 
-        // update lives
-        if (remoteHealth.isPresent()) {
-            localLives.setText(localHealth);
-            remoteLives.setText(remoteHealth.get());
+            localDamage.setText(localPlayer.damage + " %");
+            remoteDamage.setText(remotePlayer.damage + " %");
+
+            if (localLives != localPlayer.getLivesCount()) {
+                localLives = localPlayer.getLivesCount();
+                updateLivesTable(localLives, localHealthTable);
+            }
+            if (remoteLives != remotePlayer.getLivesCount()) {
+                remoteLives = remotePlayer.getLivesCount();
+                updateLivesTable(remoteLives, remoteHealthTable);
+            }
 
             // display game over screen when lives reach 0
-            if (localHealth == 0) {
+            if (localPlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("GAME OVER!\nYou lost.");
                 gameOverLabel.setColor(Color.RED);
-            } else if (remoteHealth.get() == 0) {
+            } else if (remotePlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("Congratulations you won!");
                 gameOverLabel.setColor(Color.GREEN);
             }
-        } else {
-            localLives.setText(LIVES_COUNT);
-            remoteLives.setText(LIVES_COUNT);
+        }
+    }
+
+    public void updateLivesTable(int newLivesAmount, Table table) {
+        table.clear();
+        for(int i = 0; i < newLivesAmount; i++) {
+            table.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+        }
+    }
+
+    public void updateTime(Optional<Integer> time) {
+        if (time.isPresent()) {
+            int minutes = Math.floorDiv(time.get(), 60);
+            int seconds = time.get() % 60;
+            timeCountdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
         }
     }
 }
