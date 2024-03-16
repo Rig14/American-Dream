@@ -21,7 +21,8 @@ import static helper.Constants.GRAVITY;
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
-    private Integer remoteLives = null;
+    private PlayerState remotePlayerState = null;
+    private PlayerState localPlayerState = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
     private float onHitForce;
@@ -43,17 +44,17 @@ public class RemoteManager {
                         PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
                             // not current client
-                            remoteLives = ps.livesCount;
+                            remotePlayerState = ps;
                             remotePlayers[i] = new RemotePlayer(ps.x, ps.y);
                         } else {
-                            // current player
+                            // current client
+                            localPlayerState = ps;
                             // get the force of the hit
                             if (ps.applyForce != 0) {
                                 onHitForce = ps.applyForce;
                             }
                         }
                     }
-                    
                     // Game duration in seconds, changes occur in server
                     gameTime = (gameStateMessage.gameTime);
                 }
@@ -89,16 +90,9 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    public Optional<Integer> getRemoteLives() {
-        if (remoteLives != null) {
-            return Optional.of(remoteLives);
-        }
-        return Optional.empty();
-    }
-
-    // used for off-screen indicator rendering for all players
+    // used for off-screen indicator and hud
     public Optional<PlayerState[]> getAllPlayerStates() {
-        // does not contain null
+        // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
             return Optional.of(allPlayerStates);
@@ -106,6 +100,19 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<PlayerState> getRemotePlayerState() {
+        if (remotePlayerState != null) {
+            return Optional.of(remotePlayerState);
+        }
+        return Optional.empty();
+    }
 
     public void testForHit(World world) {
         // currently the force is applied like so:

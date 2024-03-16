@@ -21,7 +21,8 @@ public class Player {
     private float y;
     private Direction direction;
 
-    private Integer livesCount;
+    // null causes client-side nullPointerException and 0 ends the game
+    private Integer livesCount = 1;
     private int damage = 0;
 
     private final Game game;
