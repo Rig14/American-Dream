@@ -17,9 +17,9 @@ import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
 import objects.player.Player;
+import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
-import static helper.Textures.TRUMP_TEXTURE;
 
 public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
@@ -35,6 +35,7 @@ public class GameScreen extends ScreenAdapter {
     // client player
     private Player player;
     // remote players
+    private RemotePlayer remotePlayer;
     private RemoteManager remoteManager;
     // ###################
 
@@ -75,9 +76,12 @@ public class GameScreen extends ScreenAdapter {
         // render map before the actual game objects
         orthogonalTiledMapRenderer.render();
 
-        // object rendering goes here
         batch.begin();
-        remoteManager.renderPlayers(batch, player.getDimensions());
+        // object rendering goes here
+
+        player.render(batch);
+
+        remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);

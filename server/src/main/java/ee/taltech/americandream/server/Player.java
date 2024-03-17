@@ -30,6 +30,8 @@ public class Player {
     private Direction nextBulletDirection;
     private float bulletTimeout;
     private final Connection connection;
+    private float velX, velY;
+    private int isShooting;
     public Player(Connection connection, Game game, int id) {
         // create player
         this.id = id;
@@ -110,6 +112,9 @@ public class Player {
             damage = 0;
         }
         livesCount = positionMessage.livesCount;
+        velX = positionMessage.velX;
+        velY = positionMessage.velY;
+        isShooting = positionMessage.isShooting;
     }
 
     public float handleBeingHit(BulletData bullet) {
@@ -129,8 +134,12 @@ public class Player {
         state.y = y;
         state.direction = direction;
         state.livesCount = livesCount;
+        state.velX = velX;
+        state.velY = velY;
+        state.isShooting = isShooting;
         state.damage = damage;
         state.name = name;
+
         return state;
     }
 

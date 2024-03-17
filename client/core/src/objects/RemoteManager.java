@@ -1,6 +1,8 @@
 package objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
@@ -29,6 +31,8 @@ public class RemoteManager {
 
 
     public RemoteManager() {
+        TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
+
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
@@ -45,7 +49,7 @@ public class RemoteManager {
                         if (ps.id != AmericanDream.id) {
                             // not current client
                             remotePlayerState = ps;
-                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name);
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name, textureAtlas, ps.velX, ps.velY, ps.isShooting);
                         } else {
                             // current client
                             localPlayerState = ps;
@@ -62,10 +66,11 @@ public class RemoteManager {
         });
     }
 
-    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions) {
+    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
                 if (rp != null) {
+                    rp.update(delta);
                     rp.render(batch, playerDimensions);
                 }
             }

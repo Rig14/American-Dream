@@ -7,8 +7,10 @@ public class PlayerState {
     public String name;
     public float x;
     public float y;
+    public float velX, velY;
     public Direction direction;
     public Integer livesCount;
+    public int isShooting;
     public Integer damage;
     public float applyForce;
 
