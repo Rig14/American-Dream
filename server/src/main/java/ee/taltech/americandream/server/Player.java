@@ -27,7 +27,8 @@ public class Player {
     private Direction nextBulletDirection;
     private float bulletTimeout;
     private final Connection connection;
-    public float velX, velY;
+    private float velX, velY;
+    private int isShooting;
     public Player(Connection connection, Game game, int id) {
         // create player
         this.id = id;
@@ -105,6 +106,7 @@ public class Player {
         livesCount = positionMessage.livesCount;
         velX = positionMessage.velX;
         velY = positionMessage.velY;
+        isShooting = positionMessage.isShooting;
     }
 
     public PlayerState getState() {
@@ -117,6 +119,7 @@ public class Player {
         state.livesCount = livesCount;
         state.velX = velX;
         state.velY = velY;
+        state.isShooting = isShooting;
 
         return state;
     }

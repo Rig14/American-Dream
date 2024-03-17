@@ -23,7 +23,7 @@ import static helper.Constants.*;
 
 public class Player extends GameEntity {
 
-    public enum State { WALKING, IDLE, JUMPING }
+    public enum State { WALKING, IDLE, JUMPING, SHOOTING }
     private final float speed;
     private Direction direction;
     private int jumpCounter;
@@ -32,6 +32,7 @@ public class Player extends GameEntity {
     private Integer livesCount = LIVES_COUNT;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
+    private int isShooting;
 
 
 
@@ -40,8 +41,10 @@ public class Player extends GameEntity {
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
-        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
+        this.isShooting = 0;
+        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
         this.playerAnimations = new PlayerAnimations(textureAtlas);
+
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
@@ -62,6 +65,8 @@ public class Player extends GameEntity {
         positionMessage.livesCount = livesCount;
         positionMessage.velX = velX;
         positionMessage.velY = velY;
+        positionMessage.isShooting = isShooting;
+
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
 
@@ -108,8 +113,6 @@ public class Player extends GameEntity {
         if (body.getLinearVelocity().y == 0) {
             jumpCounter = 0;
         }
-
-
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // shooting
@@ -118,16 +121,19 @@ public class Player extends GameEntity {
 
     public void shootInput() {
         // shooting code
+        isShooting = 0;
         BulletMessage bulletMessage = new BulletMessage();
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
             bulletMessage.direction = Direction.RIGHT;
+            isShooting = 1;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
             bulletMessage.direction = Direction.LEFT;
+            isShooting = -1;
         }
         AmericanDream.client.sendTCP(bulletMessage);
     }
@@ -209,4 +215,6 @@ public class Player extends GameEntity {
     public float getVelY() {
         return velY;
     }
+
+    public int isShooting() { return isShooting; }
 }

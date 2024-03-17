@@ -7,6 +7,7 @@ public class PlayerState {
     public float velX, velY;
     public Direction direction;
     public Integer livesCount;
+    public int isShooting;
 
     public float getX() {
         return this.x;

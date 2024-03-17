@@ -8,4 +8,5 @@ public class PlayerPositionMessage {
     public Direction direction;
     public Integer livesCount;
     public float velX, velY;
+    public int isShooting;
 }

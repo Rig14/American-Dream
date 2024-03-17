@@ -15,6 +15,10 @@ public class PlayerAnimations {
 
     private final Animation<TextureRegion> walkAnimation;
     private final Animation<TextureRegion> idleAnimation;
+    private final Animation<TextureRegion> shootAnimation;
+    private final Animation<TextureRegion> walkAnimationRemote;
+    private final Animation<TextureRegion> idleAnimationRemote;
+    private final Animation<TextureRegion> shootAnimationRemote;
     private final TextureAtlas textureAtlas;
     private Player.State currentState;
     private RemotePlayer.State currentStateRemote;
@@ -27,6 +31,11 @@ public class PlayerAnimations {
         this.textureAtlas = textureAtlas;
         walkAnimation = createAnimation("soldier-walk", 7, FRAME_DURATION);
         idleAnimation = createAnimation("soldier-idle", 7, FRAME_DURATION);
+        shootAnimation = createAnimation("soldier-shoot", 4, FRAME_DURATION);
+        walkAnimationRemote = createAnimation("soldier2-walk", 8, FRAME_DURATION);
+        idleAnimationRemote = createAnimation("soldier2-idle", 8, FRAME_DURATION);
+        shootAnimationRemote = createAnimation("soldier2-shoot", 4, FRAME_DURATION);
+
         stateTimer = 0;
     }
 
@@ -40,7 +49,9 @@ public class PlayerAnimations {
     public TextureRegion getFrame(float delta, Player player) {
         currentState = getState(player);
         TextureRegion region;
-        if (currentState == Player.State.WALKING) {
+        if (currentState == Player.State.SHOOTING) {
+            region = shootAnimation.getKeyFrame(stateTimer);
+        } else if (currentState == Player.State.WALKING) {
             region = walkAnimation.getKeyFrame(stateTimer);
         } else {
             region = idleAnimation.getKeyFrame(stateTimer);
@@ -48,6 +59,11 @@ public class PlayerAnimations {
         if (player.getVelX() < 0 && !region.isFlipX()) {
             region.flip(true, false);
         } else if (player.getVelX() > 0 && region.isFlipX()) {
+            region.flip(true, false);
+        }
+        if (player.isShooting() < 0 && !region.isFlipX()) {
+            region.flip(true, false);
+        } else if (player.isShooting() > 0 && region.isFlipX()) {
             region.flip(true, false);
         }
         stateTimer = currentState == previousState ? stateTimer + delta : 0;
@@ -57,14 +73,21 @@ public class PlayerAnimations {
     public TextureRegion getFrameRemote(float delta, RemotePlayer player) {
         currentStateRemote = getStateRemote(player);
         TextureRegion region;
-        if (currentStateRemote == RemotePlayer.State.WALKING) {
-            region = walkAnimation.getKeyFrame(stateTimer);
+        if (currentStateRemote == RemotePlayer.State.SHOOTING) {
+            region = shootAnimationRemote.getKeyFrame(stateTimer);
+        } else if (currentStateRemote == RemotePlayer.State.WALKING) {
+            region = walkAnimationRemote.getKeyFrame(stateTimer);
         } else {
-            region = idleAnimation.getKeyFrame(stateTimer);
+            region = idleAnimationRemote.getKeyFrame(stateTimer);
         }
         if (player.getVelX() < 0 && !region.isFlipX()) {
             region.flip(true, false);
         } else if (player.getVelX() > 0 && region.isFlipX()) {
+            region.flip(true, false);
+        }
+        if (player.isShooting() < 0 && !region.isFlipX()) {
+            region.flip(true, false);
+        } else if (player.isShooting() > 0 && region.isFlipX()) {
             region.flip(true, false);
         }
         stateTimer = currentStateRemote == previousStateRemote ? stateTimer + delta : 0;
@@ -72,7 +95,9 @@ public class PlayerAnimations {
         return region;
     }
     public RemotePlayer.State getStateRemote(RemotePlayer player) {
-        if (player.getVelX() < 0 || player.getVelX() > 0) {
+        if (player.isShooting() != 0) {
+            return RemotePlayer.State.SHOOTING;
+        } else if (player.getVelX() < 0 || player.getVelX() > 0) {
             return RemotePlayer.State.WALKING;
         } else if (player.getVelY()> 0 || player.getVelY() < 0 && previousStateRemote == RemotePlayer.State.JUMPING) {
             return RemotePlayer.State.JUMPING;
@@ -82,7 +107,9 @@ public class PlayerAnimations {
     }
 
     public Player.State getState(Player player) {
-        if (player.getVelX() < 0 || player.getVelX() > 0) {
+        if (player.isShooting() != 0) {
+            return Player.State.SHOOTING;
+        } if (player.getVelX() < 0 || player.getVelX() > 0) {
             return Player.State.WALKING;
         } else if (player.getVelY() > 0 || player.getVelY() < 0 && previousState == Player.State.JUMPING) {
             return Player.State.JUMPING;

@@ -26,7 +26,7 @@ public class RemoteManager {
 
 
     public RemoteManager() {
-        TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
+        TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
 
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
@@ -42,7 +42,7 @@ public class RemoteManager {
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
                             remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y, textureAtlas, ps.velX, ps.velY);
+                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y, textureAtlas, ps.velX, ps.velY, ps.isShooting);
                         }
                     }
                     // Game duration in seconds, changes occur in server

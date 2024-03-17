@@ -8,4 +8,5 @@ public class PlayerState {
     public Integer livesCount;
     public float velX;
     public float velY;
+    public int isShooting;
 }
