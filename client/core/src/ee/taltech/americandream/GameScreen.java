@@ -18,7 +18,6 @@ import objects.player.Player;
 import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
-import static helper.Textures.TRUMP_TEXTURE;
 
 public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;

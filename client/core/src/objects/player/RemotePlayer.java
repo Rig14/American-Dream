@@ -6,16 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import ee.taltech.americandream.AmericanDream;
-import helper.packet.GameStateMessage;
-import helper.packet.PlayerPositionMessage;
 
 import static helper.Constants.FRAME_HEIGHT;
 import static helper.Constants.FRAME_WIDTH;
-import static helper.Textures.BIDEN_TEXTURE;
 
 public class RemotePlayer {
     private float x, y;
