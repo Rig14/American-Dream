@@ -21,6 +21,7 @@ public class Player {
     private float x;
     private float y;
     private Direction direction;
+    private String name;
 
     private Integer livesCount;
     private int damage = 0;
@@ -102,6 +103,7 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+        name = positionMessage.name;
 
         // reset damage after respawning
         if (livesCount != null && !Objects.equals(positionMessage.livesCount, livesCount)) {
@@ -128,6 +130,7 @@ public class Player {
         state.direction = direction;
         state.livesCount = livesCount;
         state.damage = damage;
+        state.name = name;
         return state;
     }
 

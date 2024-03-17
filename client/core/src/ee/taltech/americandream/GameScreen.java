@@ -75,17 +75,12 @@ public class GameScreen extends ScreenAdapter {
         // render map before the actual game objects
         orthogonalTiledMapRenderer.render();
 
-        batch.begin();
         // object rendering goes here
-
-        // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
-        batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
-                player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
-
+        batch.begin();
         remoteManager.renderPlayers(batch, player.getDimensions());
         remoteManager.renderBullets(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
-
+        player.render(batch);
         batch.end();
 
         // for debugging

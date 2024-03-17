@@ -14,8 +14,12 @@ import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
+import java.util.Random;
 
 import static helper.Constants.*;
+import static helper.Textures.BIDEN_TEXTURE;
+import static helper.Textures.OBAMA_TEXTURE;
+import static helper.Textures.TRUMP_TEXTURE;
 
 public class Player extends GameEntity {
     private final float speed;
@@ -24,6 +28,8 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private String name;
+    private String character;
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
@@ -31,6 +37,11 @@ public class Player extends GameEntity {
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
+        // randomly generated name + idy
+        String[] availableNames = {"Trump", "Biden", "Obama"};
+        Random random = new Random();
+        character = availableNames[random.nextInt(availableNames.length )];
+        this.name = character + "_" + AmericanDream.id;
     }
 
     @Override
@@ -48,6 +59,7 @@ public class Player extends GameEntity {
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
+        positionMessage.name = name;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
     }
@@ -142,7 +154,13 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        // here we can draw the player sprite eventuallyq
+        if (character.equals("Biden")) {
+            batch.draw(BIDEN_TEXTURE, x - width / 2, y - height / 2, width, height);
+        } else if (character.equals("Trump")) {
+            batch.draw(TRUMP_TEXTURE, x - width / 2, y - height / 2, width, height);
+        } else {
+            batch.draw(OBAMA_TEXTURE, x - width / 2, y - height / 2, width, height);
+        }
     }
 
     public Vector2 getPosition() {
