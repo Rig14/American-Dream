@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
@@ -17,12 +18,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static helper.Constants.GRAVITY;
+
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
-    private Integer remoteLives = null;
+    private PlayerState remotePlayerState = null;
+    private PlayerState localPlayerState = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
+    private float onHitForce;
 
 
     public RemoteManager() {
@@ -39,10 +44,19 @@ public class RemoteManager {
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
 
-                    for (PlayerState ps : gameStateMessage.playerStates) {
+                    for (int i = 0; i < gameStateMessage.playerStates.length; i++) {
+                        PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
-                            remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y, textureAtlas, ps.velX, ps.velY, ps.isShooting);
+                            // not current client
+                            remotePlayerState = ps;
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name, textureAtlas, ps.velX, ps.velY, ps.isShooting);
+                        } else {
+                            // current client
+                            localPlayerState = ps;
+                            // get the force of the hit
+                            if (ps.applyForce != 0) {
+                                onHitForce = ps.applyForce;
+                            }
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -66,6 +80,8 @@ public class RemoteManager {
     public void renderBullets(SpriteBatch batch) {
         if (remoteBullets != null) {
             for (BulletData bullet : remoteBullets) {
+                if (bullet.isDisabled) continue;
+
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
         }
@@ -79,16 +95,9 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    public Optional<Integer> getRemoteLives() {
-        if (remoteLives != null) {
-            return Optional.of(remoteLives);
-        }
-        return Optional.empty();
-    }
-
-    // used for off-screen indicator rendering for all players
+    // used for off-screen indicator
     public Optional<PlayerState[]> getAllPlayerStates() {
-        // does not contain null
+        // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
             return Optional.of(allPlayerStates);
@@ -96,4 +105,36 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<PlayerState> getRemotePlayerState() {
+        if (remotePlayerState != null) {
+            return Optional.of(remotePlayerState);
+        }
+        return Optional.empty();
+    }
+
+    public void testForHit(World world) {
+        // currently the force is applied like so:
+        // make the horizontal gravity equal to the force
+        // and then make the force smaller over time
+        // until it is small enough to reset the gravity
+
+        if (onHitForce != 0) {
+            world.setGravity(new Vector2(onHitForce, GRAVITY));
+
+            // make on hit force smaller
+            onHitForce *= 0.9f;
+        }
+        // reset gravity if hit force is small enough
+        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
+            world.setGravity(new Vector2(0, GRAVITY));
+            onHitForce = 0;
+        }
+    }
 }

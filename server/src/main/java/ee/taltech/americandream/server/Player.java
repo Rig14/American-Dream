@@ -11,6 +11,7 @@ import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static helper.Constants.*;
 
@@ -20,8 +21,10 @@ public class Player {
     private float x;
     private float y;
     private Direction direction;
+    private String name;
 
     private Integer livesCount;
+    private int damage = 0;
 
     private final Game game;
     private Direction nextBulletDirection;
@@ -36,8 +39,7 @@ public class Player {
         this.connection = connection;
         this.playerBullets = new ArrayList<>();
         this.bulletTimeout = 0;
-        // send id to client
-        connection.sendTCP("id:" + id);
+
         // add listeners
         connection.addListener(new Listener() {
             @Override
@@ -74,10 +76,10 @@ public class Player {
             // construct the bullet to be shot
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
+            bulletData.id = id;
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);
-
             // reset timer and bullet shooting direction
             bulletTimeout = 0;
             nextBulletDirection = null;
@@ -103,10 +105,25 @@ public class Player {
         x = positionMessage.x;
         y = positionMessage.y;
         direction = positionMessage.direction;
+        name = positionMessage.name;
+
+        // reset damage after respawning
+        if (livesCount != null && !Objects.equals(positionMessage.livesCount, livesCount)) {
+            damage = 0;
+        }
         livesCount = positionMessage.livesCount;
         velX = positionMessage.velX;
         velY = positionMessage.velY;
         isShooting = positionMessage.isShooting;
+    }
+
+    public float handleBeingHit(BulletData bullet) {
+        this.damage += 2;
+        // calculate force to apply to player and bullet moving direction
+        float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
+        // damage increases force exponentially, at 100% damage the force is 4x stronger than at 0%
+        force *= (1 + (float) damage / DAMAGE_INCREASES_PUSHBACK_COEFFICIENT);
+        return force;
     }
 
     public PlayerState getState() {
@@ -120,6 +137,8 @@ public class Player {
         state.velX = velX;
         state.velY = velY;
         state.isShooting = isShooting;
+        state.damage = damage;
+        state.name = name;
 
         return state;
     }
@@ -132,4 +151,9 @@ public class Player {
         // send game state message
         connection.sendUDP(gameStateMessage);
     }
+
+    public int getId() {
+        return this.id;
+    }
+
 }

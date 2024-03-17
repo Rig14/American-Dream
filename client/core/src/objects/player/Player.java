@@ -17,8 +17,12 @@ import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
+import java.util.Random;
 
 import static helper.Constants.*;
+import static helper.Textures.BIDEN_TEXTURE;
+import static helper.Textures.OBAMA_TEXTURE;
+import static helper.Textures.TRUMP_TEXTURE;
 
 public class Player extends GameEntity {
 
@@ -29,6 +33,8 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private String name;
+    private String character;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
     private int isShooting;
@@ -46,6 +52,11 @@ public class Player extends GameEntity {
 
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
+        // randomly generated name + idy
+        String[] availableNames = {"Trump", "Biden", "Obama"};
+        Random random = new Random();
+        character = availableNames[random.nextInt(availableNames.length )];
+        this.name = character + "_" + AmericanDream.id;
     }
 
     @Override
@@ -62,6 +73,7 @@ public class Player extends GameEntity {
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
+        positionMessage.name = name;
         positionMessage.velX = velX;
         positionMessage.velY = velY;
         positionMessage.isShooting = isShooting;
@@ -112,6 +124,8 @@ public class Player extends GameEntity {
         if (body.getLinearVelocity().y == 0) {
             jumpCounter = 0;
         }
+
+
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // shooting

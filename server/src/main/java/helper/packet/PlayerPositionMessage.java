@@ -10,4 +10,5 @@ public class PlayerPositionMessage {
     public float velX;
     public float velY;
     public int isShooting;
+    public String name;
 }

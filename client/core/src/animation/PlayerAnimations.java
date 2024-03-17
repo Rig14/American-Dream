@@ -32,7 +32,7 @@ public class PlayerAnimations {
         idleAnimation = createAnimation("soldier-idle", 7, FRAME_DURATION);
         shootAnimation = createAnimation("soldier-shoot", 4, FRAME_DURATION);
         walkAnimationRemote = createAnimation("soldier2-walk", 8, FRAME_DURATION);
-        idleAnimationRemote = createAnimation("soldier2-idle", 8, FRAME_DURATION);
+        idleAnimationRemote = createAnimation("soldier2-idle", 9, FRAME_DURATION);
         shootAnimationRemote = createAnimation("soldier2-shoot", 4, FRAME_DURATION);
 
         stateTimer = 0;

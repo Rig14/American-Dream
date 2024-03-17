@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import helper.TileMapHelper;
+import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
@@ -43,9 +45,8 @@ public class GameScreen extends ScreenAdapter {
     private Hud hud;
     private OffScreenIndicator offScreenIndicator;
 
-    public GameScreen(OrthographicCamera camera) {
-
-        this.camera = camera;
+    public GameScreen(Camera camera) {
+        this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity
@@ -83,11 +84,13 @@ public class GameScreen extends ScreenAdapter {
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
-
+        player.render(batch);
         batch.end();
 
         // for debugging
-        debugRenderer.render(world, camera.combined.scl(PPM));
+        if (GAMEPLAY_DEBUG) {
+            debugRenderer.render(world, camera.combined.scl(PPM));
+        }
 
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -105,16 +108,19 @@ public class GameScreen extends ScreenAdapter {
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
-        if (remotePlayer != null) {
-            remotePlayer.update(delta);
-        }
+
+        remoteManager.testForHit(world);
+
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));
+
+            // send message to server to remove player from lobby
+            AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
 
-        // update hud, currently used for timer
-        hud.update(remoteManager.getGameTime(), player.getLives(), remoteManager.getRemoteLives());
+        // update hud
+        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
     }
 
     /**
@@ -158,8 +164,10 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        camera.setToOrtho(false, width, height);
+    public void dispose() {
+        super.dispose();
+        world.dispose();
+        batch.dispose();
+        debugRenderer.dispose();
     }
 }
