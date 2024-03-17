@@ -3,8 +3,10 @@ package animation;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import objects.player.Player;
+import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
 
@@ -15,7 +17,9 @@ public class PlayerAnimations {
     private final Animation<TextureRegion> idleAnimation;
     private final TextureAtlas textureAtlas;
     private Player.State currentState;
+    private RemotePlayer.State currentStateRemote;
     private Player.State previousState;
+    private RemotePlayer.State previousStateRemote;
     private float stateTimer;
 
 
@@ -50,6 +54,32 @@ public class PlayerAnimations {
         previousState = currentState;
         return region;
     }
+    public TextureRegion getFrameRemote(float delta, RemotePlayer player) {
+        currentStateRemote = getStateRemote(player);
+        TextureRegion region;
+        if (currentStateRemote == RemotePlayer.State.WALKING) {
+            region = walkAnimation.getKeyFrame(stateTimer);
+        } else {
+            region = idleAnimation.getKeyFrame(stateTimer);
+        }
+        if (player.getVelX() < 0 && !region.isFlipX()) {
+            region.flip(true, false);
+        } else if (player.getVelX() > 0 && region.isFlipX()) {
+            region.flip(true, false);
+        }
+        stateTimer = currentStateRemote == previousStateRemote ? stateTimer + delta : 0;
+        previousStateRemote = currentStateRemote;
+        return region;
+    }
+    public RemotePlayer.State getStateRemote(RemotePlayer player) {
+        if (player.getVelX() < 0 || player.getVelX() > 0) {
+            return RemotePlayer.State.WALKING;
+        } else if (player.getVelY()> 0 || player.getVelY() < 0 && previousStateRemote == RemotePlayer.State.JUMPING) {
+            return RemotePlayer.State.JUMPING;
+        } else {
+            return RemotePlayer.State.IDLE;
+        }
+    }
 
     public Player.State getState(Player player) {
         if (player.getVelX() < 0 || player.getVelX() > 0) {
@@ -58,6 +88,15 @@ public class PlayerAnimations {
             return Player.State.JUMPING;
         } else {
             return Player.State.IDLE;
+        }
+    }
+    public void updateRemote(float delta, RemotePlayer player) {
+        currentStateRemote = getStateRemote(player);
+        if (currentStateRemote != previousStateRemote) {
+            stateTimer = 0;
+            previousStateRemote = currentStateRemote;
+        } else {
+            stateTimer += delta;
         }
     }
     public void update(float delta, Player player) {

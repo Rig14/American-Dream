@@ -42,14 +42,6 @@ public class Player extends GameEntity {
         this.direction = Direction.RIGHT;
         textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
         this.playerAnimations = new PlayerAnimations(textureAtlas);
-        // animations
-
-        Array<TextureRegion> frames = new Array<>();
-        for (int i = 0; i < 8; i++) {
-            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-walk").getTexture(), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
-            frames.add(new TextureRegion(textureAtlas.findRegion("soldier-idle").getTexture(), i * FRAME_WIDTH, 0, FRAME_WIDTH, FRAME_HEIGHT));
-        }
-        frames.clear();
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
@@ -68,6 +60,8 @@ public class Player extends GameEntity {
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
+        positionMessage.velX = velX;
+        positionMessage.velY = velY;
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
 

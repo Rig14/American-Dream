@@ -15,6 +15,7 @@ import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
 import objects.player.Player;
+import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
 import static helper.Textures.TRUMP_TEXTURE;
@@ -33,6 +34,7 @@ public class GameScreen extends ScreenAdapter {
     // client player
     private Player player;
     // remote players
+    private RemotePlayer remotePlayer;
     private RemoteManager remoteManager;
     // ###################
 
@@ -77,10 +79,9 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
         // object rendering goes here
 
-        // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
         player.render(batch);
 
-        remoteManager.renderPlayers(batch, player.getDimensions());
+        remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
 
@@ -105,7 +106,9 @@ public class GameScreen extends ScreenAdapter {
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
-
+        if (remotePlayer != null) {
+            remotePlayer.update(delta);
+        }
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));

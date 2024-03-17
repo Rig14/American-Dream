@@ -1,6 +1,8 @@
 package objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -24,6 +26,8 @@ public class RemoteManager {
 
 
     public RemoteManager() {
+        TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprite.atlas"));
+
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
@@ -38,7 +42,7 @@ public class RemoteManager {
                     for (PlayerState ps : gameStateMessage.playerStates) {
                         if (ps.id != AmericanDream.id) {
                             remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
+                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y, textureAtlas, ps.velX, ps.velY);
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -48,10 +52,11 @@ public class RemoteManager {
         });
     }
 
-    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions) {
+    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
                 if (rp != null) {
+                    rp.update(delta);
                     rp.render(batch, playerDimensions);
                 }
             }
