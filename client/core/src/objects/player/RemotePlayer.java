@@ -49,8 +49,6 @@ public class RemotePlayer {
         // Render the remote player based on its velocity
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
         batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-        System.out.println("x: " + getVelX());
-        System.out.println("y: " + getVelY());
         // render the remote player
 
     }
