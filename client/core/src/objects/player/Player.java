@@ -1,37 +1,62 @@
 package objects.player;
 
+import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
+import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
-import objects.bullet.Bullet;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import static helper.Constants.*;
+import static helper.Textures.BIDEN_TEXTURE;
+import static helper.Textures.OBAMA_TEXTURE;
+import static helper.Textures.TRUMP_TEXTURE;
 
 public class Player extends GameEntity {
+
+    public enum State { WALKING, IDLE, JUMPING, SHOOTING }
     private final float speed;
     private Direction direction;
     private int jumpCounter;
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private String name;
+    private String character;
+    private final TextureAtlas textureAtlas;
+    private final PlayerAnimations playerAnimations;
+    private int isShooting;
+
+
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
+        this.isShooting = 0;
+        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
+        this.playerAnimations = new PlayerAnimations(textureAtlas);
+
+
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
+        // randomly generated name + idy
+        String[] availableNames = {"Trump", "Biden", "Obama"};
+        Random random = new Random();
+        character = availableNames[random.nextInt(availableNames.length )];
+        this.name = character + "_" + AmericanDream.id;
     }
 
     @Override
@@ -42,15 +67,22 @@ public class Player extends GameEntity {
         handlePlatform();
         handleOutOfBounds(delta, center);
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
-
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
         positionMessage.x = x;
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
+        positionMessage.name = name;
+        positionMessage.velX = velX;
+        positionMessage.velY = velY;
+        positionMessage.isShooting = isShooting;
+
         // send player position message to the server
         AmericanDream.client.sendUDP(positionMessage);
+
+        playerAnimations.update(delta, this);
+
     }
 
     private void handleInput(float delta) {
@@ -96,22 +128,27 @@ public class Player extends GameEntity {
 
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
-
+        // shooting
+        shootInput();
     }
 
-    public void handleBulletInput(List<Bullet> bullets) {
+    public void shootInput() {
         // shooting code
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) ||
+        isShooting = 0;
+        BulletMessage bulletMessage = new BulletMessage();
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x + 20, this.getPosition().y, BULLET_SPEED));
+            bulletMessage.direction = Direction.RIGHT;
+            isShooting = 1;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) ||
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
                 (Controllers.getCurrent() != null &&
                         Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
-            bullets.add(new Bullet(this.getPosition().x - 20, this.getPosition().y, -BULLET_SPEED));
+            bulletMessage.direction = Direction.LEFT;
+            isShooting = -1;
         }
+        AmericanDream.client.sendTCP(bulletMessage);
     }
 
     /*
@@ -141,7 +178,8 @@ public class Player extends GameEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        // here we can draw the player sprite eventually
+        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
+        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
     }
 
     public Vector2 getPosition() {
@@ -184,4 +222,12 @@ public class Player extends GameEntity {
     public Integer getLives() {
         return this.livesCount;
     }
+    public float getVelX() {
+        return velX;
+    }
+    public float getVelY() {
+        return velY;
+    }
+
+    public int isShooting() { return isShooting; }
 }

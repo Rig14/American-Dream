@@ -3,6 +3,7 @@ package ee.taltech.americandream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -10,18 +11,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import helper.Hud;
 import helper.TileMapHelper;
+import helper.packet.GameLeaveMessage;
+import indicators.OffScreenIndicator;
+import indicators.hud.Hud;
 import objects.RemoteManager;
-import objects.bullet.Bullet;
 import objects.player.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
-import static helper.Textures.TRUMP_TEXTURE;
 
 public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
@@ -36,9 +34,8 @@ public class GameScreen extends ScreenAdapter {
     // game objects
     // client player
     private Player player;
-    // bullets
-    private List<Bullet> bullets;
     // remote players
+    private RemotePlayer remotePlayer;
     private RemoteManager remoteManager;
     // ###################
 
@@ -46,10 +43,10 @@ public class GameScreen extends ScreenAdapter {
     private Vector2 center;
     // game screen overlay
     private Hud hud;
+    private OffScreenIndicator offScreenIndicator;
 
-    public GameScreen(OrthographicCamera camera) {
-        this.bullets = new ArrayList<>();
-        this.camera = camera;
+    public GameScreen(Camera camera) {
+        this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity
@@ -63,17 +60,14 @@ public class GameScreen extends ScreenAdapter {
         // remote player manager
         this.remoteManager = new RemoteManager();
 
-        this.bullets = new ArrayList<>();
-
-        // create hud
+        // visual info for player
         this.hud = new Hud(this.batch);
+        this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
     }
 
     @Override
     public void render(float delta) {
         this.update(delta);
-        // shooting code
-        player.handleBulletInput(bullets);
 
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -84,18 +78,19 @@ public class GameScreen extends ScreenAdapter {
 
         batch.begin();
         // object rendering goes here
-        // temporary local player rendering for demo, rendering inside player class causes override and abstract class errors
-        batch.draw(TRUMP_TEXTURE, player.getPosition().x - player.getDimensions().x / 2,
-                player.getPosition().y - player.getDimensions().y / 2, player.getDimensions().x, player.getDimensions().y);
 
-        remoteManager.renderPlayers(batch, player.getDimensions());
+        player.render(batch);
+
+        remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
-        remoteManager.renderIndicator(batch, camera.position.x, camera.position.y, player.getDimensions());
-
+        offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
+        player.render(batch);
         batch.end();
 
         // for debugging
-        debugRenderer.render(world, camera.combined.scl(PPM));
+        if (GAMEPLAY_DEBUG) {
+            debugRenderer.render(world, camera.combined.scl(PPM));
+        }
 
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -109,26 +104,23 @@ public class GameScreen extends ScreenAdapter {
         // update the camera position
         cameraUpdate();
 
-        //update bullets
-        bullets.forEach(bullet -> bullet.update(delta));
-        // remove out of bound bullets
-        bullets = bullets.stream().filter(b -> !b.shouldRemove(center)).collect(Collectors.toList());
-
-        // send bullets to server
-        remoteManager.sendBullets(bullets);
-
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
         player.update(delta, center);
 
+        remoteManager.testForHit(world);
+
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             AmericanDream.instance.setScreen(new TitleScreen(camera));
+
+            // send message to server to remove player from lobby
+            AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
 
-        // update hud, currently used for timer
-        hud.update(remoteManager.getGameTime(), player.getLives(), remoteManager.getRemoteLives());
+        // update hud
+        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
     }
 
     /**
@@ -169,5 +161,13 @@ public class GameScreen extends ScreenAdapter {
 
     public void setCenter(Vector2 vector2) {
         this.center = vector2;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        world.dispose();
+        batch.dispose();
+        debugRenderer.dispose();
     }
 }

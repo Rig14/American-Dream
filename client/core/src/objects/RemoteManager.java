@@ -1,51 +1,62 @@
 package objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
-import helper.packet.BulletPositionMessage;
 import helper.packet.GameStateMessage;
-import objects.bullet.Bullet;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static helper.Constants.BULLET_DIMENSIONS;
-import static helper.Constants.CAMERA_ZOOM;
-import static helper.Constants.OFFSCREEN_X;
-import static helper.Constants.OFFSCREEN_X_NEG;
-import static helper.Constants.OFFSCREEN_Y;
-import static helper.Constants.OFFSCREEN_Y_NEG;
-import static helper.Textures.BULLET_TEXTURE;
+import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
-    private Integer remoteLives = null;
+    private PlayerState remotePlayerState = null;
+    private PlayerState localPlayerState = null;
     private List<BulletData> remoteBullets;
+    private PlayerState[] allPlayerStates;
+    private float onHitForce;
+
 
     public RemoteManager() {
+        TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
+
         AmericanDream.client.addListener(new Listener() {
             public void received(Connection connection, Object object) {
                 if (object instanceof GameStateMessage) {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
+                    allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
 
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
 
-                    for (PlayerState ps : gameStateMessage.playerStates) {
+                    for (int i = 0; i < gameStateMessage.playerStates.length; i++) {
+                        PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
-                            remoteLives = ps.livesCount;
-                            remotePlayers[ps.id - 1] = new RemotePlayer(ps.x, ps.y);
+                            // not current client
+                            remotePlayerState = ps;
+                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name, textureAtlas, ps.velX, ps.velY, ps.isShooting);
+                        } else {
+                            // current client
+                            localPlayerState = ps;
+                            // get the force of the hit
+                            if (ps.applyForce != 0) {
+                                onHitForce = ps.applyForce;
+                            }
                         }
                     }
                     // Game duration in seconds, changes occur in server
@@ -55,10 +66,11 @@ public class RemoteManager {
         });
     }
 
-    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions) {
+    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
                 if (rp != null) {
+                    rp.update(delta);
                     rp.render(batch, playerDimensions);
                 }
             }
@@ -68,51 +80,9 @@ public class RemoteManager {
     public void renderBullets(SpriteBatch batch) {
         if (remoteBullets != null) {
             for (BulletData bullet : remoteBullets) {
+                if (bullet.isDisabled) continue;
+
                 RemoteBullet.render(batch, bullet.x, bullet.y);
-            }
-        }
-    }
-
-    // Render indicator when remote player is off-screen
-    public void renderIndicator(SpriteBatch batch, float cameraX, float cameraY, Vector2 playerDimensions) {
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null && CAMERA_ZOOM == 1.5f) { // Changing zoom level will stop rendering the indicator
-                    // Check if remote player is off-screen and handle corners "FizzBuzz" style
-                    float cameraDeltaX = rp.getX() - cameraX;
-                    float cameraDeltaY = rp.getY() - cameraY;
-
-                    // right
-                    if (cameraDeltaX > OFFSCREEN_X) {
-                        if (cameraDeltaY > OFFSCREEN_Y) {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415, cameraY + 325); // up right
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415, cameraY - 350); // down right
-                        } else {
-                            batch.draw(BULLET_TEXTURE, cameraX + 415,
-                                    rp.getY() - playerDimensions.y / 2 + BULLET_DIMENSIONS.y / 2);
-                        }
-
-                    // left
-                    } else if (cameraDeltaX < OFFSCREEN_X_NEG) {
-                        if (cameraDeltaY > OFFSCREEN_Y) {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475, cameraY + 325); // up left
-                        } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475, cameraY - 350); // down left
-                        } else {
-                            batch.draw(BULLET_TEXTURE, cameraX - 475,
-                                    rp.getY() - playerDimensions.y / 2 + BULLET_DIMENSIONS.y / 2);
-                        }
-
-                    // up
-                    } else if (cameraDeltaY > OFFSCREEN_Y) {  // subtracting magic number 15 just works
-                        batch.draw(BULLET_TEXTURE, rp.getX() - playerDimensions.x / 2 - 15, cameraY + 325);
-
-                    // down
-                    } else if (cameraDeltaY < OFFSCREEN_Y_NEG) {  // subtracting magic number 15 just works
-                        batch.draw(BULLET_TEXTURE, rp.getX() - playerDimensions.x / 2 - 15, cameraY - 350);
-                    }
-                }
             }
         }
     }
@@ -125,16 +95,46 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    public Optional<Integer> getRemoteLives() {
-        if (remoteLives != null) {
-            return Optional.of(remoteLives);
+    // used for off-screen indicator
+    public Optional<PlayerState[]> getAllPlayerStates() {
+        // does not contain null -> contains info about both players
+        if (allPlayerStates != null
+                && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
+            return Optional.of(allPlayerStates);
         }
         return Optional.empty();
     }
 
-    public void sendBullets(List<Bullet> bullets) {
-        BulletPositionMessage bulletPositionMessage = new BulletPositionMessage();
-        bulletPositionMessage.playerBullets = bullets.stream().map(Bullet::toBulletData).collect(Collectors.toList());
-        AmericanDream.client.sendUDP(bulletPositionMessage);
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<PlayerState> getRemotePlayerState() {
+        if (remotePlayerState != null) {
+            return Optional.of(remotePlayerState);
+        }
+        return Optional.empty();
+    }
+
+    public void testForHit(World world) {
+        // currently the force is applied like so:
+        // make the horizontal gravity equal to the force
+        // and then make the force smaller over time
+        // until it is small enough to reset the gravity
+
+        if (onHitForce != 0) {
+            world.setGravity(new Vector2(onHitForce, GRAVITY));
+
+            // make on hit force smaller
+            onHitForce *= 0.9f;
+        }
+        // reset gravity if hit force is small enough
+        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
+            world.setGravity(new Vector2(0, GRAVITY));
+            onHitForce = 0;
+        }
     }
 }
