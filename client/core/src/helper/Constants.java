@@ -27,7 +27,7 @@ public class Constants {
     public static final float RESPAWN_TIME = 3f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
-    public static final String IP_ADDRESS = "localhost";
+    public static final String IP_ADDRESS = "193.40.255.24";
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static final int LIVES_COUNT = 3;
     public static final int FRAME_WIDTH = 64;
