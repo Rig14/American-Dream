@@ -29,7 +29,9 @@ public class RemoteManager {
     private PlayerState[] allPlayerStates;
     private float onHitForce;
 
-
+    /**
+     * Initialize RemoteManager that controls all data and functionality regarding remote players.
+     */
     public RemoteManager() {
         TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
 
@@ -66,6 +68,12 @@ public class RemoteManager {
         });
     }
 
+    /**
+     * Render remote player(s). Could theoretically handle more than one remote player.
+     * @param batch spritebatch where to render the players
+     * @param playerDimensions player object dimensions
+     * @param delta delta time
+     */
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (remotePlayers != null) {
             for (RemotePlayer rp : remotePlayers) {
@@ -77,6 +85,10 @@ public class RemoteManager {
         }
     }
 
+    /**
+     * Render all bullets shot by remote players.
+     * @param batch spritebatch
+     */
     public void renderBullets(SpriteBatch batch) {
         if (remoteBullets != null) {
             for (BulletData bullet : remoteBullets) {
@@ -87,7 +99,9 @@ public class RemoteManager {
         }
     }
 
-    // mainly used to update hud time
+    /**
+     * Get server-sided game time in seconds. Used for updating HUD timer.
+     */
     public Optional<Integer> getGameTime() {
         if (gameTime != null) {
             return Optional.of(gameTime);
@@ -95,7 +109,9 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    // used for off-screen indicator
+    /**
+     * Get every player's state if none of them is null.
+     */
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
@@ -112,6 +128,9 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    /**
+     * Currently does not support more than 1 remote players.
+     */
     public Optional<PlayerState> getRemotePlayerState() {
         if (remotePlayerState != null) {
             return Optional.of(remotePlayerState);
@@ -119,12 +138,14 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    /**
+     * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
+     * Float representing the force is received form the server only once, after that it's saved into the player object.
+     * Exponentially decrement the applied force every game tick.
+     * Stop applying knockback when the force is too small.
+     * @param world world where the player moves (used for applying gravity)
+     */
     public void testForHit(World world) {
-        // currently the force is applied like so:
-        // make the horizontal gravity equal to the force
-        // and then make the force smaller over time
-        // until it is small enough to reset the gravity
-
         if (onHitForce != 0) {
             world.setGravity(new Vector2(onHitForce, GRAVITY));
 
