@@ -22,7 +22,7 @@ public class Constants {
     // higher means player can go further down
     public static final float BOUNDS = 1400f;
     // how long player must hold down the down key to fall through the platform
-    public static final float PLATFORM_DESCENT = .5f;
+    public static final float PLATFORM_DESCENT = .2f;
     // in seconds
     public static final float RESPAWN_TIME = 3f;
 

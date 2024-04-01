@@ -165,10 +165,10 @@ public class Player extends GameEntity {
             if (b.getUserData() != null && b.getUserData().toString().contains("platform")) {
                 float height = Float.parseFloat(b.getUserData().toString().split(":")[1]);
                 height = height / PPM;
-                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.1)) {
+                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.5)) {
                     // bring back platform
                     b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
-                } else if ((body.getPosition().y - this.height / PPM < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.1)) && b.getPosition().x <= 2000) {
+                } else if ((body.getPosition().y - this.height / PPM < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.5)) && b.getPosition().x <= 2000) {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
