@@ -12,7 +12,7 @@ public class Constants {
     public static final float PLAYER_SPEED = 7f;
     public static final float JUMP_FORCE = 8f;
     // how many jumps can the player do
-    public static final int JUMP_COUNT = 100;
+    public static final int JUMP_COUNT = 2;
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
