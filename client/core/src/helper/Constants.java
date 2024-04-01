@@ -12,7 +12,7 @@ public class Constants {
     public static final float PLAYER_SPEED = 7f;
     public static final float JUMP_FORCE = 8f;
     // how many jumps can the player do
-    public static final int JUMP_COUNT = 2;
+    public static final int JUMP_COUNT = 3;
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
@@ -24,7 +24,7 @@ public class Constants {
     // how long player must hold down the down key to fall through the platform
     public static final float PLATFORM_DESCENT = .2f;
     // in seconds
-    public static final float RESPAWN_TIME = 3f;
+    public static final float RESPAWN_TIME = 0f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
