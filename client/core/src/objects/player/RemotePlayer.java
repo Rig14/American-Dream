@@ -19,7 +19,7 @@ public class RemotePlayer {
     private PlayerAnimations playerAnimations;
     private int isShooting;
     public enum State { WALKING, IDLE, JUMPING, SHOOTING }
-    private String character = "";
+    private String character;
 
     public RemotePlayer(float x, float y, String name, TextureAtlas textureAtlas, float velX, float velY, int isShooting) {
         this.x = x;
@@ -31,6 +31,13 @@ public class RemotePlayer {
         this.velY = velY;
         this.isShooting = isShooting;
         this.playerAnimations = new PlayerAnimations(textureAtlas);
+        if (character != null && character.contains("Obama")) {
+            playerAnimations.generateObamaRemote();
+        } else if (character != null && character.contains("Trump")) {
+            playerAnimations.generateTrumpRemote();
+        } else if (character != null && character.contains("Biden")){
+            playerAnimations.generateBidenRemote();
+        }
     }
 
     public float getVelX() {
@@ -48,6 +55,7 @@ public class RemotePlayer {
     public void render(SpriteBatch batch, Vector2 playerDimensions) {
         // Render the remote player based on its velocity
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
+
         batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
         // render the remote player
 
@@ -62,6 +70,9 @@ public class RemotePlayer {
 
     public float getY() {
         return this.y;
+    }
+    public String getCharacter() {
+        return this.character;
     }
 
 }

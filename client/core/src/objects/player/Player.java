@@ -52,6 +52,13 @@ public class Player extends GameEntity {
         Random random = new Random();
         character = availableNames[random.nextInt(availableNames.length)];
         this.name = character + "_" + AmericanDream.id;
+        if (character.contains("Obama")) {
+            playerAnimations.generateObama();
+        } else if (character.contains("Trump")) {
+            playerAnimations.generateTrump();
+        } else {
+            playerAnimations.generateBiden();
+        }
     }
 
     @Override
@@ -180,6 +187,7 @@ public class Player extends GameEntity {
     @Override
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
+
         batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
     }
 
@@ -233,6 +241,10 @@ public class Player extends GameEntity {
 
     public int isShooting() {
         return isShooting;
+    }
+
+    public String getCharacter() {
+        return character;
     }
 
     public enum State {WALKING, IDLE, JUMPING, SHOOTING}

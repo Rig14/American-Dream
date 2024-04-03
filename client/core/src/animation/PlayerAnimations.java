@@ -12,12 +12,12 @@ import static helper.Constants.*;
 
 public class PlayerAnimations {
 
-    private final Animation<TextureRegion> walkAnimation;
-    private final Animation<TextureRegion> idleAnimation;
-    private final Animation<TextureRegion> shootAnimation;
-    private final Animation<TextureRegion> walkAnimationRemote;
-    private final Animation<TextureRegion> idleAnimationRemote;
-    private final Animation<TextureRegion> shootAnimationRemote;
+    private Animation<TextureRegion> walkAnimation;
+    private Animation<TextureRegion> idleAnimation;
+    private Animation<TextureRegion> shootAnimation;
+    private Animation<TextureRegion> walkAnimationRemote;
+    private Animation<TextureRegion> idleAnimationRemote;
+    private Animation<TextureRegion> shootAnimationRemote;
     private final TextureAtlas textureAtlas;
     private Player.State currentState;
     private RemotePlayer.State currentStateRemote;
@@ -28,13 +28,6 @@ public class PlayerAnimations {
 
     public PlayerAnimations (TextureAtlas textureAtlas) {
         this.textureAtlas = textureAtlas;
-        walkAnimation = createAnimation("soldier-walk", 7, FRAME_DURATION);
-        idleAnimation = createAnimation("soldier-idle", 7, FRAME_DURATION);
-        shootAnimation = createAnimation("soldier-shoot", 4, FRAME_DURATION);
-        walkAnimationRemote = createAnimation("soldier2-walk", 8, FRAME_DURATION);
-        idleAnimationRemote = createAnimation("soldier2-idle", 9, FRAME_DURATION);
-        shootAnimationRemote = createAnimation("soldier2-shoot", 4, FRAME_DURATION);
-
         stateTimer = 0;
     }
 
@@ -133,6 +126,36 @@ public class PlayerAnimations {
         } else {
             stateTimer += delta;
         }
+    }
+    public void generateObama() {
+        walkAnimation = createAnimation("soldier-walk", 7, FRAME_DURATION);
+        idleAnimation = createAnimation("soldier-idle", 7, FRAME_DURATION);
+        shootAnimation = createAnimation("soldier-shoot", 4, FRAME_DURATION);
+    }
+    public void generateObamaRemote() {
+        walkAnimationRemote = createAnimation("soldier-walk", 7, FRAME_DURATION);
+        idleAnimationRemote = createAnimation("soldier-idle", 7, FRAME_DURATION);
+        shootAnimationRemote = createAnimation("soldier-shoot", 4, FRAME_DURATION);
+    }
+    public void generateTrump() {
+        walkAnimation = createAnimation("soldier2-walk", 8, FRAME_DURATION);
+        idleAnimation = createAnimation("soldier2-idle", 9, FRAME_DURATION);
+        shootAnimation = createAnimation("soldier2-shoot", 4, FRAME_DURATION);
+    }
+    public void generateTrumpRemote() {
+        walkAnimationRemote = createAnimation("soldier2-walk", 8, FRAME_DURATION);
+        idleAnimationRemote = createAnimation("soldier2-idle", 9, FRAME_DURATION);
+        shootAnimationRemote = createAnimation("soldier2-shoot", 4, FRAME_DURATION);
+    }
+    public void generateBiden() {
+        walkAnimation = createAnimation("soldier3-walk", 8, FRAME_DURATION);
+        idleAnimation = createAnimation("soldier3-idle", 7, FRAME_DURATION);
+        shootAnimation = createAnimation("soldier3-shoot", 4, FRAME_DURATION);
+    }
+    public void generateBidenRemote() {
+        walkAnimationRemote = createAnimation("soldier3-walk", 8, FRAME_DURATION);
+        idleAnimationRemote = createAnimation("soldier3-idle", 7, FRAME_DURATION);
+        shootAnimationRemote = createAnimation("soldier3-shoot", 4, FRAME_DURATION);
     }
 
     public Animation<TextureRegion> getWalkAnimation() {
