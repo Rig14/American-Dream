@@ -54,6 +54,7 @@ public class RemotePlayer {
 
     public void render(SpriteBatch batch, Vector2 playerDimensions) {
         // Render the remote player based on its velocity
+        System.out.println(this.character);
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
 
         batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
