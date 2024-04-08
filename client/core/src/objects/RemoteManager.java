@@ -1,6 +1,9 @@
 package objects;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -28,6 +31,8 @@ public class RemoteManager {
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
     private float onHitForce;
+    private float AIplayerX;
+    private float AIplayerY;
 
 
     public RemoteManager() {
@@ -40,6 +45,12 @@ public class RemoteManager {
                     allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
+
+                    // AI player
+                    if (AIplayerX != 0 && AIplayerY != 0) {
+                        AIplayerX = gameStateMessage.AIplayerX;
+                        AIplayerY = gameStateMessage.AIplayerY;
+                    }
 
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
@@ -75,6 +86,18 @@ public class RemoteManager {
                 }
             }
         }
+    }
+
+    public void renderAIPlayer(SpriteBatch batch) {
+        // check if AI player exists
+        if (AIplayerX == 0 && AIplayerY == 0) return;
+
+        Pixmap pixmap = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.RED);
+        pixmap.fillCircle((int) AIplayerX, (int) AIplayerY, 10);
+        Texture texture = new Texture(pixmap);
+
+        batch.draw(texture, AIplayerX, AIplayerY);
     }
 
     public void renderBullets(SpriteBatch batch) {
