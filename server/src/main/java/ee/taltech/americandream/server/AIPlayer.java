@@ -27,4 +27,7 @@ public class AIPlayer {
     public float getY() {
         return y;
     }
+
+    public void update(float delta, Player[] players) {
+    }
 }

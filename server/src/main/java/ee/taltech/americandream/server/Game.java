@@ -41,6 +41,12 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.update(1000f / TICK_RATE / 1000f);
                 }
+
+                // update AI player
+                if (aiPlayer != null) {
+                    aiPlayer.update(1000f / TICK_RATE / 1000f, players);
+                }
+
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
 
@@ -135,6 +141,9 @@ public class Game extends Thread {
     }
 
     public void addAIPlayer() {
+        // check if AI player already exists
+        if (aiPlayer != null) return;
+
         // find point between players and spawn the AI player there
         float x = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / players.length;
         float y = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / players.length;
