@@ -5,11 +5,14 @@ import helper.BulletData;
 import java.util.ArrayList;
 import java.util.List;
 
+import static helper.Constants.*;
+
 public class AIPlayer {
     private final List<BulletData> bullets;
     private float x;
     private float y;
     private float velocity = 100;
+    private float shootCountdown = 0;
 
     public AIPlayer(float x, float y) {
         this.x = x;
@@ -55,5 +58,24 @@ public class AIPlayer {
 
         x += (float) (Math.cos(angle) * velocity * delta);
         y += (float) (Math.sin(angle) * velocity * delta);
+
+        // shoot a bullet if countdown is over
+        if (shootCountdown >= AI_PLAYER_SHOOTING_INTERVAL) {
+            BulletData bullet = new BulletData();
+            bullet.x = x;
+            bullet.y = y;
+            bullet.speedBullet = PISTOL_BULLET_SPEED * (closestPlayer.getState().x < x ? -1 : 1);
+            bullet.id = -1;
+            bullets.add(bullet);
+            shootCountdown = 0;
+        }
+
+        // update bullets
+        bullets.forEach(bullet -> bullet.x += bullet.speedBullet);
+
+        // removing bullets
+        bullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);
+
+        shootCountdown += delta;
     }
 }
