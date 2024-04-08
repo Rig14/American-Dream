@@ -14,11 +14,11 @@ import static helper.Constants.*;
 
 public class Game extends Thread {
 
-    private final List<AIPlayer> aiPlayers;
     private final Lobby lobby;
+    private final Player[] players;
+    private AIPlayer aiPlayer;
     private float gameTime;
     private boolean running = true;
-    private Player[] players;
     private boolean bothJoinedMultiplayer = false;
 
     public Game(Connection[] connections, Lobby lobby) {
@@ -32,8 +32,6 @@ public class Game extends Thread {
         for (int i = 0; i < connections.length; i++) {
             players[i] = new Player(connections[i], this, connections[i].getID());
         }
-
-        this.aiPlayers = new ArrayList<>();
     }
 
     public void run() {
@@ -132,7 +130,6 @@ public class Game extends Thread {
         float x = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / players.length;
         float y = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / players.length;
 
-        AIPlayer aiPlayer = new AIPlayer(x, y);
-        aiPlayers.add(aiPlayer);
+        aiPlayer = new AIPlayer(x, y);
     }
 }
