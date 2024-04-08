@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
@@ -88,7 +89,7 @@ public class RemoteManager {
         // check if AI player exists
         if (AIplayerX == 0 && AIplayerY == 0) return;
 
-        batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, 20, 20);
+        batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
     }
 
     public void renderBullets(SpriteBatch batch) {
