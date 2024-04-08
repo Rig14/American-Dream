@@ -20,4 +20,6 @@ public class Constants {
     // optimal range 20-50 (10 for testing)
     // force *= 1 + (damage / x)
     public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 10;
+    // how fast the AI player shoots bullets
+    public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
 }

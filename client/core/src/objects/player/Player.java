@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
+import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -113,6 +114,11 @@ public class Player extends GameEntity {
             keyDownTime += delta;
         } else {
             keyDownTime = 0;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+            // spawn AI player
+            AmericanDream.client.sendTCP(new AddAIMessage());
         }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)

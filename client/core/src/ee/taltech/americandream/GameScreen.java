@@ -83,6 +83,7 @@ public class GameScreen extends ScreenAdapter {
 
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
+        remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
         batch.end();
