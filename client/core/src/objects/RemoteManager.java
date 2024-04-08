@@ -1,9 +1,6 @@
 package objects;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -13,6 +10,7 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
+import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
@@ -47,10 +45,8 @@ public class RemoteManager {
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
 
                     // AI player
-                    if (AIplayerX != 0 && AIplayerY != 0) {
-                        AIplayerX = gameStateMessage.AIplayerX;
-                        AIplayerY = gameStateMessage.AIplayerY;
-                    }
+                    AIplayerX = gameStateMessage.AIplayerX;
+                    AIplayerY = gameStateMessage.AIplayerY;
 
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
@@ -92,12 +88,7 @@ public class RemoteManager {
         // check if AI player exists
         if (AIplayerX == 0 && AIplayerY == 0) return;
 
-        Pixmap pixmap = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.RED);
-        pixmap.fillCircle((int) AIplayerX, (int) AIplayerY, 10);
-        Texture texture = new Texture(pixmap);
-
-        batch.draw(texture, AIplayerX, AIplayerY);
+        batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, 20, 20);
     }
 
     public void renderBullets(SpriteBatch batch) {
