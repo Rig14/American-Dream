@@ -14,11 +14,12 @@ import static helper.Constants.*;
 
 public class Game extends Thread {
 
+    private final List<AIPlayer> aiPlayers;
+    private final Lobby lobby;
     private float gameTime;
     private boolean running = true;
     private Player[] players;
     private boolean bothJoinedMultiplayer = false;
-    private final Lobby lobby;
 
     public Game(Connection[] connections, Lobby lobby) {
         // set game duration
@@ -31,6 +32,8 @@ public class Game extends Thread {
         for (int i = 0; i < connections.length; i++) {
             players[i] = new Player(connections[i], this, connections[i].getID());
         }
+
+        this.aiPlayers = new ArrayList<>();
     }
 
     public void run() {
@@ -52,7 +55,7 @@ public class Game extends Thread {
                     // add bullets to the game state message
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
-                
+
                 // handle bullets hitting players
                 handleBulletHits(gameStateMessage);
 
@@ -94,13 +97,13 @@ public class Game extends Thread {
         }
 
         // check if bullets hit players
-        for (BulletData bullet: bullets) {
+        for (BulletData bullet : bullets) {
             // construct bullet hitbox
             Rectangle bulletHitbox = new Rectangle((int) bullet.x - BULLET_HITBOX / 2, (int) bullet.y - BULLET_HITBOX / 2, BULLET_HITBOX, BULLET_HITBOX);
             // check if bullet hit any player
             for (int i = 0; i < playerHitboxes.length; i++) {
                 if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
-                                && !bullet.isDisabled // has already hit
+                        && !bullet.isDisabled // has already hit
                         && bullet.id != playerStates[i].id // is not the player who shot the bullet
                 ) {
                     // remove bullet
@@ -122,5 +125,14 @@ public class Game extends Thread {
     public void end() {
         running = false;
         lobby.clearLobby();
+    }
+
+    public void addAIPlayer() {
+        // find point between players and spawn the AI player there
+        float x = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / players.length;
+        float y = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / players.length;
+
+        AIPlayer aiPlayer = new AIPlayer(x, y);
+        aiPlayers.add(aiPlayer);
     }
 }
