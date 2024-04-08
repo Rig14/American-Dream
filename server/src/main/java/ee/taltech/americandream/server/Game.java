@@ -54,6 +54,15 @@ public class Game extends Thread {
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
 
+                // ai logic
+                if (aiPlayer != null) {
+                    // add AI player bullet data
+                    gameStateMessage.bulletData.addAll(aiPlayer.getBullets());
+                    // add AI player position
+                    gameStateMessage.AIplayerX = aiPlayer.getX();
+                    gameStateMessage.AIplayerY = aiPlayer.getY();
+                }
+
                 // handle bullets hitting players
                 handleBulletHits(gameStateMessage);
 
