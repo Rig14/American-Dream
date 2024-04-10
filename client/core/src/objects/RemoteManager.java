@@ -93,8 +93,10 @@ public class RemoteManager {
         }
     }
 
+    /**
+     Render AI player if it exists.
+     */
     public void renderAIPlayer(SpriteBatch batch) {
-        // check if AI player exists
         if (AIplayerX == 0 && AIplayerY == 0) return;
 
         batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
@@ -157,7 +159,7 @@ public class RemoteManager {
      * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
      * Float representing the force is received form the server only once, after that it's saved into the player object.
      * Exponentially decrement the applied force every game tick.
-     * Stop applying knockback when the force is too small.
+     * Stop applying knockback when the force becomes too small.
      * @param world world where the player moves (used for applying gravity)
      */
     public void testForHit(World world) {

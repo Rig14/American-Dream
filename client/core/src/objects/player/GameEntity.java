@@ -9,6 +9,12 @@ public abstract class GameEntity {
     protected float width, height;
     protected Body body;
 
+    /**
+     * Initialize an object that interacts with the game and responds to player input.
+     * @param width width of the player object
+     * @param height height
+     * @param body object that moves around in the map/world and collides with other bodies
+     */
     public GameEntity(float width, float height, Body body) {
         this.x = body.getPosition().x;
         this.y = body.getPosition().y;
