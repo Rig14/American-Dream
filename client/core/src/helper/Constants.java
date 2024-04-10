@@ -2,6 +2,8 @@ package helper;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.awt.*;
+
 public class Constants {
     // debug mode
     public static final boolean GAMEPLAY_DEBUG = true;
@@ -12,7 +14,7 @@ public class Constants {
     public static final float PLAYER_SPEED = 7f;
     public static final float JUMP_FORCE = 8f;
     // how many jumps can the player do
-    public static final int JUMP_COUNT = 100;
+    public static final int JUMP_COUNT = 3;
     // camera speed - less is faster
     public static final float CAMERA_SPEED = 4f;
     // the zoom level of the camera
@@ -22,9 +24,9 @@ public class Constants {
     // higher means player can go further down
     public static final float BOUNDS = 1400f;
     // how long player must hold down the down key to fall through the platform
-    public static final float PLATFORM_DESCENT = .5f;
+    public static final float PLATFORM_DESCENT = .2f;
     // in seconds
-    public static final float RESPAWN_TIME = 3f;
+    public static final float RESPAWN_TIME = 0f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final String IP_ADDRESS = "localhost";
@@ -33,5 +35,7 @@ public class Constants {
     public static final int FRAME_WIDTH = 64;
     public static final int FRAME_HEIGHT = 74;
     public static final float FRAME_DURATION = 0.2f;
+
+    public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 
 }

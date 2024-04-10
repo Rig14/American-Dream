@@ -55,7 +55,7 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
 
         // remote player manager
         this.remoteManager = new RemoteManager();
@@ -83,6 +83,7 @@ public class GameScreen extends ScreenAdapter {
 
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
+        remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
         batch.end();

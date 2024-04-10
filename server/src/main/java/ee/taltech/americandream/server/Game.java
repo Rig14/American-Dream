@@ -14,11 +14,12 @@ import static helper.Constants.*;
 
 public class Game extends Thread {
 
+    private final Lobby lobby;
+    private final Player[] players;
+    private AIPlayer aiPlayer;
     private float gameTime;
     private boolean running = true;
-    private Player[] players;
     private boolean bothJoinedMultiplayer = false;
-    private final Lobby lobby;
 
     public Game(Connection[] connections, Lobby lobby) {
         // set game duration
@@ -40,6 +41,12 @@ public class Game extends Thread {
                 for (Player player : players) {
                     player.update(1000f / TICK_RATE / 1000f);
                 }
+
+                // update AI player
+                if (aiPlayer != null) {
+                    aiPlayer.update(1000f / TICK_RATE / 1000f, players);
+                }
+
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
 
@@ -52,7 +59,16 @@ public class Game extends Thread {
                     // add bullets to the game state message
                     gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
                 }
-                
+
+                // ai logic
+                if (aiPlayer != null) {
+                    // add AI player bullet data
+                    gameStateMessage.bulletData.addAll(aiPlayer.getBullets());
+                    // add AI player position
+                    gameStateMessage.AIplayerX = aiPlayer.getX();
+                    gameStateMessage.AIplayerY = aiPlayer.getY();
+                }
+
                 // handle bullets hitting players
                 handleBulletHits(gameStateMessage);
 
@@ -94,13 +110,13 @@ public class Game extends Thread {
         }
 
         // check if bullets hit players
-        for (BulletData bullet: bullets) {
+        for (BulletData bullet : bullets) {
             // construct bullet hitbox
             Rectangle bulletHitbox = new Rectangle((int) bullet.x - BULLET_HITBOX / 2, (int) bullet.y - BULLET_HITBOX / 2, BULLET_HITBOX, BULLET_HITBOX);
             // check if bullet hit any player
             for (int i = 0; i < playerHitboxes.length; i++) {
                 if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
-                                && !bullet.isDisabled // has already hit
+                        && !bullet.isDisabled // has already hit
                         && bullet.id != playerStates[i].id // is not the player who shot the bullet
                 ) {
                     // remove bullet
@@ -122,5 +138,16 @@ public class Game extends Thread {
     public void end() {
         running = false;
         lobby.clearLobby();
+    }
+
+    public void addAIPlayer() {
+        // check if AI player already exists
+        if (aiPlayer != null) return;
+
+        // find point between players and spawn the AI player there
+        float x = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / players.length;
+        float y = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / players.length;
+
+        aiPlayer = new AIPlayer(x, y);
     }
 }

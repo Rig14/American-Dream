@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
+import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -20,14 +21,12 @@ import java.util.Objects;
 import java.util.Random;
 
 import static helper.Constants.*;
-import static helper.Textures.BIDEN_TEXTURE;
-import static helper.Textures.OBAMA_TEXTURE;
-import static helper.Textures.TRUMP_TEXTURE;
 
 public class Player extends GameEntity {
 
-    public enum State { WALKING, IDLE, JUMPING, SHOOTING }
     private final float speed;
+    private final TextureAtlas textureAtlas;
+    private final PlayerAnimations playerAnimations;
     private Direction direction;
     private int jumpCounter;
     private float keyDownTime = 0;
@@ -35,11 +34,8 @@ public class Player extends GameEntity {
     private Integer livesCount = LIVES_COUNT;
     private String name;
     private String character;
-    private final TextureAtlas textureAtlas;
-    private final PlayerAnimations playerAnimations;
     private int isShooting;
-
-
+    private float jumpCounterResetTime = 0;
 
     public Player(float width, float height, Body body) {
         super(width, height, body);
@@ -55,7 +51,7 @@ public class Player extends GameEntity {
         // randomly generated name + idy
         String[] availableNames = {"Trump", "Biden", "Obama"};
         Random random = new Random();
-        character = availableNames[random.nextInt(availableNames.length )];
+        character = availableNames[random.nextInt(availableNames.length)];
         this.name = character + "_" + AmericanDream.id;
     }
 
@@ -120,9 +116,19 @@ public class Player extends GameEntity {
             keyDownTime = 0;
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+            // spawn AI player
+            AmericanDream.client.sendTCP(new AddAIMessage());
+        }
+
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
-            jumpCounter = 0;
+            // body y velocity must main 0 for some time to reset jump counter
+            if (jumpCounterResetTime > 0.1f) {
+                jumpCounter = 0;
+                jumpCounterResetTime = 0;
+            }
+            jumpCounterResetTime += delta;
         }
 
 
@@ -165,10 +171,11 @@ public class Player extends GameEntity {
             if (b.getUserData() != null && b.getUserData().toString().contains("platform")) {
                 float height = Float.parseFloat(b.getUserData().toString().split(":")[1]);
                 height = height / PPM;
-                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.1)) {
+                if (body.getPosition().y - this.height / PPM >= height && b.getPosition().x >= 2000 && (keyDownTime == 0 || keyDownTime > PLATFORM_DESCENT * 1.5)) {
                     // bring back platform
                     b.setTransform(b.getPosition().x - 2000, b.getPosition().y, 0);
-                } else if ((body.getPosition().y - this.height / PPM < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.1)) && b.getPosition().x <= 2000) {
+                    keyDownTime = 0;
+                } else if ((body.getPosition().y - this.height / PPM < height || (keyDownTime >= PLATFORM_DESCENT && keyDownTime <= PLATFORM_DESCENT * 1.5)) && b.getPosition().x <= 2000) {
                     // remove platform
                     b.setTransform(b.getPosition().x + 2000, b.getPosition().y, 0);
                 }
@@ -214,7 +221,6 @@ public class Player extends GameEntity {
         }
     }
 
-
     public Direction getDirection() {
         return direction;
     }
@@ -222,12 +228,18 @@ public class Player extends GameEntity {
     public Integer getLives() {
         return this.livesCount;
     }
+
     public float getVelX() {
         return velX;
     }
+
     public float getVelY() {
         return velY;
     }
 
-    public int isShooting() { return isShooting; }
+    public int isShooting() {
+        return isShooting;
+    }
+
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }
