@@ -77,6 +77,45 @@ public class RemoteManager {
     }
 
     /**
+     * Get server-sided game time in seconds. Used for updating HUD timer.
+     */
+    public Optional<Integer> getGameTime() {
+        if (gameTime != null) {
+            return Optional.of(gameTime);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Get all players' state if none of them is null.
+     */
+    public Optional<PlayerState[]> getAllPlayerStates() {
+        // does not contain null -> contains info about both players
+        if (allPlayerStates != null
+                && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
+            return Optional.of(allPlayerStates);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Currently does not support more than 1 remote players.
+     */
+    public Optional<PlayerState> getRemotePlayerState() {
+        if (remotePlayerState != null) {
+            return Optional.of(remotePlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Render remote player(s). Could theoretically handle more than one remote player.
      * @param batch spritebatch where to render the players
      * @param playerDimensions player object dimensions
@@ -114,45 +153,6 @@ public class RemoteManager {
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
         }
-    }
-
-    /**
-     * Get server-sided game time in seconds. Used for updating HUD timer.
-     */
-    public Optional<Integer> getGameTime() {
-        if (gameTime != null) {
-            return Optional.of(gameTime);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Get every player's state if none of them is null.
-     */
-    public Optional<PlayerState[]> getAllPlayerStates() {
-        // does not contain null -> contains info about both players
-        if (allPlayerStates != null
-                && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            return Optional.of(allPlayerStates);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<PlayerState> getLocalPlayerState() {
-        if (localPlayerState != null) {
-            return Optional.of(localPlayerState);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Currently does not support more than 1 remote players.
-     */
-    public Optional<PlayerState> getRemotePlayerState() {
-        if (remotePlayerState != null) {
-            return Optional.of(remotePlayerState);
-        }
-        return Optional.empty();
     }
 
     /**

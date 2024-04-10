@@ -27,24 +27,19 @@ public class GameScreen extends ScreenAdapter {
     private World world;
     private Box2DDebugRenderer debugRenderer;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
-
     private TileMapHelper tileMapHelper;
 
-    // ###################
-    // game objects
-    // client player
-    private Player player;
-    // remote players
-    private RemotePlayer remotePlayer;
-    private RemoteManager remoteManager;
-    // ###################
+    private Player player;  // local client player
+    private RemotePlayer remotePlayer;  // remote player(s)
+    private final RemoteManager remoteManager;
 
-    // center point of the map
-    private Vector2 center;
-    // game screen overlay
-    private Hud hud;
-    private OffScreenIndicator offScreenIndicator;
+    private Vector2 mapCenterPoint;
+    private final Hud hud;
+    private final OffScreenIndicator offScreenIndicator;
 
+    /**
+     * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
+     */
     public GameScreen(Camera camera) {
         this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
@@ -57,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
         this.tileMapHelper = new TileMapHelper(this);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
 
-        // remote player manager
+        // remote player(s) manager
         this.remoteManager = new RemoteManager();
 
         // visual info for player
@@ -65,6 +60,22 @@ public class GameScreen extends ScreenAdapter {
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
     }
 
+    public World getWorld() {
+        return world;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public void setMapCenterPoint(Vector2 vector2) {
+        this.mapCenterPoint = vector2;
+    }
+
+    /**
+     * Render a new frame.
+     * @param delta time passed since the rendering of the previous frame
+     */
     @Override
     public void render(float delta) {
         this.update(delta);
@@ -76,16 +87,16 @@ public class GameScreen extends ScreenAdapter {
         // render map before the actual game objects
         orthogonalTiledMapRenderer.render();
 
+        // object rendering
         batch.begin();
-        // object rendering goes here
 
         player.render(batch);
-
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
+
         batch.end();
 
         // for debugging
@@ -98,6 +109,9 @@ public class GameScreen extends ScreenAdapter {
         hud.stage.draw();
     }
 
+    /**
+     * Update all game objects and data before the rendering of a new frame.
+     */
     private void update(float delta) {
         // updates objects in the world
         world.step(1 / FPS, 6, 2);
@@ -108,9 +122,10 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        player.update(delta, center);
 
+        player.update(delta, mapCenterPoint);
         remoteManager.testForHit(world);
+        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -119,51 +134,37 @@ public class GameScreen extends ScreenAdapter {
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
-
-        // update hud
-        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
     }
 
     /**
-     * Updates the camera position relative to players and center point
-     * <p>
-     * new camera position will be the center point of the triangle
-     * created by players and the center point
+     * Updates the camera position relative to the players and the center point of the world.
+     * New camera position will be the center point of the triangle created by players and the center point.
      */
     private void cameraUpdate() {
-        // if player is out of bound then set the camera to the center
+        // if player is out of bounds then set the camera to the center
         if (
-                player.getPosition().y > center.y + BOUNDS
-                        || player.getPosition().y < center.y - BOUNDS
-                        || player.getPosition().x > center.x + BOUNDS
-                        || player.getPosition().x < center.x - BOUNDS
+                player.getPosition().y > mapCenterPoint.y + BOUNDS
+                        || player.getPosition().y < mapCenterPoint.y - BOUNDS
+                        || player.getPosition().x > mapCenterPoint.x + BOUNDS
+                        || player.getPosition().x < mapCenterPoint.x - BOUNDS
         ) {
             // "lerp" makes the camera move smoothly back to the center point.
-            camera.position.lerp(new Vector3(center.x, center.y, 0), 0.1f);
+            camera.position.lerp(new Vector3(mapCenterPoint.x, mapCenterPoint.y, 0), 0.1f);
             camera.update();
             return;
         }
         // make camera follow the player slowly
         // vector from center to player
-        Vector2 vector = new Vector2(player.getPosition().x - center.x, player.getPosition().y - center.y);
-        camera.position.x = center.x + vector.x / CAMERA_SPEED;
-        camera.position.y = center.y + vector.y / CAMERA_SPEED;
+        Vector2 vector = new Vector2(player.getPosition().x - mapCenterPoint.x, player.getPosition().y - mapCenterPoint.y);
+        camera.position.x = mapCenterPoint.x + vector.x / CAMERA_SPEED;
+        camera.position.y = mapCenterPoint.y + vector.y / CAMERA_SPEED;
         // update the camera
         camera.update();
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public void setCenter(Vector2 vector2) {
-        this.center = vector2;
-    }
-
+    /**
+     * This method is called when the game is closed.
+     */
     @Override
     public void dispose() {
         super.dispose();
