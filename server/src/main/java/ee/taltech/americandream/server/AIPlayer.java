@@ -13,6 +13,7 @@ public class AIPlayer {
     private float y;
     private float velocity = 100;
     private float shootCountdown = 0;
+    private float knockback = 0;
 
     public AIPlayer(float x, float y) {
         this.x = x;
@@ -76,6 +77,20 @@ public class AIPlayer {
         // removing bullets
         bullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);
 
+        if (Math.abs(knockback) < 1) {
+            // if knockback is small enough, set it to 0
+            knockback = 0;
+        } else {
+            // apply knockback
+            x += knockback * delta;
+            // reduce knockback
+            knockback *= 0.9;
+        }
+
         shootCountdown += delta;
+    }
+
+    public void bulletHit(BulletData bullet) {
+        knockback = (bullet.speedBullet < 0 ? -1 : 1) * PISTOL_BULLET_FORCE;
     }
 }
