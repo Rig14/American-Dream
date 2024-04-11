@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
@@ -17,21 +18,20 @@ import static helper.Constants.*;
 
 public class Player {
     private final int id;
+    private final Game game;
+    private final Connection connection;
     private List<BulletData> playerBullets;
     private float x;
     private float y;
     private Direction direction;
     private String name;
-
     private Integer livesCount;
     private int damage = 0;
-
-    private final Game game;
     private Direction nextBulletDirection;
     private float bulletTimeout;
-    private final Connection connection;
     private float velX, velY;
     private int isShooting;
+
     public Player(Connection connection, Game game, int id) {
         // create player
         this.id = id;
@@ -47,6 +47,7 @@ public class Player {
                 super.disconnected(connection);
                 onDisconnect();
             }
+
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
                 // handle incoming data
@@ -59,6 +60,12 @@ public class Player {
                 if (object instanceof BulletMessage bulletMessage) {
                     // handle bullet position message
                     handleBullets(bulletMessage);
+                }
+
+                // handle adding AI player
+                if (object instanceof AddAIMessage addAIMessage) {
+                    // handle adding AI player
+                    game.addAIPlayer();
                 }
             }
         });
