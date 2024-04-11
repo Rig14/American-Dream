@@ -115,7 +115,10 @@ public class RemoteManager {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            // add AI player to the list
+            if (AIplayerX == 0 && AIplayerY == 0) {
+                return Optional.of(allPlayerStates);
+            }
+            // add AI player to the list if it exists
             PlayerState[] newAllPlayerStates = Arrays.copyOf(allPlayerStates, allPlayerStates.length + 1);
             PlayerState AIplayer = new PlayerState();
             AIplayer.x = AIplayerX;
