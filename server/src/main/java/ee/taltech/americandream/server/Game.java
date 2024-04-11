@@ -109,6 +109,12 @@ public class Game extends Thread {
             playerHitboxes[i] = new Rectangle((int) playerStates[i].x - PLAYER_WIDTH / 2, (int) playerStates[i].y - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT);
         }
 
+        // if AI player exists, construct hitbox for AI player
+        Rectangle aiPlayerHitbox = null;
+        if (aiPlayer != null) {
+            aiPlayerHitbox = new Rectangle((int) aiPlayer.getX() - AI_PLAYER_SIZE.width / 2, (int) aiPlayer.getY() - AI_PLAYER_SIZE.height / 2, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+        }
+
         // check if bullets hit players
         for (BulletData bullet : bullets) {
             // construct bullet hitbox
@@ -131,6 +137,15 @@ public class Game extends Thread {
                         }
                     }
                 }
+            }
+
+            // AI player hit
+            if (aiPlayerHitbox != null
+                    && aiPlayerHitbox.intersects(bulletHitbox)
+                    && !bullet.isDisabled && bullet.id != -1
+            ) {
+                bullet.isDisabled = true;
+                aiPlayer.bulletHit(bullet);
             }
         }
     }
