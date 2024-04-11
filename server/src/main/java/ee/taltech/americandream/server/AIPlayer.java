@@ -77,13 +77,14 @@ public class AIPlayer {
         // removing bullets
         bullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);
 
-        // apply knockback
-        x += knockback * delta;
-        // reduce knockback
-        knockback *= 0.9;
-        // if knockback is small enough, set it to 0
         if (Math.abs(knockback) < 1) {
+            // if knockback is small enough, set it to 0
             knockback = 0;
+        } else {
+            // apply knockback
+            x += knockback * delta;
+            // reduce knockback
+            knockback *= 0.9;
         }
 
         shootCountdown += delta;
