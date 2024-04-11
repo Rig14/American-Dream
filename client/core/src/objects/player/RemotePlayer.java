@@ -35,7 +35,7 @@ public class RemotePlayer {
             playerAnimations.generateObamaRemote();
         } else if (character != null && character.contains("Trump")) {
             playerAnimations.generateTrumpRemote();
-        } else if (character != null && character.contains("Biden")){
+        } else if (character != null) {
             playerAnimations.generateBidenRemote();
         }
     }
@@ -57,8 +57,10 @@ public class RemotePlayer {
         System.out.println(this.character);
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
 
-        batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-        // render the remote player
+        if (currentFrame != null) {
+            batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+            // render the remote player
+        }
 
     }
     public void update(float delta) {

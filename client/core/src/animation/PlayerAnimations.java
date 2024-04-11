@@ -64,23 +64,26 @@ public class PlayerAnimations {
     }
     public TextureRegion getFrameRemote(float delta, RemotePlayer player) {
         currentStateRemote = getStateRemote(player);
-        TextureRegion region;
-        if (currentStateRemote == RemotePlayer.State.SHOOTING) {
+        TextureRegion region = null;
+
+        if (currentStateRemote == RemotePlayer.State.SHOOTING && shootAnimationRemote != null) {
             region = shootAnimationRemote.getKeyFrame(stateTimer);
-        } else if (currentStateRemote == RemotePlayer.State.WALKING) {
+        } else if (currentStateRemote == RemotePlayer.State.WALKING && walkAnimationRemote != null) {
             region = walkAnimationRemote.getKeyFrame(stateTimer);
-        } else {
+        } else if (idleAnimationRemote != null){
             region = idleAnimationRemote.getKeyFrame(stateTimer);
         }
-        if (player.getVelX() < 0 && !region.isFlipX()) {
-            region.flip(true, false);
-        } else if (player.getVelX() > 0 && region.isFlipX()) {
-            region.flip(true, false);
-        }
-        if (player.isShooting() < 0 && !region.isFlipX()) {
-            region.flip(true, false);
-        } else if (player.isShooting() > 0 && region.isFlipX()) {
-            region.flip(true, false);
+        if (region != null) {
+            if (player.getVelX() < 0 && !region.isFlipX()) {
+                region.flip(true, false);
+            } else if (player.getVelX() > 0 && region.isFlipX()) {
+                region.flip(true, false);
+            }
+            if (player.isShooting() < 0 && !region.isFlipX()) {
+                region.flip(true, false);
+            } else if (player.isShooting() > 0 && region.isFlipX()) {
+                region.flip(true, false);
+            }
         }
         stateTimer = currentStateRemote == previousStateRemote ? stateTimer + delta : 0;
         previousStateRemote = currentStateRemote;
