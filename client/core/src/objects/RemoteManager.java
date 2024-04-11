@@ -13,6 +13,7 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
+import helper.Textures;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,7 +88,7 @@ public class RemoteManager {
     }
 
     /**
-     * Get all players' state if none of them is null.
+     * Get all players' state if none of them is null. Check for AI player.
      */
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players

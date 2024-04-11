@@ -39,6 +39,7 @@ public class GameScreen extends ScreenAdapter {
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
+     * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera) {
         this.camera = (OrthographicCamera) camera;

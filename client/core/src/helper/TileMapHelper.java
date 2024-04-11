@@ -24,10 +24,16 @@ public class TileMapHelper {
     private TiledMap tiledMap;
     private GameScreen gameScreen;
 
+    /**
+     * Initialize TileMapHelper which loads the tilemap background, tile outlines and objects.
+     */
     public TileMapHelper(GameScreen gameScreen) {
         this.gameScreen = gameScreen;
     }
 
+    /**
+     * Load tilemap from a .tmx file.
+     */
     public OrthogonalTiledMapRenderer setupMap(String fileName) {
         // load map
         tiledMap = new TmxMapLoader().load(fileName);
@@ -35,6 +41,9 @@ public class TileMapHelper {
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
 
+    /**
+     * Load tilemap objects such as the player itself to enable collisions.
+     */
     private void parseMapObjects(MapObjects mapObjects) {
         // parsing map objects
         for (MapObject mapObject : mapObjects) {
@@ -68,6 +77,9 @@ public class TileMapHelper {
         }
     }
 
+    /**
+     * Create static objects such as platforms.
+     */
     private void createStaticBody(PolygonMapObject polygonMapObject) {
         // creating static body
         BodyDef bodyDef = new BodyDef();
@@ -85,6 +97,9 @@ public class TileMapHelper {
         shape.dispose();
     }
 
+    /**
+     * Load the shape of an object, for example a rectangular platform.
+     */
     private Shape createPolygonShape(PolygonMapObject polygonMapObject) {
         // points of the polygon
         float[] vertices = polygonMapObject.getPolygon().getTransformedVertices();

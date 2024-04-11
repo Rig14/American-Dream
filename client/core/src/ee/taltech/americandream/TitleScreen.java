@@ -14,10 +14,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 
 public class TitleScreen extends ScreenAdapter {
-    private final TextButton multiplayerButton;
 
+    private final TextButton multiplayerButton;
     private final Stage stage;
 
+    /**
+     * Initialize TitleScreen where players can choose between multiplayer and local play
+     * or exit the game.
+     * @param camera used for creating the image that the player will see on the screen
+     */
     public TitleScreen(Camera camera) {
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
@@ -57,6 +62,11 @@ public class TitleScreen extends ScreenAdapter {
         stage.addActor(table);
     }
 
+    /**
+     * Render TitleScreen if the client is connected to the server. Otherwise, make the buttons
+     * unclickable and add a grey shade.
+     * Check for the pressing of 'esc', exit game if pressed.
+     */
     @Override
     public void render(float delta) {
         // black background
@@ -89,6 +99,9 @@ public class TitleScreen extends ScreenAdapter {
         stage.dispose();
     }
 
+    /**
+     * Handle changing screen size.
+     */
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
