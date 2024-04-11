@@ -10,7 +10,6 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
-import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
@@ -21,6 +20,7 @@ import java.util.Optional;
 
 import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
+import static helper.Textures.ALIEN_TEXTURE;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
@@ -93,7 +93,17 @@ public class RemoteManager {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            return Optional.of(allPlayerStates);
+            if (AIplayerX == 0 && AIplayerY == 0) {
+                return Optional.of(allPlayerStates);
+            }
+            // add AI player to the list if it exists
+            PlayerState[] newAllPlayerStates = Arrays.copyOf(allPlayerStates, allPlayerStates.length + 1);
+            PlayerState AIplayer = new PlayerState();
+            AIplayer.x = AIplayerX;
+            AIplayer.y = AIplayerY;
+            AIplayer.name = "AI";
+            newAllPlayerStates[allPlayerStates.length] = AIplayer;
+            return Optional.of(newAllPlayerStates);
         }
         return Optional.empty();
     }
