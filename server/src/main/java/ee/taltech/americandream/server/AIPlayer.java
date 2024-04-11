@@ -15,6 +15,11 @@ public class AIPlayer {
     private float shootCountdown = 0;
     private float knockback = 0;
 
+    /**
+     * Create AI player.
+     * It will slowly move towards the closest player and randomly shoot bullets. Ai player doesn't have any lives
+     * and can't fall off the platforms.
+     */
     public AIPlayer(float x, float y) {
         this.x = x;
         this.y = y;
@@ -33,6 +38,10 @@ public class AIPlayer {
         return y;
     }
 
+    /**
+     * Update the AI player's position (move towards the closest player), shoot bullets and check for bullet hits.
+     * @param players all regular players of the current game instance
+     */
     public void update(float delta, Player[] players) {
         // select player closest to
         Player closestPlayer = null;
@@ -90,6 +99,10 @@ public class AIPlayer {
         shootCountdown += delta;
     }
 
+    /**
+     * AI player can be hit by bullets just like a regular player.
+     * Except it doesn't have a damage percentage which means that the applied force is constant.
+     */
     public void bulletHit(BulletData bullet) {
         knockback = (bullet.speedBullet < 0 ? -1 : 1) * PISTOL_BULLET_FORCE;
     }
