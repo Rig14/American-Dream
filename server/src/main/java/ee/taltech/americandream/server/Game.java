@@ -112,7 +112,7 @@ public class Game extends Thread {
         // if AI player exists, construct hitbox for AI player
         Rectangle aiPlayerHitbox = null;
         if (aiPlayer != null) {
-            aiPlayerHitbox = new Rectangle((int) aiPlayer.getX() - AI_PLAYER_SIZE.width / 2, (int) aiPlayer.getY() - AI_PLAYER_SIZE.height / 2, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+            aiPlayerHitbox = new Rectangle((int) aiPlayer.getX(), (int) aiPlayer.getY(), AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
         }
 
         // check if bullets hit players
