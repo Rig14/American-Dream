@@ -13,11 +13,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
+import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 import static helper.Constants.*;
@@ -32,6 +34,7 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private Integer damage = 0;
     private final String name;
     private int isShooting;
     private float jumpCounterResetTime = 0;
@@ -77,6 +80,18 @@ public class Player extends GameEntity {
         return isShooting;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Integer getLivesCount() {
+        return livesCount;
+    }
+
+    public Integer getDamage() {
+        return damage;
+    }
+
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
@@ -95,13 +110,18 @@ public class Player extends GameEntity {
      * @param  center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         handleInput(delta);
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
+
+        if (ps.isPresent()) {
+            livesCount = ps.get().livesCount;
+            damage = ps.get().damage;
+        }
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();

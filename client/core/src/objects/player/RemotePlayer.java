@@ -6,41 +6,53 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import static helper.Textures.BIDEN_TEXTURE;
-import static helper.Textures.OBAMA_TEXTURE;
-import static helper.Textures.TRUMP_TEXTURE;
+import helper.PlayerState;
 
 import static helper.Constants.FRAME_HEIGHT;
 import static helper.Constants.FRAME_WIDTH;
 
 public class RemotePlayer {
-    private float x, y;
-    private float velX, velY;
-    private PlayerAnimations playerAnimations;
-    private int isShooting;
+    private final float x;
+    private final float y;
+    private final float velX;
+    private final float velY;
+    private final PlayerAnimations playerAnimations;
+    private final int isShooting;
+    private final Integer livesCount;
+    private final Integer damage;
+
     public enum State { WALKING, IDLE, JUMPING, SHOOTING }
-    private String character = "";
+    private String name = "";
 
     /**
-     * Initialize RemotePlayer that represents the other client.
-     * @param x x coordinate of the remote player
-     * @param y y coordinate
-     * @param name remote player's name
+     * Initialize RemotePlayer that represents a remote client.
+     * @param ps PlayerState containing all information about remote player
      * @param textureAtlas object containing player sprites
-     * @param velX horizontal velocity of the  player
-     * @param velY vertical velocity
-     * @param isShooting boolean representing if the player is currently shooting bullets or not
      */
-    public RemotePlayer(float x, float y, String name, TextureAtlas textureAtlas, float velX, float velY, int isShooting) {
-        this.x = x;
-        this.y = y;
-        if (name != null) {
-            this.character = name.split("_")[0];
+    public RemotePlayer(PlayerState ps, TextureAtlas textureAtlas) {
+        this.x = ps.x;
+        this.y = ps.y;
+        if (ps.name != null) {
+            this.name = ps.name.split("_")[0];
         }
-        this.velX = velX;
-        this.velY = velY;
-        this.isShooting = isShooting;
+        this.velX = ps.velX;
+        this.velY = ps.velY;
+        this.isShooting = ps.isShooting;
+        this.livesCount = ps.livesCount;
+        this.damage = ps.damage;
         this.playerAnimations = new PlayerAnimations(textureAtlas);
+    }
+
+    public float getX() {
+        return this.x;
+    }
+
+    public float getY() {
+        return this.y;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public float getVelX() {
@@ -55,12 +67,12 @@ public class RemotePlayer {
         return isShooting;
     }
 
-    public float getX() {
-        return this.x;
+    public Integer getLivesCount() {
+        return livesCount;
     }
 
-    public float getY() {
-        return this.y;
+    public Integer getDamage() {
+        return damage;
     }
 
     /**

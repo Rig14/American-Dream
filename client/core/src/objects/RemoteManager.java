@@ -15,21 +15,20 @@ import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 import helper.Textures;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
-import static helper.Textures.ALIEN_TEXTURE;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
     private Integer gameTime = null;
-    private PlayerState remotePlayerState = null;
-    private PlayerState localPlayerState = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
+    private PlayerState localPlayerState;
     private float onHitForce;
     private float AIplayerX;
     private float AIplayerY;
@@ -59,8 +58,7 @@ public class RemoteManager {
                         PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
                             // not current client
-                            remotePlayerState = ps;
-                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name, textureAtlas, ps.velX, ps.velY, ps.isShooting);
+                            remotePlayers[i] = new RemotePlayer(ps, textureAtlas);
                         } else {
                             // current client
                             localPlayerState = ps;
@@ -87,6 +85,23 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Return remote players list if it contains at least 1 remote player.
+     */
+    public Optional<List<RemotePlayer>> getRemotePlayers() {
+        if (remotePlayers != null) {
+            return Optional.of(Arrays.asList(remotePlayers));
+        }
+        return Optional.empty();
+    }
+
     /**
      * Get all players' state if none of them is null. Check for AI player.
      */
@@ -105,23 +120,6 @@ public class RemoteManager {
             AIplayer.name = "AI";
             newAllPlayerStates[allPlayerStates.length] = AIplayer;
             return Optional.of(newAllPlayerStates);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<PlayerState> getLocalPlayerState() {
-        if (localPlayerState != null) {
-            return Optional.of(localPlayerState);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Currently does not support more than 1 remote players.
-     */
-    public Optional<PlayerState> getRemotePlayerState() {
-        if (remotePlayerState != null) {
-            return Optional.of(remotePlayerState);
         }
         return Optional.empty();
     }
