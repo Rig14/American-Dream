@@ -32,37 +32,77 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
-    private String name;
-    private String character;
+    private final String name;
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
+
+    /**
+     * Initialize Player.
+     * @param width width of the player object/body
+     * @param height height
+     * @param body object that moves around in the world and collides with other bodies
+     */
     public Player(float width, float height, Body body) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
         this.direction = Direction.RIGHT;
         this.isShooting = 0;
-        textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
+        this.textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
         this.playerAnimations = new PlayerAnimations(textureAtlas);
 
-
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
-        // randomly generated name + idy
-        String[] availableNames = {"Trump", "Biden", "Obama"};
+        // assign player a randomly generated name + id
+        String[] characterNames = {"Trump", "Biden", "Obama"};
         Random random = new Random();
-        character = availableNames[random.nextInt(availableNames.length)];
-        this.name = character + "_" + AmericanDream.id;
+        String characterName = characterNames[random.nextInt(characterNames.length)];
+        this.name = characterName + "_" + AmericanDream.id;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public float getVelX() {
+        return velX;
+    }
+
+    public float getVelY() {
+        return velY;
+    }
+
+    public int isShooting() {
+        return isShooting;
+    }
+
+    public Vector2 getPosition() {
+        return body.getPosition().scl(PPM);
+    }
+
+    /**
+     * Get the dimensions of the player (width, height).
+     */
+    public Vector2 getDimensions() {
+        return new Vector2(width, height);
+    }
+
+    /**
+     * Update player data according to input, collisions (platforms) and respawning.
+     * Construct and send new playerPositionMessage.
+     * @param delta delta time
+     * @param  center point of the map/world
+     */
     @Override
     public void update(float delta, Vector2 center) {
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         handleInput(delta);
         handlePlatform();
-        handleOutOfBounds(delta, center);
+        handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
+
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
         positionMessage.x = x;
@@ -78,9 +118,21 @@ public class Player extends GameEntity {
         AmericanDream.client.sendUDP(positionMessage);
 
         playerAnimations.update(delta, this);
-
     }
 
+    /**
+     * Render player and find the correct animation frame.
+     */
+    @Override
+    public void render(SpriteBatch batch) {
+        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
+        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+    }
+
+    /**
+     * Handle mouse and keyboard input.
+     * Update the speed of the player body according to user input.
+     */
     private void handleInput(float delta) {
         Controller controller = Controllers.getCurrent();
         velX = 0;
@@ -130,16 +182,17 @@ public class Player extends GameEntity {
             }
             jumpCounterResetTime += delta;
         }
-
-
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
-        // shooting
-        shootInput();
+        // check for shooting input
+        shootingInput();
     }
 
-    public void shootInput() {
-        // shooting code
+    /**
+     * Check for shooting input.
+     * Create and send new BulletMessage if the player is shooting.
+     */
+    public void shootingInput() {
         isShooting = 0;
         BulletMessage bulletMessage = new BulletMessage();
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
@@ -157,7 +210,7 @@ public class Player extends GameEntity {
         AmericanDream.client.sendTCP(bulletMessage);
     }
 
-    /*
+    /**
      * Handle the platform.
      * If player is below the platform, move it some random distance to the right
      * If player is above the platform, move it back to the original position
@@ -183,63 +236,20 @@ public class Player extends GameEntity {
         }
     }
 
-    @Override
-    public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
-        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-    }
-
-    public Vector2 getPosition() {
-        return body.getPosition().scl(PPM);
-    }
-
-    /*
-     * Get the dimensions of the player
-     * (width, height)
-     */
-    public Vector2 getDimensions() {
-        return new Vector2(width, height);
-    }
-
-    /*
-     * Checks if player is out of bounds and handles it (respawn)
+    /**
+     * Decrement lives and respawn the player if it's out of bounds.
      */
     private void handleOutOfBounds(float delta, Vector2 center) {
         if (y < -BOUNDS) {
-            if (timeTillRespawn <= RESPAWN_TIME) {
-                // wait for respawn time
+            if (timeTillRespawn <= RESPAWN_TIME) {  // delay the respawning if necessary
                 timeTillRespawn += delta;
             } else {
-                // respawn player
+                livesCount--;
+                // move the player back to the initial spawning position (far above platforms)
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
-                // set time till respawn to 0
                 timeTillRespawn = 0;
-                // decrement lives
-                livesCount--;
             }
         }
     }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public Integer getLives() {
-        return this.livesCount;
-    }
-
-    public float getVelX() {
-        return velX;
-    }
-
-    public float getVelY() {
-        return velY;
-    }
-
-    public int isShooting() {
-        return isShooting;
-    }
-
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }

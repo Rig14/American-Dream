@@ -7,7 +7,7 @@ import java.awt.*;
 public class Constants {
     // debug mode
     public static final boolean GAMEPLAY_DEBUG = true;
-    // pixels per meter (not sure what it does)
+    // pixels per meter (for every meter in LibGDX box2D world there are 16 pixels on player's camera)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
     public static final float FPS = 60f;

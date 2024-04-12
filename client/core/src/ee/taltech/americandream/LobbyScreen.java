@@ -18,6 +18,10 @@ public class LobbyScreen extends ScreenAdapter {
     private final Stage stage;
     private final Camera camera;
 
+    /**
+     * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
+     * @param camera used for creating the image that the player will see on the screen
+     */
     public LobbyScreen(Camera camera) {
         this.stage = new Stage();
         this.camera = camera;
@@ -49,6 +53,11 @@ public class LobbyScreen extends ScreenAdapter {
         stage.addActor(table);
     }
 
+    /**
+     * Render LobbyScreen. Lost connection to the server does not disable starting
+     * the game. The only difference is that the other player won't be loaded.
+     * Check for the pressing of 'esc', return to LobbySelectionScreen if pressed.
+     */
     @Override
     public void render(float delta) {
         super.render(delta);
@@ -72,6 +81,9 @@ public class LobbyScreen extends ScreenAdapter {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Handle changing screen size.
+     */
     @Override
     public void dispose() {
         super.dispose();

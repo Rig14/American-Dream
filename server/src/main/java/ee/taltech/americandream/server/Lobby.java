@@ -15,6 +15,11 @@ public class Lobby {
     private Game game;
     private final List<Connection> connections;
 
+    /**
+     * Initialize new Lobby.
+     * @param name lobby name
+     * @param lobbySize exact amount of players needed to start a new game
+     */
     public Lobby(String name, int lobbySize) {
         this.name = name;
         this.lobbySize = lobbySize;
@@ -25,10 +30,24 @@ public class Lobby {
         id++;
     }
 
+    public int getId() {
+        return lobbyId;
+    }
+
+    public String getStatus() {
+        return name + " " + connections.size() + "/" + lobbySize;
+    }
+
     public void removeDisconnected() {
         connections.removeIf(connection -> !connection.isConnected());
     }
 
+    /**
+     * Check for and add new connections (clients).
+     * Remove disconnected clients.
+     * Receives: GameLeaveMessage - message indicating that a client has left the game instance
+     * @param connection connection with a specific client
+     */
     public void addConnection(Connection connection) {
         removeDisconnected();
 
@@ -57,6 +76,9 @@ public class Lobby {
         connections.add(connection);
     }
 
+    /**
+     * Create a new game instance with the connections of a specific lobby.
+     */
     public void startGame() {
         // create array of connections
         Connection[] connectionArray = new Connection[connections.size()];
@@ -67,19 +89,17 @@ public class Lobby {
         game.start();
     }
 
-    public int getId() {
-        return lobbyId;
-    }
-
-    public String getStatus() {
-        return name + " " + connections.size() + "/" + lobbySize;
-    }
-
+    /**
+     * Check if there are enough clients connected to start a new game.
+     */
     public boolean canStartGame() {
         removeDisconnected();
         return connections.size() >= lobbySize && game == null;
     }
 
+    /**
+     * End previous game.
+     */
     public void clearLobby() {
         game = null;
     }
