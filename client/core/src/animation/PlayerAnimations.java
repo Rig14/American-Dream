@@ -24,6 +24,9 @@ public class PlayerAnimations {
     private Player.State previousState;
     private RemotePlayer.State previousStateRemote;
     private float stateTimer;
+    // used for flipping the idle animation based on the last movement or shooting command
+    private boolean lastWalkedRight = false;
+    private boolean lastWalkedRightRemote = false;
 
 
     public PlayerAnimations (TextureAtlas textureAtlas) {
@@ -41,6 +44,7 @@ public class PlayerAnimations {
     public TextureRegion getFrame(float delta, Player player) {
         currentState = getState(player);
         TextureRegion region;
+
         if (currentState == Player.State.SHOOTING) {
             region = shootAnimation.getKeyFrame(stateTimer);
         } else if (currentState == Player.State.WALKING) {
@@ -48,15 +52,25 @@ public class PlayerAnimations {
         } else {
             region = idleAnimation.getKeyFrame(stateTimer);
         }
+
+        if (!lastWalkedRight && !region.isFlipX()) {
+            region.flip(true, false);
+        } else if (lastWalkedRight && region.isFlipX()) {
+            region.flip(true, false);
+        }
         if (player.getVelX() < 0 && !region.isFlipX()) {
             region.flip(true, false);
+            lastWalkedRight = false;
         } else if (player.getVelX() > 0 && region.isFlipX()) {
             region.flip(true, false);
+            lastWalkedRight = true;
         }
         if (player.isShooting() < 0 && !region.isFlipX()) {
             region.flip(true, false);
+            lastWalkedRight = false;
         } else if (player.isShooting() > 0 && region.isFlipX()) {
             region.flip(true, false);
+            lastWalkedRight = true;
         }
         stateTimer = currentState == previousState ? stateTimer + delta : 0;
         previousState = currentState;
@@ -65,24 +79,35 @@ public class PlayerAnimations {
     public TextureRegion getFrameRemote(float delta, RemotePlayer player) {
         currentStateRemote = getStateRemote(player);
         TextureRegion region = null;
-
+        System.out.println(lastWalkedRightRemote);
         if (currentStateRemote == RemotePlayer.State.SHOOTING && shootAnimationRemote != null) {
             region = shootAnimationRemote.getKeyFrame(stateTimer);
         } else if (currentStateRemote == RemotePlayer.State.WALKING && walkAnimationRemote != null) {
             region = walkAnimationRemote.getKeyFrame(stateTimer);
-        } else if (idleAnimationRemote != null){
+        } else if (idleAnimationRemote != null) {
             region = idleAnimationRemote.getKeyFrame(stateTimer);
         }
         if (region != null) {
+            if (!lastWalkedRightRemote && !region.isFlipX()) {
+                region.flip(true, false);
+            } else if (lastWalkedRightRemote && region.isFlipX()) {
+                region.flip(true, false);
+            }
             if (player.getVelX() < 0 && !region.isFlipX()) {
                 region.flip(true, false);
+                System.out.println("aaaaaa");
+                lastWalkedRightRemote = false;
             } else if (player.getVelX() > 0 && region.isFlipX()) {
                 region.flip(true, false);
+                System.out.println("bruh");
+                lastWalkedRightRemote = true;
             }
             if (player.isShooting() < 0 && !region.isFlipX()) {
                 region.flip(true, false);
+                lastWalkedRightRemote = false;
             } else if (player.isShooting() > 0 && region.isFlipX()) {
                 region.flip(true, false);
+                lastWalkedRightRemote = true;
             }
         }
         stateTimer = currentStateRemote == previousStateRemote ? stateTimer + delta : 0;
