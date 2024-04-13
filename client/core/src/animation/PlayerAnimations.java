@@ -151,8 +151,8 @@ public class PlayerAnimations {
     }
     public void update(float delta, Player player) {
         currentState = getState(player);
-        System.out.println("currentState: " + currentState);
-        System.out.println("previousState: " + previousState);
+        // System.out.println("currentState: " + currentState);
+        // System.out.println("previousState: " + previousState);
         if (currentState != previousState) {
             stateTimer = 0;
             previousState = currentState;

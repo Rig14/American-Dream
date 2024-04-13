@@ -5,18 +5,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import helper.packet.GameLeaveMessage;
 
 public class LobbyScreen extends ScreenAdapter {
-    private final TextButton startGameButton;
     private final Stage stage;
     private final Camera camera;
+    private String selectedCharacter;
 
     /**
      * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
@@ -35,22 +39,48 @@ public class LobbyScreen extends ScreenAdapter {
         buttonStyle.font = new BitmapFont();
         buttonStyle.fontColor = Color.WHITE;
 
-        // make button
-        startGameButton = new TextButton("Start Game", buttonStyle);
+        Table characterSelectionTable = new Table();
+        characterSelectionTable.setFillParent(true);
 
-        // add button to table
-        table.add(startGameButton).row();
+        // Add character selection buttons
+        TextButton character1Button = createCharacterButton("Obama", new Texture("obama.jpg"));
+        TextButton character2Button = createCharacterButton("Trump", new Texture("trump.jpg"));
+        TextButton character3Button = createCharacterButton("Biden", new Texture("biden.jpg"));
+        // Add buttons to the table
+        table.add(character1Button).size(50, 200).pad(50);
+        table.add(character2Button).size(50, 200).pad(50);
+        table.add(character3Button).size(50, 200).pad(50);
 
-        // add listener for start game button
-        startGameButton.addListener(new ChangeListener() {
+        characterSelectionTable.center();
+
+        table.add(characterSelectionTable).row();
+        stage.addActor(table);
+    }
+    private TextButton createCharacterButton(String characterName, Texture characterTexture) {
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = new BitmapFont();
+        buttonStyle.fontColor = Color.WHITE;
+        // Create an image with the character's texture
+        Image characterPreview = new Image(characterTexture);
+
+        // Create a table to hold the character preview and the button
+        Table characterTable = new Table();
+        characterTable.add(characterPreview).size(100, 100).pad(10).row();
+        characterTable.add(new Label(characterName, new Label.LabelStyle(new BitmapFont(), Color.WHITE))).row();
+
+        TextButton characterButton = new TextButton("", buttonStyle); // Empty text for the button
+
+        characterButton.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent changeEvent, Actor actor) {
-                // start the game
-                AmericanDream.instance.setScreen(new GameScreen(camera));
+            public void changed(ChangeEvent event, Actor actor) {
+                // Handle character selection
+                selectedCharacter = characterName;
+                System.out.println("Selected character: " + characterName);
+                AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter));
             }
         });
-
-        stage.addActor(table);
+        characterButton.add(characterTable).pad(10);
+        return characterButton;
     }
 
     /**
@@ -63,8 +93,8 @@ public class LobbyScreen extends ScreenAdapter {
         super.render(delta);
         // black screen
         Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
 
         // pressing ESC
@@ -88,5 +118,9 @@ public class LobbyScreen extends ScreenAdapter {
     public void dispose() {
         super.dispose();
         stage.dispose();
+    }
+
+    public String getSelectedCharacter() {
+        return selectedCharacter;
     }
 }
