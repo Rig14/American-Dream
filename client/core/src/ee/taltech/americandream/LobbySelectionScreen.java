@@ -28,6 +28,14 @@ public class LobbySelectionScreen extends ScreenAdapter {
     private final TextButton.TextButtonStyle buttonStyle;
     private final TextButton.TextButtonStyle disabledButtonStyle;
 
+
+    /**
+     * Initialize LobbySelectionScreen where the status of all available lobbies is displayed to the player.
+     * If another (remote) player joins or leaves a lobby, the number next to lobby's name will change.
+     * Receives: LobbyDataMessage
+     * Sends: LobbyJoinMessage
+     * @param camera used for creating the image that the player will see on the screen
+     */
     public LobbySelectionScreen(Camera camera) {
         this.camera = camera;
         this.stage = new Stage();
@@ -109,6 +117,11 @@ public class LobbySelectionScreen extends ScreenAdapter {
         stage.addActor(table);
     }
 
+    /**
+     * Render LobbySelectionScreen. Lost connection to the server does not disable joining a lobby and starting
+     * the game. The only difference is that the other player won't be loaded.
+     * Check for the pressing of 'esc', return to TitleScreen if pressed.
+     */
     @Override
     public void render(float delta) {
         super.render(delta);
@@ -131,6 +144,9 @@ public class LobbySelectionScreen extends ScreenAdapter {
         stage.dispose();
     }
 
+    /**
+     * Handle changing screen size.
+     */
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);

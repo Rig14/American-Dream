@@ -21,6 +21,11 @@ public class Game extends Thread {
     private boolean running = true;
     private boolean bothJoinedMultiplayer = false;
 
+    /**
+     * Create a new game instance containing specific clients.
+     * @param connections list of connections to each client
+     * @param lobby lobby which manages the current game instance
+     */
     public Game(Connection[] connections, Lobby lobby) {
         // set game duration
         this.gameTime = GAME_DURATION;
@@ -34,6 +39,11 @@ public class Game extends Thread {
         }
     }
 
+    /**
+     * Update all players and bullets of the game instance. Decrement game time if both players have joined the map.
+     * End the game if a player has 0 lives left or the game time runs out.
+     * Sends: GameStateMessage - contains all data about players, player lives, damage, bullets and game time.
+     */
     public void run() {
         while (running) {
             try {
@@ -70,7 +80,7 @@ public class Game extends Thread {
                 }
 
                 // handle bullets hitting players
-                handleBulletHits(gameStateMessage);
+                checkForBulletHits(gameStateMessage);
 
                 // send game state message to all players
                 for (Player player : players) {
@@ -99,7 +109,13 @@ public class Game extends Thread {
         }
     }
 
-    private void handleBulletHits(GameStateMessage gameStateMessage) {
+    /**
+     * Generate a hitbox for each player (including AI player). Iterate through all bullets and check if any of them
+     * intersects the player's hitbox.
+     * Handle bullet hits by disabling the bullet, calculating bullet force and applying force to the player.
+     * @param gameStateMessage contains data about players' and bullets' locations
+     */
+    private void checkForBulletHits(GameStateMessage gameStateMessage) {
         List<BulletData> bullets = gameStateMessage.bulletData;
         PlayerState[] playerStates = gameStateMessage.playerStates;
 
@@ -150,11 +166,17 @@ public class Game extends Thread {
         }
     }
 
+    /**
+     * Close current instance of the game and clear the lobby.
+     */
     public void end() {
         running = false;
         lobby.clearLobby();
     }
 
+    /**
+     * Add an AI player to the current game instance.
+     */
     public void addAIPlayer() {
         // check if AI player already exists
         if (aiPlayer != null) return;

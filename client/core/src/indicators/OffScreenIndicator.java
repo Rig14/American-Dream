@@ -17,13 +17,22 @@ public class OffScreenIndicator {
     private final Texture indicator = BULLET_TEXTURE; // rendered as the indicator
     private float time;
 
+    /**
+     * Initialize OffScreenIndicator.
+     * @param playerDimensions dimensions of the Player object
+     */
     public OffScreenIndicator(Vector2 playerDimensions) {
         this.playerDimensions = playerDimensions;
         this.time = 0;
     }
 
-    // Render indicator when local or remote player is off-screen
-    // Can handle changing zoom constant and replacing current texture with other similar size textures
+    /**
+     * Render indicator when local or remote player is off-screen.
+     * Handles changing zoom constant, replacing the indicator texture and multiple players being off-screen at once.
+     * @param batch spritebatch where to render the indicator
+     * @param camera camera to check if the player outside frustum (visible area of the game map)
+     * @param allPlayerStates information about all players positions
+     */
     public void renderIndicators(SpriteBatch batch, Camera camera, Optional<PlayerState[]> allPlayerStates) {
         time += Gdx.graphics.getDeltaTime();
         if (allPlayerStates.isPresent()) {
