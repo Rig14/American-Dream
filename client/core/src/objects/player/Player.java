@@ -15,6 +15,7 @@ import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
+import helper.packet.GameLeaveMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
@@ -27,22 +28,21 @@ public class Player extends GameEntity {
     private final float speed;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
+    private final String name;
     private Direction direction;
     private int jumpCounter;
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
-    private final String name;
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
-
     /**
      * Initialize Player.
-     * @param width width of the player object/body
+     *
+     * @param width  width of the player object/body
      * @param height height
-     * @param body object that moves around in the world and collides with other bodies
+     * @param body   object that moves around in the world and collides with other bodies
      */
     public Player(float width, float height, Body body) {
         super(width, height, body);
@@ -91,8 +91,9 @@ public class Player extends GameEntity {
     /**
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
-     * @param delta delta time
-     * @param  center point of the map/world
+     *
+     * @param delta  delta time
+     * @param center point of the map/world
      */
     @Override
     public void update(float delta, Vector2 center) {
@@ -249,7 +250,14 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
+                if (livesCount == 0) {
+                    // end game
+                    AmericanDream.client.sendTCP(new GameLeaveMessage());
+
+                }
             }
         }
     }
+
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }
