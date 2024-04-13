@@ -20,7 +20,7 @@ soldier-idle
   index: -1
 soldier-shoot
   rotate: false
-  xy: 580, 306
+  xy: 580, 382
   size: 256, 74
   orig: 256, 74
   offset: 0, 0
@@ -34,26 +34,47 @@ soldier-walk
   index: -1
 soldier2-hurt
   rotate: false
-  xy: 2, 2
+  xy: 452, 78
   size: 192, 74
   orig: 192, 74
   offset: 0, 0
   index: -1
 soldier2-idle
   rotate: false
-  xy: 2, 306
+  xy: 2, 382
   size: 576, 74
   orig: 576, 74
   offset: 0, 0
   index: -1
 soldier2-shoot
   rotate: false
-  xy: 516, 230
+  xy: 516, 306
   size: 256, 74
   orig: 256, 74
   offset: 0, 0
   index: -1
 soldier2-walk
+  rotate: false
+  xy: 2, 306
+  size: 512, 74
+  orig: 512, 74
+  offset: 0, 0
+  index: -1
+soldier3-idle
+  rotate: false
+  xy: 2, 2
+  size: 448, 74
+  orig: 448, 74
+  offset: 0, 0
+  index: -1
+soldier3-shoot
+  rotate: false
+  xy: 516, 230
+  size: 256, 74
+  orig: 256, 74
+  offset: 0, 0
+  index: -1
+soldier3-walk
   rotate: false
   xy: 2, 230
   size: 512, 74

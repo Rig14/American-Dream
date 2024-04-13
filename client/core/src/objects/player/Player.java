@@ -59,6 +59,13 @@ public class Player extends GameEntity {
         Random random = new Random();
         String characterName = characterNames[random.nextInt(characterNames.length)];
         this.name = characterName + "_" + AmericanDream.id;
+        if (characterName.contains("Obama")) {
+            playerAnimations.generateObama();
+        } else if (characterName.contains("Trump")) {
+            playerAnimations.generateTrump();
+        } else {
+            playerAnimations.generateBiden();
+        }
     }
 
     public Direction getDirection() {
