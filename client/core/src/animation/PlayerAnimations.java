@@ -24,6 +24,7 @@ public class PlayerAnimations {
     private Player.State previousState;
     private RemotePlayer.State previousStateRemote;
     private float stateTimer;
+    private float stateTimerRemote;
     // used for flipping the idle animation based on the last movement or shooting command
     private boolean lastWalkedRight = false;
     private boolean lastWalkedRightRemote = false;
@@ -32,6 +33,7 @@ public class PlayerAnimations {
     public PlayerAnimations (TextureAtlas textureAtlas) {
         this.textureAtlas = textureAtlas;
         stateTimer = 0;
+        stateTimerRemote = 0;
     }
 
     private Animation<TextureRegion> createAnimation(String regionName, int frameCount, float frameDuration) {
@@ -79,13 +81,12 @@ public class PlayerAnimations {
     public TextureRegion getFrameRemote(float delta, RemotePlayer player) {
         currentStateRemote = getStateRemote(player);
         TextureRegion region = null;
-        System.out.println(lastWalkedRightRemote);
         if (currentStateRemote == RemotePlayer.State.SHOOTING && shootAnimationRemote != null) {
-            region = shootAnimationRemote.getKeyFrame(stateTimer);
+            region = shootAnimationRemote.getKeyFrame(stateTimerRemote);
         } else if (currentStateRemote == RemotePlayer.State.WALKING && walkAnimationRemote != null) {
-            region = walkAnimationRemote.getKeyFrame(stateTimer);
+            region = walkAnimationRemote.getKeyFrame(stateTimerRemote);
         } else if (idleAnimationRemote != null) {
-            region = idleAnimationRemote.getKeyFrame(stateTimer);
+            region = idleAnimationRemote.getKeyFrame(stateTimerRemote);
         }
         if (region != null) {
             if (!lastWalkedRightRemote && !region.isFlipX()) {
@@ -95,11 +96,9 @@ public class PlayerAnimations {
             }
             if (player.getVelX() < 0 && !region.isFlipX()) {
                 region.flip(true, false);
-                System.out.println("aaaaaa");
                 lastWalkedRightRemote = false;
             } else if (player.getVelX() > 0 && region.isFlipX()) {
                 region.flip(true, false);
-                System.out.println("bruh");
                 lastWalkedRightRemote = true;
             }
             if (player.isShooting() < 0 && !region.isFlipX()) {
@@ -110,7 +109,7 @@ public class PlayerAnimations {
                 lastWalkedRightRemote = true;
             }
         }
-        stateTimer = currentStateRemote == previousStateRemote ? stateTimer + delta : 0;
+        stateTimerRemote = currentStateRemote == previousStateRemote ? stateTimerRemote + delta : 0;
         previousStateRemote = currentStateRemote;
         return region;
     }
@@ -119,7 +118,7 @@ public class PlayerAnimations {
             return RemotePlayer.State.SHOOTING;
         } else if (player.getVelX() < 0 || player.getVelX() > 0) {
             return RemotePlayer.State.WALKING;
-        } else if (player.getVelY()> 0 || player.getVelY() < 0 && previousStateRemote == RemotePlayer.State.JUMPING) {
+        } else if (player.getVelY() > 0 || player.getVelY() < 0 && previousStateRemote == RemotePlayer.State.JUMPING) {
             return RemotePlayer.State.JUMPING;
         } else {
             return RemotePlayer.State.IDLE;
@@ -139,21 +138,28 @@ public class PlayerAnimations {
     }
     public void updateRemote(float delta, RemotePlayer player) {
         currentStateRemote = getStateRemote(player);
+        // System.out.println("current: " + currentStateRemote);
+        // System.out.println("previous: " + previousStateRemote);
         if (currentStateRemote != previousStateRemote) {
-            stateTimer = 0;
+            stateTimerRemote = 0;
             previousStateRemote = currentStateRemote;
         } else {
-            stateTimer += delta;
+            stateTimerRemote += delta;
         }
+        // System.out.println("delta :" + stateTimerRemote);
+        // System.out.println("Remote update stateTimer:" + stateTimerRemote);
     }
     public void update(float delta, Player player) {
         currentState = getState(player);
+        System.out.println("currentState: " + currentState);
+        System.out.println("previousState: " + previousState);
         if (currentState != previousState) {
             stateTimer = 0;
             previousState = currentState;
         } else {
             stateTimer += delta;
         }
+        // System.out.println(stateTimer);
     }
     public void generateObama() {
         walkAnimation = createAnimation("soldier-walk", 7, FRAME_DURATION);

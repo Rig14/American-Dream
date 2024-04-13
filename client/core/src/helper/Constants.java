@@ -34,7 +34,7 @@ public class Constants {
     public static final int LIVES_COUNT = 3;
     public static final int FRAME_WIDTH = 64;
     public static final int FRAME_HEIGHT = 74;
-    public static final float FRAME_DURATION = 0.2f;
+    public static final float FRAME_DURATION = 0.3f;
 
     public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 

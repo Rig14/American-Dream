@@ -72,7 +72,6 @@ public class GameScreen extends ScreenAdapter {
         // clear the screen (black screen)
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-
         // render map before the actual game objects
         orthogonalTiledMapRenderer.render();
 
@@ -80,7 +79,6 @@ public class GameScreen extends ScreenAdapter {
         // object rendering goes here
 
         player.render(batch);
-
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);

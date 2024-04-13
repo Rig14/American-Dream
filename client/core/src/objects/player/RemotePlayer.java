@@ -64,6 +64,7 @@ public class RemotePlayer {
     }
     public void update(float delta) {
         playerAnimations.updateRemote(delta, this);
+        // System.out.println("rp update delta: " + delta);
     }
 
     public float getX() {
