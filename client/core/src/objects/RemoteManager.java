@@ -24,7 +24,7 @@ import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
-    private RemotePlayer[] remotePlayers;
+    private List<RemotePlayer> remotePlayers;
     private Integer gameTime = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
@@ -45,7 +45,7 @@ public class RemoteManager {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
                     allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
-                    remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
+                    remotePlayers = new ArrayList<>();
 
                     // AI player
                     AIplayerX = gameStateMessage.AIplayerX;
@@ -58,7 +58,7 @@ public class RemoteManager {
                         PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
                             // not current client
-                            remotePlayers[i] = new RemotePlayer(ps, textureAtlas);
+                            remotePlayers.add(new RemotePlayer(ps, textureAtlas));
                         } else {
                             // current client
                             localPlayerState = ps;
@@ -96,8 +96,8 @@ public class RemoteManager {
      * Return remote players list if it contains at least 1 remote player.
      */
     public Optional<List<RemotePlayer>> getRemotePlayers() {
-        if (remotePlayers != null) {
-            return Optional.of(Arrays.asList(remotePlayers));
+        if (remotePlayers != null && !remotePlayers.isEmpty()) {
+            return Optional.of(new ArrayList<>(remotePlayers));
         }
         return Optional.empty();
     }
@@ -131,12 +131,10 @@ public class RemoteManager {
      * @param delta delta time
      */
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
-        if (remotePlayers != null) {
+        if (!remotePlayers.isEmpty()) {
             for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
-                    rp.update(delta);
-                    rp.render(batch, playerDimensions);
-                }
+                rp.update(delta);
+                rp.render(batch, playerDimensions);
             }
         }
     }
