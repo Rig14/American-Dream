@@ -122,9 +122,9 @@ public class GameScreen extends ScreenAdapter {
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
 
-        player.update(delta, mapCenterPoint);
+        player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
         remoteManager.testForHit(world);
-        hud.update(remoteManager.getGameTime(), remoteManager.getLocalPlayerState(), remoteManager.getRemotePlayerState());
+        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {

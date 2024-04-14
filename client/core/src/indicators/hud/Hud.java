@@ -12,8 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
-import helper.PlayerState;
+import objects.player.Player;
+import objects.player.RemotePlayer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static helper.Constants.LIVES_COUNT;
@@ -23,30 +27,48 @@ import static helper.Textures.HEALTH_TEXTURE;
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
-    private Viewport viewport;
+    private final Viewport viewport;
 
-    // Player names
-    private String localName = "loading...";
-    private String remoteName = "loading...";
-
-    //Player lives to register changes and update healthTables
+    //Player lives to register changes and update health tables
     private int localLives = LIVES_COUNT;
-    private int remoteLives = LIVES_COUNT;
+    private int firstRemoteLivesDisplayed = LIVES_COUNT;
+    private int secondRemoteLivesDisplayed = LIVES_COUNT;
+    private int thirdRemoteLivesDisplayed = LIVES_COUNT;
 
-    //labels to be displayed on the hud
-    private Label timeTextLabel;
-    private Label timeCountdownLabel;
+    // label styles
+    private final Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
+    private final Label.LabelStyle redDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.RED);
 
-    private Label localPlayerName;
-    private Table localHealthTable = new Table();
-    private Label localDamage;
+    // displayed labels
+    private final Label timeTextLabel = new Label("TIME", whiteDefaultStyle);;
+    private final Label timeCountdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
 
-    private Label remotePlayerName;
-    private Table remoteHealthTable = new Table();
-    private Label remoteDamage;
+    private final Label placeHolder = new Label("", whiteDefaultStyle);
+    private final Label gameOverLabel = new Label("", whiteDefaultStyle);
 
-    private Label placeHolder;
-    private Label gameOverLabel;
+
+    private final Label localPlayerName = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
+    private final Table localHealthTable = new Table();
+    private final Label localDamage = new Label("0 %", redDefaultStyle);
+
+    private final Label firstRemotePlayerName = new Label("loading...", whiteDefaultStyle);
+    private final Table firstRemoteHealthTable = new Table();
+    private final Label firstRemoteDamage = new Label("0 %", redDefaultStyle);
+
+    private final Label secondRemotePlayerName = new Label("", whiteDefaultStyle);
+    private final Table secondRemoteHealthTable = new Table();
+    private final Label secondRemoteDamage = new Label("", redDefaultStyle);
+
+    private final Label thirdRemotePlayerName = new Label("", whiteDefaultStyle);
+    private final Table thirdRemoteHealthTable = new Table();
+    private final Label thirdRemoteDamage = new Label("", redDefaultStyle);
+
+    // lists of changing values
+    private final List<Label> nameLabels = List.of(firstRemotePlayerName, secondRemotePlayerName, thirdRemotePlayerName);
+    private final List<Label> damageLabels = List.of(firstRemoteDamage, secondRemoteDamage, thirdRemoteDamage);
+    private final List<Table> healthTables = List.of(firstRemoteHealthTable, secondRemoteHealthTable, thirdRemoteHealthTable);
+    private final List<Integer> livesDisplayed = new ArrayList<>(List.of(firstRemoteLivesDisplayed, secondRemoteLivesDisplayed, thirdRemoteLivesDisplayed));
+
 
     /**
      * Initialize HUD.
@@ -67,53 +89,53 @@ public class Hud {
         table.top();                // Top-Align table
         table.setFillParent(true);  // make the table fill the entire stage
 
-        // define label styles
-        Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
-        Label.LabelStyle redDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.RED);
-
-        // define labels
-        timeTextLabel = new Label("TIME", whiteDefaultStyle);
-        timeCountdownLabel = new Label( "Waiting for other player...", whiteDefaultStyle);
-
-
-        localPlayerName = new Label(localName, whiteDefaultStyle);
+        // fill lives tables
         for (int i = 0; i < LIVES_COUNT; i++) {
             localHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+            firstRemoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+            secondRemoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
+            thirdRemoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
         }
-        localDamage = new Label("0 %", redDefaultStyle);
-
-
-        remotePlayerName = new Label(remoteName, whiteDefaultStyle);
-        for (int i = 0; i < LIVES_COUNT; i++) {
-            remoteHealthTable.add(new Image(HEALTH_TEXTURE)).width(20).height(20);
-        }
-        remoteDamage = new Label("0 %", redDefaultStyle);
-
-
-        placeHolder = new Label("", whiteDefaultStyle);
-        gameOverLabel = new Label("", whiteDefaultStyle);
-
+        secondRemoteHealthTable.setVisible(false);
+        thirdRemoteHealthTable.setVisible(false);
 
         //add labels to table
         table.add(localPlayerName).expandX().padTop(10);
         table.add(timeTextLabel).expandX().padTop(10);
-        table.add(remotePlayerName).expandX().padTop(10);
+        table.add(firstRemotePlayerName).expandX().padTop(10);
 
         table.row();
         table.add(localHealthTable).expandX().padTop(5);
         table.add(timeCountdownLabel).expandX().padTop(5);
-        table.add(remoteHealthTable).expandX().padTop(5);
+        table.add(firstRemoteHealthTable).expandX().padTop(5);
 
         table.row();
         table.add(localDamage);
         table.add(placeHolder);
-        table.add(remoteDamage);
+        table.add(firstRemoteDamage);
 
         table.row();
         table.add(placeHolder);
         table.add(gameOverLabel).padTop(150);
 
-        //add table to the stage
+
+        // additional remote players
+        table.row();
+        table.add(secondRemotePlayerName).padTop(150);
+        table.add(placeHolder).padTop(150);
+        table.add(thirdRemotePlayerName).padTop(150);
+
+        table.row();
+        table.add(secondRemoteHealthTable);
+        table.add(placeHolder);
+        table.add(thirdRemoteHealthTable);
+
+        table.row();
+        table.add(secondRemoteDamage);
+        table.add(placeHolder);
+        table.add(thirdRemoteDamage);
+
+        // add main table to the stage
         stage.addActor(table);
     }
 
@@ -121,43 +143,58 @@ public class Hud {
      * Initialize player names, update game time, players lives and players damage percentage.
      * Updating takes place every game tick.
      * @param time game time in seconds
-     * @param local local player's state containing: name, health, damage
-     * @param remote remote player's state containing: name, health, damage
+     * @param localPlayer local player
+     * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Optional<PlayerState> local, Optional<PlayerState> remote) {
+    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers) {
         updateTime(time);
         // update lives, health, damage
-        if (local.isPresent() && remote.isPresent()) {
-            PlayerState remotePlayer = remote.get();
-            PlayerState localPlayer = local.get();
-
-            // Initialize names
-            if (localName.equals("loading...") && localPlayer.name != null && remotePlayer.name != null) {
-                localName = localPlayer.name;
-                remoteName = remotePlayer.name;
-                localPlayerName.setText(localName);
-                remotePlayerName.setText(remoteName);
+        if (localPlayer != null) {
+            // update local player
+            if (!localPlayerName.getText().toString().equals(localPlayer.getName())) {
+                localPlayerName.setText(localPlayer.getName());
             }
-
-            localDamage.setText(localPlayer.damage + " %");
-            remoteDamage.setText(remotePlayer.damage + " %");
-
             if (localLives != localPlayer.getLivesCount()) {
                 localLives = localPlayer.getLivesCount();
                 updateLivesTable(localLives, localHealthTable);
             }
-            if (remoteLives != remotePlayer.getLivesCount()) {
-                remoteLives = remotePlayer.getLivesCount();
-                updateLivesTable(remoteLives, remoteHealthTable);
-            }
+            localDamage.setText(localPlayer.getDamage() + " %");
 
-            // display game over screen when lives reach 0
+            updateRemotePlayers(remotePlayers);
+            // display game over screen
             if (localPlayer.getLivesCount() == 0) {
-                gameOverLabel.setText("GAME OVER!\n" + localName + " lost.");
+                gameOverLabel.setText("GAME OVER!\n You lost.");
                 gameOverLabel.setColor(Color.RED);
-            } else if (remotePlayer.getLivesCount() == 0) {
-                gameOverLabel.setText("Congratulations " + localName + " won!");
+            // check if all remote players are defeated  &&  the game has already started
+            } else if (!remotePlayers.isEmpty() &&
+                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) {
+                gameOverLabel.setText("Congratulations you won!");
                 gameOverLabel.setColor(Color.GREEN);
+            } else {
+                gameOverLabel.setText("");  // prevents  error caused by UDP losses
+            }
+        }
+    }
+
+    /**
+     * Update remote players' data.
+     * To add even more remote players (over 3), extend label lists.
+     * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
+     */
+    private void updateRemotePlayers(List<RemotePlayer> remotePlayers) {
+        int remotePlayerCount = remotePlayers.size();
+        for (int i = 0; i < remotePlayerCount; i++) {
+            RemotePlayer rp = remotePlayers.get(i);
+            if (rp.getLivesCount() != null) {
+                if (!nameLabels.get(i).getText().toString().equals(rp.getName())) {
+                    nameLabels.get(i).setText(rp.getName());
+                    healthTables.get(i).setVisible(true);  // make additional remote players tables visible
+                }
+                if (livesDisplayed.get(i) != rp.getLivesCount()) {
+                    livesDisplayed.add(i, rp.getLivesCount());
+                    updateLivesTable(rp.getLivesCount(), healthTables.get(i));
+                }
+                damageLabels.get(i).setText(rp.getDamage() + " %");
             }
         }
     }
@@ -168,7 +205,7 @@ public class Hud {
      * @param  newLivesAmount lives count
      * @param table lives table pointer
      */
-    public void updateLivesTable(int newLivesAmount, Table table) {
+    private void updateLivesTable(int newLivesAmount, Table table) {
         table.clear();
         // lost lives
         for(int i = 0; i < LIVES_COUNT - newLivesAmount; i++) {
@@ -184,7 +221,7 @@ public class Hud {
      * Update the displayed game time.
      * @param time new game time in seconds
      */
-    public void updateTime(Optional<Integer> time) {
+    private void updateTime(Optional<Integer> time) {
         if (time.isPresent()) {
             int minutes = Math.floorDiv(time.get(), 60);
             int seconds = time.get() % 60;

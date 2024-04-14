@@ -59,7 +59,7 @@ public class Lobby {
                 if (object instanceof GameLeaveMessage) {
                     // remove connection from lobby and restart game if needed
                     connections.remove(connection);
-                    if (game != null) {
+                    if (connections.size() <= 1 && game != null) {
                         game.end();
                     }
                 }
@@ -98,9 +98,10 @@ public class Lobby {
     }
 
     /**
-     * End previous game.
+     * End ongoing game instance and clear lobby of players.
      */
     public void clearLobby() {
         game = null;
+        connections.clear();
     }
 }

@@ -9,17 +9,19 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static helper.Constants.*;
 
 public class Game extends Thread {
 
     private final Lobby lobby;
-    private final Player[] players;
+    private Player[] alivePlayers;
+    private final Player[] allPlayers;
     private AIPlayer aiPlayer;
     private float gameTime;
     private boolean running = true;
-    private boolean bothJoinedMultiplayer = false;
+    private boolean allJoinedMultiplayer = false;
 
     /**
      * Create a new game instance containing specific clients.
@@ -31,12 +33,13 @@ public class Game extends Thread {
         this.gameTime = GAME_DURATION;
         this.lobby = lobby;
 
-        players = new Player[connections.length];
+        alivePlayers = new Player[connections.length];
         // start game with connections
         // make players from connections
         for (int i = 0; i < connections.length; i++) {
-            players[i] = new Player(connections[i], this, connections[i].getID());
+            alivePlayers[i] = new Player(connections[i], this, connections[i].getID());
         }
+        allPlayers = alivePlayers.clone();
     }
 
     /**
@@ -47,27 +50,28 @@ public class Game extends Thread {
     public void run() {
         while (running) {
             try {
+                checkForDeadPlayers();
                 // update players
-                for (Player player : players) {
+                for (Player player : alivePlayers) {
                     player.update(1000f / TICK_RATE / 1000f);
                 }
 
                 // update AI player
                 if (aiPlayer != null) {
-                    aiPlayer.update(1000f / TICK_RATE / 1000f, players);
+                    aiPlayer.update(1000f / TICK_RATE / 1000f, alivePlayers);
                 }
 
                 // construct game state message
                 GameStateMessage gameStateMessage = new GameStateMessage();
 
                 gameStateMessage.gameTime = Math.round(gameTime);
-                gameStateMessage.playerStates = new PlayerState[players.length];
+                gameStateMessage.playerStates = new PlayerState[allPlayers.length];
                 gameStateMessage.bulletData = new ArrayList<>();
-                for (int i = 0; i < players.length; i++) {
+                for (int i = 0; i < allPlayers.length; i++) {
                     // add player states to the game state message (like position)
-                    gameStateMessage.playerStates[i] = players[i].getState();
+                    gameStateMessage.playerStates[i] = allPlayers[i].getState();
                     // add bullets to the game state message
-                    gameStateMessage.bulletData.addAll(players[i].getPlayerBullets());
+                    gameStateMessage.bulletData.addAll(allPlayers[i].getPlayerBullets());
                 }
 
                 // ai logic
@@ -82,22 +86,23 @@ public class Game extends Thread {
                 // handle bullets hitting players
                 checkForBulletHits(gameStateMessage);
 
-                // send game state message to all players
-                for (Player player : players) {
+                // send game state message to all players, including dead players
+                for (Player player : allPlayers) {
                     player.sendGameState(gameStateMessage);
                 }
 
                 // Start decrementing time when both players have joined the level
                 // Fixes countdown starting too early while in title screen
-                if (bothJoinedMultiplayer) {
+                if (allJoinedMultiplayer) {
                     gameTime -= 1f / TICK_RATE;
                 } else if (!Arrays.stream(gameStateMessage.playerStates).map(x -> x.direction).toList().contains(null)) {
-                    bothJoinedMultiplayer = true;  // true when both players start sending non-null position data
+                    allJoinedMultiplayer = true;  // true when all players start sending non-null position data
                 }
 
-                // end game when      time ends  ||  one player has 0 lives
-                if (gameTime <= 0
-                        || Arrays.stream(gameStateMessage.playerStates).map(x -> x.livesCount).toList().contains(0)) {
+                // end game when      time ends  ||  only one player has more than 0 lives
+                if (gameTime <= 0 || alivePlayers.length < 2) {
+                    Arrays.stream(allPlayers).forEach(x -> x.sendGameStateTCP(gameStateMessage)); // last message
+                    lobby.clearLobby();
                     this.end();
                 }
 
@@ -106,6 +111,19 @@ public class Game extends Thread {
             } catch (InterruptedException e) {
                 running = false;
             }
+        }
+    }
+
+    /**
+     * Remove players with 0 lives from alive players array. This prevents them from interfering with the
+     * ongoing game.
+     * allPlayers array still lets them spectate the game.
+     */
+    private void checkForDeadPlayers() {
+        if (Arrays.stream(alivePlayers).anyMatch(x -> Objects.equals(x.getState().livesCount, 0))) {
+            alivePlayers = Arrays.stream(alivePlayers)
+                    .filter(x -> x.getState().livesCount != 0)  // ignores null during initialization
+                    .toArray(Player[]::new);
         }
     }
 
@@ -137,15 +155,16 @@ public class Game extends Thread {
             Rectangle bulletHitbox = new Rectangle((int) bullet.x - BULLET_HITBOX / 2, (int) bullet.y - BULLET_HITBOX / 2, BULLET_HITBOX, BULLET_HITBOX);
             // check if bullet hit any player
             for (int i = 0; i < playerHitboxes.length; i++) {
-                if (playerHitboxes[i].intersects(bulletHitbox) // hitboxes hit
-                        && !bullet.isDisabled // has already hit
-                        && bullet.id != playerStates[i].id // is not the player who shot the bullet
+                if (playerHitboxes[i].intersects(bulletHitbox)  // hitboxes hit
+                        && !bullet.isDisabled  // has already hit
+                        && bullet.id != playerStates[i].id  // is not the player who shot the bullet
+                        && !Objects.equals(playerStates[i].livesCount, 0)  // player is not dead
                 ) {
                     // remove bullet
                     bullet.isDisabled = true;
                     // find player with corresponding id
 
-                    for (Player player : players) {
+                    for (Player player : alivePlayers) {
                         if (player.getId() == playerStates[i].id) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)
@@ -182,8 +201,8 @@ public class Game extends Thread {
         if (aiPlayer != null) return;
 
         // find point between players and spawn the AI player there
-        float x = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / players.length;
-        float y = Arrays.stream(players).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / players.length;
+        float x = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / alivePlayers.length;
+        float y = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / alivePlayers.length;
 
         aiPlayer = new AIPlayer(x, y);
     }
