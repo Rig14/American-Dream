@@ -20,6 +20,7 @@ public class RemotePlayer {
     private final int isShooting;
     private final Integer livesCount;
     private final Integer damage;
+    private String character = "";
 
     public enum State { WALKING, IDLE, JUMPING, SHOOTING }
     private String name = "";
@@ -41,6 +42,16 @@ public class RemotePlayer {
         this.livesCount = ps.livesCount;
         this.damage = ps.damage;
         this.playerAnimations = new PlayerAnimations(textureAtlas);
+        if (name != null) {
+            this.character = name.split("_")[0];
+        }
+        if (character != null && character.contains("Obama")) {
+            playerAnimations.generateObamaRemote();
+        } else if (character != null && character.contains("Trump")) {
+            playerAnimations.generateTrumpRemote();
+        } else if (character != null) {
+            playerAnimations.generateBidenRemote();
+        }
     }
 
     public float getX() {
@@ -83,8 +94,11 @@ public class RemotePlayer {
     public void render(SpriteBatch batch, Vector2 playerDimensions) {
         // Render the remote player based on its velocity
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
-        batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-        // render the remote player
+
+        if (currentFrame != null) {
+            batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+            // render the remote player
+        }
 
     }
 
@@ -94,6 +108,7 @@ public class RemotePlayer {
      */
     public void update(float delta) {
         playerAnimations.updateRemote(delta, this);
+        // System.out.println("rp update delta: " + delta);
     }
 
 }

@@ -10,22 +10,18 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
-import helper.packet.GameLeaveMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
 import static helper.Constants.*;
-import static helper.Textures.HEALTH_TEXTURE;
 import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class Player extends GameEntity {
@@ -33,13 +29,13 @@ public class Player extends GameEntity {
     private final float speed;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
+    private final String name;
     private Direction direction;
     private int jumpCounter;
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
     private Integer damage = 0;
-    private final String name;
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
@@ -51,7 +47,7 @@ public class Player extends GameEntity {
      * @param height height
      * @param body object that moves around in the world and collides with other bodies
      */
-    public Player(float width, float height, Body body) {
+    public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
@@ -62,10 +58,14 @@ public class Player extends GameEntity {
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
         // assign player a randomly generated name + id
-        String[] characterNames = {"Trump", "Biden", "Obama"};
-        Random random = new Random();
-        String characterName = characterNames[random.nextInt(characterNames.length)];
-        this.name = characterName + "_" + AmericanDream.id;
+        this.name = selectedCharacter + "_" + AmericanDream.id;
+        if (selectedCharacter.contains("Obama")) {
+            playerAnimations.generateObama();
+        } else if (selectedCharacter.contains("Trump")) {
+            playerAnimations.generateTrump();
+        } else {
+            playerAnimations.generateBiden();
+        }
     }
 
     public Direction getDirection() {
@@ -111,7 +111,7 @@ public class Player extends GameEntity {
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
      * @param delta delta time
-     * @param  center point of the map/world
+     * @param center point of the map/world
      */
     @Override
     public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
