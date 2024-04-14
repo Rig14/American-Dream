@@ -117,7 +117,7 @@ public class Game extends Thread {
     /**
      * Remove players with 0 lives from alive players array. This prevents them from interfering with the
      * ongoing game.
-     * allPlayers array lets them still spectate the game.
+     * allPlayers array still lets them spectate the game.
      */
     private void checkForDeadPlayers() {
         if (Arrays.stream(alivePlayers).anyMatch(x -> Objects.equals(x.getState().livesCount, 0))) {

@@ -12,8 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
-import ee.taltech.americandream.AmericanDream;
-import helper.packet.GameLeaveMessage;
 import objects.player.Player;
 import objects.player.RemotePlayer;
 
@@ -179,9 +177,9 @@ public class Hud {
     }
 
     /**
-     * Update remote players data.
+     * Update remote players' data.
      * To add even more remote players (over 3), extend label lists.
-     * @param remotePlayers all joined remote players
+     * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
     private void updateRemotePlayers(List<RemotePlayer> remotePlayers) {
         int remotePlayerCount = remotePlayers.size();
