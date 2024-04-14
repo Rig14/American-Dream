@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
+import ee.taltech.americandream.LobbyScreen;
 import helper.Direction;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
@@ -44,7 +45,7 @@ public class Player extends GameEntity {
      * @param height height
      * @param body   object that moves around in the world and collides with other bodies
      */
-    public Player(float width, float height, Body body) {
+    public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
         this.speed = PLAYER_SPEED;
         this.jumpCounter = 0;
@@ -55,13 +56,10 @@ public class Player extends GameEntity {
 
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
         // assign player a randomly generated name + id
-        String[] characterNames = {"Trump", "Biden", "Obama"};
-        Random random = new Random();
-        String characterName = characterNames[random.nextInt(characterNames.length)];
-        this.name = characterName + "_" + AmericanDream.id;
-        if (characterName.contains("Obama")) {
+        this.name = selectedCharacter + "_" + AmericanDream.id;
+        if (selectedCharacter.contains("Obama")) {
             playerAnimations.generateObama();
-        } else if (characterName.contains("Trump")) {
+        } else if (selectedCharacter.contains("Trump")) {
             playerAnimations.generateTrump();
         } else {
             playerAnimations.generateBiden();

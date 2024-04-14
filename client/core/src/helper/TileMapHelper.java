@@ -23,12 +23,14 @@ import static helper.Constants.PPM;
 public class TileMapHelper {
     private TiledMap tiledMap;
     private GameScreen gameScreen;
+    private String selectedCharacter;
 
     /**
      * Initialize TileMapHelper which loads the tilemap background, tile outlines and objects.
      */
-    public TileMapHelper(GameScreen gameScreen) {
+    public TileMapHelper(GameScreen gameScreen, String selectedCharacter) {
         this.gameScreen = gameScreen;
+        this.selectedCharacter = selectedCharacter;
     }
 
     /**
@@ -66,7 +68,7 @@ public class TileMapHelper {
                             false,
                             gameScreen.getWorld()
                     );
-                    gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body));
+                    gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body, selectedCharacter));
                 }
             }
             if (mapObject.getName().equals("Center")) {

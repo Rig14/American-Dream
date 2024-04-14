@@ -17,7 +17,6 @@ import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
 import objects.player.Player;
-import objects.player.RemotePlayer;
 
 import static helper.Constants.*;
 
@@ -30,18 +29,18 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
 
     private Player player;  // local client player
-    private RemotePlayer remotePlayer;  // remote player(s)
     private final RemoteManager remoteManager;
 
     private Vector2 mapCenterPoint;
     private final Hud hud;
     private final OffScreenIndicator offScreenIndicator;
+    private String selectedCharacter;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      * @param camera used for creating the image that the player will see on the screen
      */
-    public GameScreen(Camera camera) {
+    public GameScreen(Camera camera, String selectedCharacter) {
         this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -50,7 +49,7 @@ public class GameScreen extends ScreenAdapter {
         this.debugRenderer = new Box2DDebugRenderer();
 
         // setting up the map
-        this.tileMapHelper = new TileMapHelper(this);
+        this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
         this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
 
         // remote player(s) manager
