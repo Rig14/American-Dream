@@ -2,10 +2,12 @@ package helper;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.awt.*;
+
 public class Constants {
     // debug mode
-    public static final boolean GAMEPLAY_DEBUG = true;
-    // pixels per meter (not sure what it does)
+    public static final boolean GAMEPLAY_DEBUG = false;
+    // pixels per meter (for every meter in LibGDX box2D world there are 16 pixels on player's camera)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
     public static final float FPS = 60f;
@@ -32,6 +34,8 @@ public class Constants {
     public static final int LIVES_COUNT = 3;
     public static final int FRAME_WIDTH = 64;
     public static final int FRAME_HEIGHT = 74;
-    public static final float FRAME_DURATION = 0.2f;
+    public static final float FRAME_DURATION = 0.3f;
+
+    public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 
 }
