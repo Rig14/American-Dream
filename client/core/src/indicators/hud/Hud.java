@@ -48,6 +48,14 @@ public class Hud {
     private Label placeHolder;
     private Label gameOverLabel;
 
+    /**
+     * Initialize HUD.
+     * Create a table that contains information about: game time, player names, lives, damage percentage and
+     * "game over" message.
+     * Some table slots are empty at first or contain "loading..." style placeholders.
+     * Game time and player names placeholders are filled as soon as the client receives remote player's state object.
+     * @param spritebatch spritebatch where to render all information
+     */
     public Hud(SpriteBatch spritebatch) {
 
         // set up the HUD viewport using a new camera separate from the main game camera
@@ -109,6 +117,13 @@ public class Hud {
         stage.addActor(table);
     }
 
+    /**
+     * Initialize player names, update game time, players lives and players damage percentage.
+     * Updating takes place every game tick.
+     * @param time game time in seconds
+     * @param local local player's state containing: name, health, damage
+     * @param remote remote player's state containing: name, health, damage
+     */
     public void update(Optional<Integer> time, Optional<PlayerState> local, Optional<PlayerState> remote) {
         updateTime(time);
         // update lives, health, damage
@@ -147,6 +162,12 @@ public class Hud {
         }
     }
 
+    /**
+     * Update lives table according to the lives count. Clear the previous lives table and add new heart image objects.
+     * For every displayed heart there has to be a new Image object, otherwise the hearts won't appear on the screen
+     * @param  newLivesAmount lives count
+     * @param table lives table pointer
+     */
     public void updateLivesTable(int newLivesAmount, Table table) {
         table.clear();
         // lost lives
@@ -159,6 +180,10 @@ public class Hud {
         }
     }
 
+    /**
+     * Update the displayed game time.
+     * @param time new game time in seconds
+     */
     public void updateTime(Optional<Integer> time) {
         if (time.isPresent()) {
             int minutes = Math.floorDiv(time.get(), 60);

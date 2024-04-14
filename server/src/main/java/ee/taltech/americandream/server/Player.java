@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
+import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
@@ -17,21 +18,30 @@ import static helper.Constants.*;
 
 public class Player {
     private final int id;
-    private List<BulletData> playerBullets;
+    private final Game game;
+    private final Connection connection;
+    private final List<BulletData> playerBullets;
     private float x;
     private float y;
     private Direction direction;
     private String name;
-
     private Integer livesCount;
     private int damage = 0;
-
-    private final Game game;
     private Direction nextBulletDirection;
     private float bulletTimeout;
-    private final Connection connection;
     private float velX, velY;
     private int isShooting;
+
+
+    /**
+     * Initialize server-side representation of a player based on the PlayerPositionMessages sent by a specific client.
+     * Receives: PlayerPositionMessage - data regarding the player, including lives
+     *           BulletMessage - indicates that the player has shot a new bullet
+     *           AddAiMessage - Player has triggered the activation of AI player
+     * @param connection connection to the client
+     * @param game game instance
+     * @param id player id
+     */
     public Player(Connection connection, Game game, int id) {
         // create player
         this.id = id;
@@ -47,6 +57,7 @@ public class Player {
                 super.disconnected(connection);
                 onDisconnect();
             }
+
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
                 // handle incoming data
@@ -58,17 +69,50 @@ public class Player {
                 // handle bullet position message
                 if (object instanceof BulletMessage bulletMessage) {
                     // handle bullet position message
-                    handleBullets(bulletMessage);
+                    handleNewBullet(bulletMessage);
+                }
+
+                // handle adding AI player
+                if (object instanceof AddAIMessage addAIMessage) {
+                    // handle adding AI player
+                    game.addAIPlayer();
                 }
             }
         });
     }
 
-    private void handleBullets(BulletMessage bulletMessage) {
-        // handle bullet message
-        nextBulletDirection = bulletMessage.direction;
+    public int getId() {
+        return this.id;
     }
 
+    public List<BulletData> getPlayerBullets() {
+        return playerBullets;
+    }
+
+    /**
+     * Generate new PlayerState.
+     */
+    public PlayerState getState() {
+        PlayerState state = new PlayerState();
+        state.id = id;
+        state.x = x;
+        state.y = y;
+        state.direction = direction;
+        state.livesCount = livesCount;
+        state.velX = velX;
+        state.velY = velY;
+        state.isShooting = isShooting;
+        state.damage = damage;
+        state.name = name;
+        return state;
+    }
+
+    /**
+     * Update player's position according to received PlayerPositionMessage.
+     * Update existing bullets' positions and add new bullets that are shot by the player.
+     * Remove bullets that are out of bounds.
+     * @param delta tick rate
+     */
     public void update(float delta) {
         // update player
         // will shoot a bullet if the bulletTimeout is 0
@@ -94,12 +138,17 @@ public class Player {
         }
     }
 
-    private void onDisconnect() {
-        // handle disconnect
-        // end game
-        game.end();
+    /**
+     * Each time a player shoots a new bullet, a BulletMessage is sent. Rest of the bullet logic is server-sided.
+     */
+    private void handleNewBullet(BulletMessage bulletMessage) {
+        // handle bullet message
+        nextBulletDirection = bulletMessage.direction;
     }
 
+    /**
+     * Handle incoming PlayerPositionMessages.
+     */
     private void handlePositionMessage(PlayerPositionMessage positionMessage) {
         // handle position message
         x = positionMessage.x;
@@ -117,6 +166,10 @@ public class Player {
         isShooting = positionMessage.isShooting;
     }
 
+    /**
+     * Calculate the force of the bullet hit and increment player's damage.
+     * @param bullet bullet shot by another player that hit 'this' player.
+     */
     public float handleBeingHit(BulletData bullet) {
         this.damage += 2;
         // calculate force to apply to player and bullet moving direction
@@ -126,34 +179,19 @@ public class Player {
         return force;
     }
 
-    public PlayerState getState() {
-        // get player state
-        PlayerState state = new PlayerState();
-        state.id = id;
-        state.x = x;
-        state.y = y;
-        state.direction = direction;
-        state.livesCount = livesCount;
-        state.velX = velX;
-        state.velY = velY;
-        state.isShooting = isShooting;
-        state.damage = damage;
-        state.name = name;
-
-        return state;
-    }
-
-    public List<BulletData> getPlayerBullets() {
-        return playerBullets;
-    }
-
+    /**
+     * Send gameStateMessage to the client of 'this' player.
+     * @param gameStateMessage contains info about all players, bullets and game time
+     */
     public void sendGameState(GameStateMessage gameStateMessage) {
-        // send game state message
         connection.sendUDP(gameStateMessage);
     }
 
-    public int getId() {
-        return this.id;
+    /**
+     * End the game in case of a disconnect.
+     */
+    private void onDisconnect() {
+        game.end();
     }
 
 }

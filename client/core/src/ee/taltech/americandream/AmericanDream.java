@@ -16,13 +16,11 @@ import java.util.HashMap;
 import static helper.Constants.*;
 
 public class AmericanDream extends Game {
-    // static variables, you can access these
-    // from literally anywhere in the code
     public static Client client;
     public static int id;
     public static AmericanDream instance;
 
-    /*
+    /**
      * This method is called when the game is created.
      * e.g. when user opens the game.
      */
@@ -39,7 +37,7 @@ public class AmericanDream extends Game {
         setScreen(new TitleScreen(camera));
     }
 
-    /*
+    /**
      * This method registers classes for serialization.
      * Classes that are sent over the network need to be registered.
      */
@@ -58,9 +56,10 @@ public class AmericanDream extends Game {
         kryo.register(HashMap.class);
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
+        kryo.register(AddAIMessage.class);
     }
 
-    /*
+    /**
      * This method sets up the connection to the server.
      */
     private void setupConnection() {
@@ -76,7 +75,7 @@ public class AmericanDream extends Game {
         id = client.getID();
     }
 
-    /*
+    /**
      * This method is called when the game is closed.
      */
     @Override

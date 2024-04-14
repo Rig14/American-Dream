@@ -1,5 +1,7 @@
 package helper;
 
+import java.awt.*;
+
 public class Constants {
     public static final int[] PORTS = new int[]{8080, 8081};
     public static final int LOBBY_SIZE = 2;
@@ -20,4 +22,7 @@ public class Constants {
     // optimal range 20-50 (10 for testing)
     // force *= 1 + (damage / x)
     public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 10;
+    // how fast the AI player shoots bullets
+    public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
+    public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 }

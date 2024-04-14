@@ -20,6 +20,12 @@ public class GameServer extends Thread {
     private final Server server;
     private final List<Lobby> lobbies;
 
+    /**
+     * The GameServer contains lobbies and runs threaded game instances.
+     * Game instance creation is managed by the Lobby class.
+     * Receives: LobbyJoinMessage - new client connection and the desired lobby that the player (connection) will be added to.
+     * Sends: LobbyDataMessage - lobby names and the amount of players in each lobby.
+     */
     public GameServer() {
         // setup server and open ports
         this.server = new Server();
@@ -68,6 +74,10 @@ public class GameServer extends Thread {
         gameServer.start();
     }
 
+    /**
+     * This method registers classes for serialization.
+     * Classes that are sent over the network need to be registered.
+     */
     private void registerClasses() {
         // register classes for serialization
         Kryo kryo = server.getKryo();
@@ -83,9 +93,12 @@ public class GameServer extends Thread {
         kryo.register(HashMap.class);
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
+        kryo.register(AddAIMessage.class);
     }
 
-
+    /**
+     * Run GameServer and update lobbies.
+     */
     @Override
     public void run() {
         super.run();

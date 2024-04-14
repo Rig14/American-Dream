@@ -13,12 +13,15 @@ import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
+import helper.Textures;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
+import static helper.Textures.ALIEN_TEXTURE;
 
 public class RemoteManager {
     private RemotePlayer[] remotePlayers;
@@ -28,8 +31,12 @@ public class RemoteManager {
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
     private float onHitForce;
+    private float AIplayerX;
+    private float AIplayerY;
 
-
+    /**
+     * Initialize RemoteManager that controls all data and functionality regarding remote players.
+     */
     public RemoteManager() {
         TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("spriteatlas/SoldierSprites.atlas"));
 
@@ -40,6 +47,10 @@ public class RemoteManager {
                     allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
                     remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
+
+                    // AI player
+                    AIplayerX = gameStateMessage.AIplayerX;
+                    AIplayerY = gameStateMessage.AIplayerY;
 
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
@@ -66,28 +77,9 @@ public class RemoteManager {
         });
     }
 
-    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
-                    rp.update(delta);
-                    rp.render(batch, playerDimensions);
-                }
-            }
-        }
-    }
-
-    public void renderBullets(SpriteBatch batch) {
-        if (remoteBullets != null) {
-            for (BulletData bullet : remoteBullets) {
-                if (bullet.isDisabled) continue;
-
-                RemoteBullet.render(batch, bullet.x, bullet.y);
-            }
-        }
-    }
-
-    // mainly used to update hud time
+    /**
+     * Get server-sided game time in seconds. Used for updating HUD timer.
+     */
     public Optional<Integer> getGameTime() {
         if (gameTime != null) {
             return Optional.of(gameTime);
@@ -95,12 +87,24 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    // used for off-screen indicator
+    /**
+     * Get all players' state if none of them is null. Check for AI player.
+     */
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            return Optional.of(allPlayerStates);
+            if (AIplayerX == 0 && AIplayerY == 0) {
+                return Optional.of(allPlayerStates);
+            }
+            // add AI player to the list if it exists
+            PlayerState[] newAllPlayerStates = Arrays.copyOf(allPlayerStates, allPlayerStates.length + 1);
+            PlayerState AIplayer = new PlayerState();
+            AIplayer.x = AIplayerX;
+            AIplayer.y = AIplayerY;
+            AIplayer.name = "AI";
+            newAllPlayerStates[allPlayerStates.length] = AIplayer;
+            return Optional.of(newAllPlayerStates);
         }
         return Optional.empty();
     }
@@ -112,6 +116,9 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    /**
+     * Currently does not support more than 1 remote players.
+     */
     public Optional<PlayerState> getRemotePlayerState() {
         if (remotePlayerState != null) {
             return Optional.of(remotePlayerState);
@@ -119,12 +126,54 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    public void testForHit(World world) {
-        // currently the force is applied like so:
-        // make the horizontal gravity equal to the force
-        // and then make the force smaller over time
-        // until it is small enough to reset the gravity
+    /**
+     * Render remote player(s). Could theoretically handle more than one remote player.
+     * @param batch spritebatch where to render the players
+     * @param playerDimensions player object dimensions
+     * @param delta delta time
+     */
+    public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
+        if (remotePlayers != null) {
+            for (RemotePlayer rp : remotePlayers) {
+                if (rp != null) {
+                    rp.update(delta);
+                    rp.render(batch, playerDimensions);
+                }
+            }
+        }
+    }
 
+    /**
+     Render AI player if it exists.
+     */
+    public void renderAIPlayer(SpriteBatch batch) {
+        if (AIplayerX == 0 && AIplayerY == 0) return;
+
+        batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+    }
+
+    /**
+     * Render all bullets shot by remote players.
+     * @param batch spritebatch
+     */
+    public void renderBullets(SpriteBatch batch) {
+        if (remoteBullets != null) {
+            for (BulletData bullet : remoteBullets) {
+                if (bullet.isDisabled) continue;
+
+                RemoteBullet.render(batch, bullet.x, bullet.y);
+            }
+        }
+    }
+
+    /**
+     * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
+     * Float representing the force is received form the server only once, after that it's saved into the player object.
+     * Exponentially decrement the applied force every game tick.
+     * Stop applying knockback when the force becomes too small.
+     * @param world world where the player moves (used for applying gravity)
+     */
+    public void testForHit(World world) {
         if (onHitForce != 0) {
             world.setGravity(new Vector2(onHitForce, GRAVITY));
 
