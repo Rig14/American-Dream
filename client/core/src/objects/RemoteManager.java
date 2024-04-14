@@ -15,21 +15,21 @@ import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
 import helper.Textures;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
-import static helper.Textures.ALIEN_TEXTURE;
 
 public class RemoteManager {
-    private RemotePlayer[] remotePlayers;
+    private List<RemotePlayer> remotePlayers = new ArrayList<>();
     private Integer gameTime = null;
-    private PlayerState remotePlayerState = null;
-    private PlayerState localPlayerState = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
+    private PlayerState localPlayerState;
     private float onHitForce;
     private float AIplayerX;
     private float AIplayerY;
@@ -46,7 +46,7 @@ public class RemoteManager {
                     GameStateMessage gameStateMessage = (GameStateMessage) object;
                     allPlayerStates = gameStateMessage.playerStates;
                     // handle game state message
-                    remotePlayers = new RemotePlayer[gameStateMessage.playerStates.length];
+                    remotePlayers = new ArrayList<>();
 
                     // AI player
                     AIplayerX = gameStateMessage.AIplayerX;
@@ -59,8 +59,7 @@ public class RemoteManager {
                         PlayerState ps = gameStateMessage.playerStates[i];
                         if (ps.id != AmericanDream.id) {
                             // not current client
-                            remotePlayerState = ps;
-                            remotePlayers[i] = new RemotePlayer(ps.x, ps.y, ps.name, textureAtlas, ps.velX, ps.velY, ps.isShooting);
+                            remotePlayers.add(new RemotePlayer(ps, textureAtlas));
                         } else {
                             // current client
                             localPlayerState = ps;
@@ -88,6 +87,24 @@ public class RemoteManager {
     }
 
     /**
+     * Get playerState for updating the local player.
+     * In the future can be used for moving lives logic to server-side.
+     */
+    public Optional<PlayerState> getLocalPlayerState() {
+        if (localPlayerState != null) {
+            return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Return remote players list if it contains at least 1 remote player.
+     */
+    public List<RemotePlayer> getRemotePlayers() {
+            return new ArrayList<>(remotePlayers);
+    }
+
+    /**
      * Get all players' state if none of them is null. Check for AI player.
      */
     public Optional<PlayerState[]> getAllPlayerStates() {
@@ -109,23 +126,6 @@ public class RemoteManager {
         return Optional.empty();
     }
 
-    public Optional<PlayerState> getLocalPlayerState() {
-        if (localPlayerState != null) {
-            return Optional.of(localPlayerState);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Currently does not support more than 1 remote players.
-     */
-    public Optional<PlayerState> getRemotePlayerState() {
-        if (remotePlayerState != null) {
-            return Optional.of(remotePlayerState);
-        }
-        return Optional.empty();
-    }
-
     /**
      * Render remote player(s). Could theoretically handle more than one remote player.
      * @param batch spritebatch where to render the players
@@ -133,9 +133,9 @@ public class RemoteManager {
      * @param delta delta time
      */
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers) {
-                if (rp != null) {
+        if (!remotePlayers.isEmpty()) {
+            for (RemotePlayer rp : new ArrayList<>(remotePlayers)) {
+                if (!Objects.equals(rp.getLivesCount(), 0)) {  // ignores null
                     rp.update(delta);
                     rp.render(batch, playerDimensions);
                 }

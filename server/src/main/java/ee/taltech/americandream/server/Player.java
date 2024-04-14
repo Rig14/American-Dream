@@ -188,6 +188,13 @@ public class Player {
     }
 
     /**
+     * Assure that the final gameStateMessage reaches all clients before the game instance closes.
+     */
+    public void sendGameStateTCP(GameStateMessage gameStateMessage) {
+        connection.sendTCP(gameStateMessage);
+    }
+
+    /**
      * End the game in case of a disconnect.
      */
     private void onDisconnect() {
