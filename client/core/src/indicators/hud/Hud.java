@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
+import ee.taltech.americandream.AmericanDream;
+import helper.packet.GameLeaveMessage;
 import objects.player.Player;
 import objects.player.RemotePlayer;
 
@@ -27,7 +29,7 @@ import static helper.Textures.HEALTH_TEXTURE;
 public class Hud {
     //Scene2D.ui Stage and its own Viewport for HUD
     public Stage stage;
-    private Viewport viewport;
+    private final Viewport viewport;
 
     //Player lives to register changes and update health tables
     private int localLives = LIVES_COUNT;
@@ -143,16 +145,14 @@ public class Hud {
      * Initialize player names, update game time, players lives and players damage percentage.
      * Updating takes place every game tick.
      * @param time game time in seconds
-     * @param local local player
+     * @param localPlayer local player
      * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Player local, List<RemotePlayer> remotePlayers) {
+    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers) {
         updateTime(time);
         // update lives, health, damage
-        if (!remotePlayers.isEmpty() && local != null) {
-            Player localPlayer = local;
-
-            // Local player name, lives, damage
+        if (localPlayer != null) {
+            // update local player
             if (!localPlayerName.getText().toString().equals(localPlayer.getName())) {
                 localPlayerName.setText(localPlayer.getName());
             }
@@ -163,17 +163,17 @@ public class Hud {
             localDamage.setText(localPlayer.getDamage() + " %");
 
             updateRemotePlayers(remotePlayers);
-
             // display game over screen
             if (localPlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("GAME OVER!\n You lost.");
                 gameOverLabel.setColor(Color.RED);
-            // check if all remote players are defeated
-            } else if (remotePlayers.stream()
-                    .filter(x -> Objects.equals(x.getLivesCount(), 0))
-                    .toArray().length == remotePlayers.size()) {
+            // check if all remote players are defeated  &&  the game has already started
+            } else if (!remotePlayers.isEmpty() &&
+                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) {
                 gameOverLabel.setText("Congratulations you won!");
                 gameOverLabel.setColor(Color.GREEN);
+            } else {
+                gameOverLabel.setText("");  // prevents  error caused by UDP losses
             }
         }
     }

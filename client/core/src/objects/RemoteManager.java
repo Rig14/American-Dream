@@ -18,6 +18,7 @@ import helper.Textures;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static helper.Constants.AI_PLAYER_SIZE;
@@ -87,10 +88,10 @@ public class RemoteManager {
 
     /**
      * Get playerState for updating the local player.
-     * Prevent nullifying local player lives (why does server send null even though local player lives are never null?).
+     * In the future can be used for moving lives logic to server-side.
      */
     public Optional<PlayerState> getLocalPlayerState() {
-        if (localPlayerState != null && localPlayerState.livesCount != null) {
+        if (localPlayerState != null) {
             return Optional.of(localPlayerState);
         }
         return Optional.empty();
@@ -134,8 +135,10 @@ public class RemoteManager {
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (!remotePlayers.isEmpty()) {
             for (RemotePlayer rp : new ArrayList<>(remotePlayers)) {
-                rp.update(delta);
-                rp.render(batch, playerDimensions);
+                if (!Objects.equals(rp.getLivesCount(), 0)) {  // ignores null
+                    rp.update(delta);
+                    rp.render(batch, playerDimensions);
+                }
             }
         }
     }

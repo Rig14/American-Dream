@@ -113,12 +113,14 @@ public class Player extends GameEntity {
     @Override
     public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
         if (ps.isPresent()) {
-            livesCount = ps.get().livesCount;
+            // update server-sided lives here in the future
             damage = ps.get().damage;
         }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
-        handleInput(delta);
+        if (livesCount > 0) {  // let the dead player spectate, but ignore its input
+            handleInput(delta);
+        }
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
@@ -145,8 +147,10 @@ public class Player extends GameEntity {
      */
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
-        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+        if (livesCount > 0) {
+            TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
+            batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+        }
     }
 
     /**
@@ -269,11 +273,6 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
-
-                if (livesCount == 0) {
-                    // end game
-                    AmericanDream.client.sendTCP(new GameLeaveMessage());
-                }
             }
         }
     }

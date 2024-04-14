@@ -98,9 +98,10 @@ public class Lobby {
     }
 
     /**
-     * End previous game.
+     * End ongoing game instance and clear lobby of players.
      */
     public void clearLobby() {
         game = null;
+        connections.clear();
     }
 }
