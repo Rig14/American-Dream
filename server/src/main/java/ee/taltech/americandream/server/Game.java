@@ -97,7 +97,9 @@ public class Game extends Thread {
 
                 // end game when      time ends  ||  one player has 0 lives
                 if (gameTime <= 0
-                        || Arrays.stream(gameStateMessage.playerStates).map(x -> x.livesCount).toList().contains(0)) {
+                        || Arrays.stream(gameStateMessage.playerStates)
+                        .filter(x -> (x.livesCount == null || x.livesCount > 0))
+                        .toList().size() <= 1) {
                     this.end();
                 }
 

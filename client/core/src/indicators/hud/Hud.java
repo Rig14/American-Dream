@@ -15,7 +15,9 @@ import com.badlogic.gdx.Gdx;
 import objects.player.Player;
 import objects.player.RemotePlayer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static helper.Constants.LIVES_COUNT;
@@ -29,9 +31,9 @@ public class Hud {
 
     //Player lives to register changes and update health tables
     private int localLives = LIVES_COUNT;
-    private int firstRemoteLives = LIVES_COUNT;
-    private int secondRemoteLives = LIVES_COUNT;
-    private int thirdRemoteLives = LIVES_COUNT;
+    private int firstRemoteLivesDisplayed = LIVES_COUNT;
+    private int secondRemoteLivesDisplayed = LIVES_COUNT;
+    private int thirdRemoteLivesDisplayed = LIVES_COUNT;
 
     // label styles
     private final Label.LabelStyle whiteDefaultStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
@@ -60,6 +62,12 @@ public class Hud {
     private final Label thirdRemotePlayerName = new Label("", whiteDefaultStyle);
     private final Table thirdRemoteHealthTable = new Table();
     private final Label thirdRemoteDamage = new Label("", redDefaultStyle);
+
+    // lists of changing values
+    private final List<Label> nameLabels = List.of(firstRemotePlayerName, secondRemotePlayerName, thirdRemotePlayerName);
+    private final List<Label> damageLabels = List.of(firstRemoteDamage, secondRemoteDamage, thirdRemoteDamage);
+    private final List<Table> healthTables = List.of(firstRemoteHealthTable, secondRemoteHealthTable, thirdRemoteHealthTable);
+    private final List<Integer> livesDisplayed = new ArrayList<>(List.of(firstRemoteLivesDisplayed, secondRemoteLivesDisplayed, thirdRemoteLivesDisplayed));
 
 
     /**
@@ -136,25 +144,23 @@ public class Hud {
      * Updating takes place every game tick.
      * @param time game time in seconds
      * @param local local player
-     * @param remote remote players; amount ranging from 1 to (lobbyMaxSize - 1)
+     * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Player local, Optional<List<RemotePlayer>> remote) {
+    public void update(Optional<Integer> time, Player local, List<RemotePlayer> remotePlayers) {
         updateTime(time);
         // update lives, health, damage
-        if (remote.isPresent()) {
-            List<RemotePlayer> remotePlayers = remote.get();
+        if (!remotePlayers.isEmpty() && local != null) {
             Player localPlayer = local;
 
-            // Initialize local player fields
-            if (localPlayerName.getText().toString().equals("loading...")) {
+            // Local player name, lives, damage
+            if (!localPlayerName.getText().toString().equals(localPlayer.getName())) {
                 localPlayerName.setText(localPlayer.getName());
             }
-            localDamage.setText(localPlayer.getDamage() + " %");
-
             if (localLives != localPlayer.getLivesCount()) {
                 localLives = localPlayer.getLivesCount();
                 updateLivesTable(localLives, localHealthTable);
             }
+            localDamage.setText(localPlayer.getDamage() + " %");
 
             updateRemotePlayers(remotePlayers);
 
@@ -163,7 +169,9 @@ public class Hud {
                 gameOverLabel.setText("GAME OVER!\n You lost.");
                 gameOverLabel.setColor(Color.RED);
             // check if all remote players are defeated
-            } else if (remotePlayers.stream().mapToInt(RemotePlayer::getLivesCount).max().getAsInt() == 0) {
+            } else if (remotePlayers.stream()
+                    .filter(x -> Objects.equals(x.getLivesCount(), 0))
+                    .toArray().length == remotePlayers.size()) {
                 gameOverLabel.setText("Congratulations you won!");
                 gameOverLabel.setColor(Color.GREEN);
             }
@@ -171,18 +179,25 @@ public class Hud {
     }
 
     /**
-     *
+     * Update remote players data.
+     * To add even more remote players (over 3), extend label lists.
+     * @param remotePlayers all joined remote players
      */
     private void updateRemotePlayers(List<RemotePlayer> remotePlayers) {
         int remotePlayerCount = remotePlayers.size();
-        if (remotePlayerCount == 1 && firstRemotePlayerName.getText().toString().equals("loading...")) {
-            firstRemotePlayerName.setText(remotePlayers.get(0).getName());
-        } else if (remotePlayerCount == 2 && secondRemotePlayerName.getText().toString().isEmpty()) {
-            secondRemotePlayerName.setText(remotePlayers.get(1).getName());
-            secondRemoteHealthTable.setVisible(true);
-        } else if (remotePlayerCount == 3 && thirdRemotePlayerName.getText().toString().isEmpty()) {
-            thirdRemotePlayerName.setText(remotePlayers.get(2).getName());
-            thirdRemoteHealthTable.setVisible(true);
+        for (int i = 0; i < remotePlayerCount; i++) {
+            RemotePlayer rp = remotePlayers.get(i);
+            if (rp.getLivesCount() != null) {
+                if (!nameLabels.get(i).getText().toString().equals(rp.getName())) {
+                    nameLabels.get(i).setText(rp.getName());
+                    healthTables.get(i).setVisible(true);  // make additional remote players tables visible
+                }
+                if (livesDisplayed.get(i) != rp.getLivesCount()) {
+                    livesDisplayed.add(i, rp.getLivesCount());
+                    updateLivesTable(rp.getLivesCount(), healthTables.get(i));
+                }
+                damageLabels.get(i).setText(rp.getDamage() + " %");
+            }
         }
     }
 

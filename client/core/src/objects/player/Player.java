@@ -16,6 +16,7 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
+import helper.packet.GameLeaveMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
@@ -111,17 +112,16 @@ public class Player extends GameEntity {
      */
     @Override
     public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
+        if (ps.isPresent()) {
+            livesCount = ps.get().livesCount;
+            damage = ps.get().damage;
+        }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         handleInput(delta);
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
-
-        if (ps.isPresent()) {
-            livesCount = ps.get().livesCount;
-            damage = ps.get().damage;
-        }
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
@@ -269,6 +269,11 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
+
+                if (livesCount == 0) {
+                    // end game
+                    AmericanDream.client.sendTCP(new GameLeaveMessage());
+                }
             }
         }
     }

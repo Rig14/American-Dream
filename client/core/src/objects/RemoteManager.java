@@ -24,7 +24,7 @@ import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
-    private List<RemotePlayer> remotePlayers;
+    private List<RemotePlayer> remotePlayers = new ArrayList<>();
     private Integer gameTime = null;
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
@@ -85,8 +85,12 @@ public class RemoteManager {
         return Optional.empty();
     }
 
+    /**
+     * Get playerState for updating the local player.
+     * Prevent nullifying local player lives (why does server send null even though local player lives are never null?).
+     */
     public Optional<PlayerState> getLocalPlayerState() {
-        if (localPlayerState != null) {
+        if (localPlayerState != null && localPlayerState.livesCount != null) {
             return Optional.of(localPlayerState);
         }
         return Optional.empty();
@@ -95,11 +99,8 @@ public class RemoteManager {
     /**
      * Return remote players list if it contains at least 1 remote player.
      */
-    public Optional<List<RemotePlayer>> getRemotePlayers() {
-        if (remotePlayers != null && !remotePlayers.isEmpty()) {
-            return Optional.of(new ArrayList<>(remotePlayers));
-        }
-        return Optional.empty();
+    public List<RemotePlayer> getRemotePlayers() {
+            return new ArrayList<>(remotePlayers);
     }
 
     /**
@@ -132,7 +133,7 @@ public class RemoteManager {
      */
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (!remotePlayers.isEmpty()) {
-            for (RemotePlayer rp : remotePlayers) {
+            for (RemotePlayer rp : new ArrayList<>(remotePlayers)) {
                 rp.update(delta);
                 rp.render(batch, playerDimensions);
             }
