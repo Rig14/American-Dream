@@ -49,7 +49,7 @@ public class Hud {
     private final Label gameOverLabel = new Label("", whiteDefaultStyle);
 
 
-    private final Label localPlayerName = new Label("loading...", whiteDefaultStyle);
+    private final Label localPlayerName = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
     private final Table localHealthTable = new Table();
     private final Label localDamage = new Label("0 %", redDefaultStyle);
 

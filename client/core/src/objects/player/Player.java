@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
@@ -24,6 +25,8 @@ import java.util.Optional;
 import java.util.Random;
 
 import static helper.Constants.*;
+import static helper.Textures.HEALTH_TEXTURE;
+import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class Player extends GameEntity {
 
@@ -150,6 +153,7 @@ public class Player extends GameEntity {
         if (livesCount > 0) {
             TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
             batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 30, 30);
         }
     }
 

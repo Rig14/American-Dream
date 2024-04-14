@@ -33,10 +33,9 @@ public class GameServer extends Thread {
         // create lobbies
         this.lobbies = new ArrayList<>();
         // initialize default lobbies
-        for (int i = 0; i < 3; i++) {
-            Lobby lobby = new Lobby("Default lobby " + (i + 1), LOBBY_SIZE);
-            lobbies.add(lobby);
-        }
+        lobbies.add(new Lobby("Default lobby " + (1), 2));
+        lobbies.add(new Lobby("Default lobby " + (2), 3));
+        lobbies.add(new Lobby("Default lobby " + (3), 4));
 
         // register used classes
         registerClasses();
