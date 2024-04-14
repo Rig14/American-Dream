@@ -14,5 +14,6 @@ public class Textures {
     // Heart png (8bit) is from this website: https://www.pngwing.com/en/free-png-nymsb
     public final static Texture HEALTH_TEXTURE = new Texture(Gdx.files.internal("heart.png"));
     public final static Texture BLACK_HEART_TEXTURE = new Texture(Gdx.files.internal("black_heart.png"));
+    public final static Texture PLAYER_INDICATOR_TEXTURE = new Texture("player-indicator.png");
 
 }

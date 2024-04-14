@@ -12,17 +12,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
-import ee.taltech.americandream.LobbyScreen;
 import helper.Direction;
+import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
-import helper.packet.GameLeaveMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
-import java.util.Random;
+import java.util.Optional;
 
 import static helper.Constants.*;
+import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class Player extends GameEntity {
 
@@ -35,15 +35,17 @@ public class Player extends GameEntity {
     private float keyDownTime = 0;
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
+    private Integer damage = 0;
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
+
     /**
      * Initialize Player.
-     *
-     * @param width  width of the player object/body
+     * @param width width of the player object/body
      * @param height height
-     * @param body   object that moves around in the world and collides with other bodies
+     * @param body object that moves around in the world and collides with other bodies
      */
     public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
@@ -82,6 +84,18 @@ public class Player extends GameEntity {
         return isShooting;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Integer getLivesCount() {
+        return livesCount;
+    }
+
+    public Integer getDamage() {
+        return damage;
+    }
+
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
@@ -96,15 +110,20 @@ public class Player extends GameEntity {
     /**
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
-     *
-     * @param delta  delta time
+     * @param delta delta time
      * @param center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
+        if (ps.isPresent()) {
+            // update server-sided lives here in the future
+            damage = ps.get().damage;
+        }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
-        handleInput(delta);
+        if (livesCount > 0) {  // let the dead player spectate, but ignore its input
+            handleInput(delta);
+        }
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
@@ -131,8 +150,11 @@ public class Player extends GameEntity {
      */
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
-        batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+        if (livesCount > 0) {
+            TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
+            batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 30, 30);
+        }
     }
 
     /**
@@ -255,14 +277,7 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
-                if (livesCount == 0) {
-                    // end game
-                    AmericanDream.client.sendTCP(new GameLeaveMessage());
-
-                }
             }
         }
     }
-
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }
