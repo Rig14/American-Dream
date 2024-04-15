@@ -40,7 +40,7 @@ public class GameScreen extends ScreenAdapter {
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      * @param camera used for creating the image that the player will see on the screen
      */
-    public GameScreen(Camera camera, String selectedCharacter) {
+    public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
         this.camera = (OrthographicCamera) camera;
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
@@ -50,8 +50,13 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
-
+        if (selectedMap.equals("Swamp")) {
+            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+        } else if (selectedMap.equals("Desert")) {
+            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+        } else {
+            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+        }
         // remote player(s) manager
         this.remoteManager = new RemoteManager();
 
