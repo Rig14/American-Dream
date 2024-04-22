@@ -6,12 +6,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import static helper.Constants.FONT_SCALING_FACTOR;
 
-public class Buttons {
+public class UI {
     /**
      * Disable a button by setting it to be not clickable
      * Changes the button style to be disabled
@@ -49,5 +50,20 @@ public class Buttons {
         button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
         button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg"))).tint(Color.BLACK);
         return button;
+    }
+
+    public static Label createLabel(String text) {
+        return createLabel(text, Color.WHITE);
+    }
+
+    public static Label createLabel(String text, Color textColor) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 16;
+        BitmapFont font = generator.generateFont(parameter);
+        Label label = new Label(text, new Label.LabelStyle(font, textColor));
+        label.setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * 3), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * 3));
+        generator.dispose();
+        return label;
     }
 }

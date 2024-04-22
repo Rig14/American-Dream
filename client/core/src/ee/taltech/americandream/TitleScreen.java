@@ -7,14 +7,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-import static helper.Buttons.createButton;
-import static helper.Buttons.disableButton;
+import static helper.UI.*;
 
 
 public class TitleScreen extends ScreenAdapter {
@@ -31,20 +27,22 @@ public class TitleScreen extends ScreenAdapter {
     public TitleScreen(Camera camera) {
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+        Table mainContainer = new Table();
+        mainContainer.setFillParent(true);
 
-        Table table = new Table();
-        table.setFillParent(true);
+        Table buttonsContainer = new Table();
+        mainContainer.add(buttonsContainer).row();
 
         multiplayerButton = createButton("Multiplayer");
         TextButton localButton = createButton("Local Play");
         disableButton(localButton);
         TextButton exitButton = createButton("Exit");
 
-        table.add(multiplayerButton).row();
-        table.add(new Container<>().height(10)).row();
-        table.add(localButton).row();
-        table.add(new Container<>().height(10)).row();
-        table.add(exitButton).row();
+        buttonsContainer.add(multiplayerButton).row();
+        buttonsContainer.add(new Container<>().height(10)).row();
+        buttonsContainer.add(localButton).row();
+        buttonsContainer.add(new Container<>().height(10)).row();
+        buttonsContainer.add(exitButton).row();
 
         exitButton.addListener(new ChangeListener() {
             @Override
@@ -61,13 +59,41 @@ public class TitleScreen extends ScreenAdapter {
                 AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             }
         });
+        // top content
+        Table versionContainer = new Table();
+        versionContainer.setFillParent(true);
+        versionContainer.top().left();
+        versionContainer.pad(5);
+        Label version = createLabel("0.3-BETA"); // current game version number
+        versionContainer.add(version).row();
+
+        // bottom content
+
+        // names
+        Table authorsContainer = new Table();
+        authorsContainer.setFillParent(true);
+        authorsContainer.bottom().left();
+        authorsContainer.pad(10);
+        Label authors = createLabel("TalTech 2024 American Dream");
+        authorsContainer.add(authors).row();
+
+        // copyright
+        Table copyrightContainer = new Table();
+        copyrightContainer.setFillParent(true);
+        copyrightContainer.bottom().right();
+        copyrightContainer.pad(10);
+        Label crText = createLabel("RRE© all rights reserved");
+        copyrightContainer.add(crText);
 
         // add background to the stage
         Image background = new Image(new Texture(Gdx.files.internal("screen-bg/title.jpg")));
         background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.addActor(background);
 
-        stage.addActor(table);
+        stage.addActor(versionContainer);
+        stage.addActor(mainContainer);
+        stage.addActor(authorsContainer);
+        stage.addActor(copyrightContainer);
     }
 
     /**
