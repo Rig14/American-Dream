@@ -18,8 +18,7 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.packet.JoinLobbyMessage;
 import helper.packet.LobbyDataMessage;
 
-import static helper.UI.createButton;
-import static helper.UI.createLabel;
+import static helper.UI.*;
 
 public class LobbySelectionScreen extends ScreenAdapter {
     private final Camera camera;
@@ -113,6 +112,9 @@ public class LobbySelectionScreen extends ScreenAdapter {
                     AmericanDream.instance.setScreen(new LobbyScreen(camera));
                 }
             });
+            if (playerCount >= maxPlayerCount) {
+                disableButton(button);
+            }
             table.add(button).left().padBottom(20).row();
         });
 
