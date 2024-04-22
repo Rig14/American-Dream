@@ -100,8 +100,10 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.pad(30);
         table.top().left();
 
-        lobbyDataMessage.lobbies.forEach((id, info) -> {
-            TextButton button = createButton(info, 2);
+        lobbyDataMessage.lobbies.forEach((id, name) -> {
+            Integer playerCount = lobbyDataMessage.playerCount.get(id);
+            Integer maxPlayerCount = lobbyDataMessage.maxPlayers.get(id);
+            TextButton button = createButton(name + " " + playerCount + "/" + maxPlayerCount, 2);
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent changeEvent, Actor actor) {
