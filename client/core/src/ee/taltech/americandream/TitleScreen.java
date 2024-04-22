@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -14,7 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-import static helper.ButtonStyle.disableButton;
+import static helper.Buttons.createButton;
+import static helper.Buttons.disableButton;
 
 
 public class TitleScreen extends ScreenAdapter {
@@ -35,15 +34,10 @@ public class TitleScreen extends ScreenAdapter {
         Table table = new Table();
         table.setFillParent(true);
 
-        // white texts for buttons
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = new BitmapFont();
-        textButtonStyle.fontColor = Color.WHITE;
-
-        multiplayerButton = new TextButton("Multiplayer", textButtonStyle);
-        TextButton localButton = new TextButton("Local play", textButtonStyle);
+        multiplayerButton = createButton("Multiplayer");
+        TextButton localButton = createButton("Local Play");
         disableButton(localButton);
-        TextButton exitButton = new TextButton("Exit", textButtonStyle);
+        TextButton exitButton = createButton("Exit");
 
         table.add(multiplayerButton).row();
         table.add(localButton).row();

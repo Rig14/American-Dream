@@ -38,4 +38,6 @@ public class Constants {
 
     public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 
+    public static final float FONT_SCALING_FACTOR = 200f;
+
 }
