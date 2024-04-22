@@ -42,6 +42,7 @@ public class TitleScreen extends ScreenAdapter {
 
         multiplayerButton = new TextButton("Multiplayer", textButtonStyle);
         TextButton localButton = new TextButton("Local play", textButtonStyle);
+        disableButton(localButton);
         TextButton exitButton = new TextButton("Exit", textButtonStyle);
 
         table.add(multiplayerButton).row();
