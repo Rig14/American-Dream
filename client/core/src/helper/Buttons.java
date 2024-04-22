@@ -16,16 +16,21 @@ public class Buttons {
      */
     public static void disableButton(TextButton button) {
         button.setDisabled(true);
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = new BitmapFont();
-        textButtonStyle.fontColor = Color.GRAY;
-        button.setStyle(textButtonStyle);
+        button.getStyle().fontColor = Color.GRAY;
+        button.getStyle().overFontColor = Color.GRAY;
     }
 
+    /**
+     * Create a text button with the given text
+     *
+     * @param text The text to be displayed on the button
+     * @return A new TextButton with the given text
+     */
     public static TextButton createButton(String text) {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont();
         buttonStyle.fontColor = Color.WHITE;
+        buttonStyle.overFontColor = Color.BLACK;
         TextButton button = new TextButton(text, buttonStyle);
         button.getLabel().setFontScale(Gdx.graphics.getWidth() / FONT_SCALING_FACTOR, Gdx.graphics.getHeight() / FONT_SCALING_FACTOR);
         return button;
