@@ -2,8 +2,11 @@ package helper;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import static helper.Constants.FONT_SCALING_FACTOR;
 
@@ -32,7 +35,12 @@ public class Buttons {
         buttonStyle.fontColor = Color.WHITE;
         buttonStyle.overFontColor = Color.BLACK;
         TextButton button = new TextButton(text, buttonStyle);
+        button.padLeft(Gdx.graphics.getWidth() / 20f);
+        button.padRight(Gdx.graphics.getWidth() / 20f);
+        button.padTop(Gdx.graphics.getHeight() / 30f);
+        button.padBottom(Gdx.graphics.getHeight() / 30f);
         button.getLabel().setFontScale(Gdx.graphics.getWidth() / FONT_SCALING_FACTOR, Gdx.graphics.getHeight() / FONT_SCALING_FACTOR);
+        button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
         return button;
     }
 }
