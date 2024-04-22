@@ -90,10 +90,18 @@ public class LobbySelectionScreen extends ScreenAdapter {
      */
     private void update(float delta) {
         updateCounter += delta;
-        if (updateCounter < 1f) return;
+        if (updateCounter < 1f || lobbyDataMessage == null) return;
         stage.clear();
         table.clear();
 
+        TextButton back = createButton("Back", 3);
+        back.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                AmericanDream.instance.setScreen(new TitleScreen(camera));
+            }
+        });
+        table.add(back).top().left();
         Label title = createLabel("Select a Lobby:", Color.WHITE, 1.5f);
         table.add(title).padBottom(40).row();
         table.pad(30);
