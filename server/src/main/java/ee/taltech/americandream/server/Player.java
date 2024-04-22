@@ -132,12 +132,11 @@ public class Player {
             nextBulletDirection = null;
         }
         bulletTimeout += delta;
+
         ammoDelta += delta;
-        if (ammoDelta >= AMMO_INCREMENTING_TIME) {
+        if (ammoDelta >= AMMO_INCREMENTING_TIME && ammoCount < MAX_AMMO) {
             ammoDelta = ammoDelta % AMMO_INCREMENTING_TIME;
-            if (ammoCount < MAX_AMMO) {
-                ammoCount += 1;
-            }
+            ammoCount++;
         }
 
         // remove bullets that are out of bounds
