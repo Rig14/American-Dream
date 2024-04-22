@@ -43,7 +43,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.setFillParent(true);
 
 
-        Label placeholder = createLabel("Loading lobbies Please wait...", Color.WHITE, 1f);
+        Label placeholder = createLabel("Loading lobbies please wait...", Color.WHITE, 1f);
         table.add(placeholder).row();
 
         AmericanDream.client.addListener(new Listener() {
@@ -93,6 +93,10 @@ public class LobbySelectionScreen extends ScreenAdapter {
         if (updateCounter < 1f || lobbyDataMessage == null) return;
         stage.clear();
         table.clear();
+        Table backTable = new Table();
+        backTable.setFillParent(true);
+        backTable.pad(30);
+        table.setFillParent(true);
 
         TextButton back = createButton("Back", 3);
         back.addListener(new ChangeListener() {
@@ -101,16 +105,17 @@ public class LobbySelectionScreen extends ScreenAdapter {
                 AmericanDream.instance.setScreen(new TitleScreen(camera));
             }
         });
-        table.add(back).top().left();
+        backTable.add(back);
+        backTable.top().left();
         Label title = createLabel("Select a Lobby:", Color.WHITE, 1.5f);
-        table.add(title).padBottom(40).row();
+        table.add(title).padBottom(40).center().row();
         table.pad(30);
-        table.top().left();
+        table.center();
 
         lobbyDataMessage.lobbies.forEach((id, name) -> {
             Integer playerCount = lobbyDataMessage.playerCount.get(id);
             Integer maxPlayerCount = lobbyDataMessage.maxPlayers.get(id);
-            TextButton button = createButton(name + " " + playerCount + "/" + maxPlayerCount, 2);
+            TextButton button = createButton(name + " " + playerCount + "/" + maxPlayerCount, 1.5f);
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent changeEvent, Actor actor) {
@@ -130,6 +135,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         Image background = new Image(new Texture(Gdx.files.internal("screen-bg/ls.png")));
         background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.addActor(background);
+        stage.addActor(backTable);
         stage.addActor(table);
 
         updateCounter = 0;
