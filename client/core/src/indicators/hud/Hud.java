@@ -50,6 +50,7 @@ public class Hud {
     private final Label localPlayerName = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
     private final Table localHealthTable = new Table();
     private final Label localDamage = new Label("0 %", redDefaultStyle);
+    private final Label localAmmoCount = new Label("0 %", new Label.LabelStyle(new BitmapFont(), Color.PURPLE));
 
     private final Label firstRemotePlayerName = new Label("loading...", whiteDefaultStyle);
     private final Table firstRemoteHealthTable = new Table();
@@ -115,6 +116,9 @@ public class Hud {
         table.add(firstRemoteDamage);
 
         table.row();
+        table.add(localAmmoCount).padTop(5);
+
+        table.row();
         table.add(placeHolder);
         table.add(gameOverLabel).padTop(150);
 
@@ -159,6 +163,7 @@ public class Hud {
                 updateLivesTable(localLives, localHealthTable);
             }
             localDamage.setText(localPlayer.getDamage() + " %");
+            localAmmoCount.setText(localPlayer.getAmmoCount());
 
             updateRemotePlayers(remotePlayers);
             // display game over screen
