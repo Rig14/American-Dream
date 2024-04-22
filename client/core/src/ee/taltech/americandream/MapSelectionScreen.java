@@ -125,9 +125,9 @@ public class MapSelectionScreen extends ScreenAdapter {
             AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
-            if (selectedMap != null) {
-                AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
-            }
+        }
+        if (selectedMap != null) {
+            AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
         }
     }
 
