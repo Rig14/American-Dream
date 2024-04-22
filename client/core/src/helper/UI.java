@@ -59,7 +59,7 @@ public class UI {
      * @return A new Label with the given text
      */
     public static Label createLabel(String text) {
-        return createLabel(text, Color.WHITE);
+        return createLabel(text, Color.WHITE, 3);
     }
 
     /**
@@ -67,15 +67,16 @@ public class UI {
      *
      * @param text      The text to be displayed on the label
      * @param textColor The color of the text
+     * @param size      The size of the text
      * @return A new Label with the given text and color
      */
-    public static Label createLabel(String text, Color textColor) {
+    public static Label createLabel(String text, Color textColor, float size) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 16;
         BitmapFont font = generator.generateFont(parameter);
         Label label = new Label(text, new Label.LabelStyle(font, textColor));
-        label.setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * 3), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * 3));
+        label.setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         generator.dispose();
         return label;
     }
