@@ -93,6 +93,7 @@ public class GameServer extends Thread {
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
         kryo.register(AddAIMessage.class);
+        kryo.register(MapSelectionMessage.class);
     }
 
     /**
@@ -106,8 +107,10 @@ public class GameServer extends Thread {
                 // send lobby data message to all clients
                 LobbyDataMessage lobbyDataMessage = new LobbyDataMessage();
                 lobbyDataMessage.lobbies = new HashMap<>();
+                lobbyDataMessage.maps = new HashMap<>();
                 lobbies.forEach((l) -> {
                     lobbyDataMessage.lobbies.put(l.getId(), l.getStatus());
+                    lobbyDataMessage.maps.put(l.getId(), l.getCurrentMap());
                     l.removeDisconnected();
 
                     if (l.canStartGame()) {

@@ -109,6 +109,7 @@ public class Game extends Thread {
                 Thread.sleep(1000 / TICK_RATE);
 
             } catch (InterruptedException e) {
+                lobby.setCurrentMap(null);
                 running = false;
             }
         }
@@ -190,6 +191,7 @@ public class Game extends Thread {
      */
     public void end() {
         running = false;
+        lobby.setCurrentMap(null);
         lobby.clearLobby();
     }
 

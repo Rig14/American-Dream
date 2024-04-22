@@ -15,24 +15,31 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import helper.packet.GameLeaveMessage;
+import helper.packet.LobbyDataMessage;
+import helper.packet.MapSelectionMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapSelectionScreen extends ScreenAdapter {
     private final Stage stage;
     private final Camera camera;
     private final String selectedCharacter;
     private String selectedMap;
-    private boolean mapSelected;
+    private int id;
 
     /**
      * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
      * @param camera used for creating the image that the player will see on the screen
      */
-    public MapSelectionScreen(Camera camera, String selectedCharacter) {
+    public MapSelectionScreen(Camera camera, String selectedCharacter, int id) {
         this.stage = new Stage();
         this.camera = camera;
         this.selectedCharacter = selectedCharacter;
-        this.mapSelected = false;
+        this.id = id;
         Table table = new Table();
         table.setFillParent(true);
 
@@ -58,6 +65,18 @@ public class MapSelectionScreen extends ScreenAdapter {
 
         table.add(mapSelectionTable).row();
         stage.addActor(table);
+        AmericanDream.client.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                if (object instanceof LobbyDataMessage) {
+                    System.out.println(id);
+                    System.out.println(((LobbyDataMessage) object).maps);
+                    Map<Integer, String> mapsMap = ((LobbyDataMessage) object).maps;
+                    selectedMap = mapsMap.get(id);
+                    System.out.println(selectedMap);
+                }
+            }
+        });
     }
     private TextButton createMapButton(String mapName, Texture mapTexture) {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
@@ -77,7 +96,9 @@ public class MapSelectionScreen extends ScreenAdapter {
                 // handle map selection
                 selectedMap = mapName;
                 System.out.println("Selected map: " + mapName);
-                mapSelected = true;
+                MapSelectionMessage mapSelectionMessage = new MapSelectionMessage();
+                mapSelectionMessage.currentMap = selectedMap;
+                AmericanDream.client.sendTCP(mapSelectionMessage);
                 AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
             }
         });
@@ -104,6 +125,9 @@ public class MapSelectionScreen extends ScreenAdapter {
             AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
+            if (selectedMap != null) {
+                AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
+            }
         }
     }
 
@@ -122,9 +146,6 @@ public class MapSelectionScreen extends ScreenAdapter {
         stage.dispose();
     }
 
-    public boolean isMapSelected() {
-        return mapSelected;
-    }
     public String getSelectedMap() {
         return selectedCharacter;
     }

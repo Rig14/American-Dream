@@ -3,6 +3,7 @@ package ee.taltech.americandream.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import helper.packet.GameLeaveMessage;
+import helper.packet.MapSelectionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class Lobby {
     private final int lobbyId;
     private Game game;
     private final List<Connection> connections;
+    private String currentMap;
 
     /**
      * Initialize new Lobby.
@@ -28,6 +30,14 @@ public class Lobby {
 
         // increment id
         id++;
+    }
+
+    public String getCurrentMap() {
+        return currentMap;
+    }
+
+    public void setCurrentMap(String currentMap) {
+        this.currentMap = currentMap;
     }
 
     public int getId() {
@@ -63,6 +73,11 @@ public class Lobby {
                         game.end();
                     }
                 }
+                if (object instanceof MapSelectionMessage) {
+                    currentMap = ((MapSelectionMessage) object).currentMap;
+                    System.out.println("received MapSelectionMessage: " + currentMap);
+                }
+
             }
         });
 

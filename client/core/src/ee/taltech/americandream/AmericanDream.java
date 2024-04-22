@@ -57,6 +57,7 @@ public class AmericanDream extends Game {
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
         kryo.register(AddAIMessage.class);
+        kryo.register(MapSelectionMessage.class);
     }
 
     /**

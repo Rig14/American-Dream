@@ -93,7 +93,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
                                     AmericanDream.client.sendTCP(joinLobbyMessage);
 
                                     // navigate to lobby screen
-                                    AmericanDream.instance.setScreen(new LobbyScreen(camera));
+                                    AmericanDream.instance.setScreen(new LobbyScreen(camera, id));
                                 }
                             });
                         } else {

@@ -8,4 +8,5 @@ public class LobbyDataMessage {
 
     // lobby id -> lobby status text example: "Generic Lobby 2 0/2"
     public Map<Integer, String> lobbies;
+    public Map<Integer, String> maps;
 }

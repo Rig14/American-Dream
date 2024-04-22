@@ -15,20 +15,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import helper.packet.GameLeaveMessage;
+import helper.packet.LobbyDataMessage;
+
+import java.util.Map;
 
 public class LobbyScreen extends ScreenAdapter {
     private final Stage stage;
     private final Camera camera;
     private String selectedCharacter;
+    private String selectedMap;
+    private int id;
 
     /**
-     * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
+     * Initialize LobbyScreen that contains a buttons for selecting different characters. Pressing a button will start a new game instance.
      * @param camera used for creating the image that the player will see on the screen
      */
-    public LobbyScreen(Camera camera) {
+    public LobbyScreen(Camera camera, int id) {
         this.stage = new Stage();
         this.camera = camera;
+        this.id = id;
         Table table = new Table();
         table.setFillParent(true);
 
@@ -55,6 +63,18 @@ public class LobbyScreen extends ScreenAdapter {
 
         table.add(characterSelectionTable).row();
         stage.addActor(table);
+        AmericanDream.client.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                if (object instanceof LobbyDataMessage) {
+                    System.out.println(id);
+                    System.out.println(((LobbyDataMessage) object).maps);
+                    Map<Integer, String> mapsMap = ((LobbyDataMessage) object).maps;
+                    selectedMap = mapsMap.get(id);
+                    System.out.println(selectedMap);
+                }
+            }
+        });
     }
     private TextButton createCharacterButton(String characterName, Texture characterTexture) {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
@@ -76,7 +96,9 @@ public class LobbyScreen extends ScreenAdapter {
                 // Handle character selection
                 selectedCharacter = characterName;
                 System.out.println("Selected character: " + characterName);
-                AmericanDream.instance.setScreen(new MapSelectionScreen(camera, selectedCharacter));
+                if (selectedMap == null) {
+                    AmericanDream.instance.setScreen(new MapSelectionScreen(camera, selectedCharacter, id));
+                }
             }
         });
         characterButton.add(characterTable).pad(10);
@@ -102,6 +124,9 @@ public class LobbyScreen extends ScreenAdapter {
             AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
+        }
+        if (selectedMap != null && selectedCharacter != null) {
+            AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
         }
     }
 
