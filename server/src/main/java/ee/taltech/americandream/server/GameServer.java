@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static helper.Constants.*;
+import static helper.Constants.LOBBY_UPDATE_RATE_IN_SECONDS;
+import static helper.Constants.PORTS;
 
 public class GameServer extends Thread {
     private final Server server;
@@ -108,8 +109,12 @@ public class GameServer extends Thread {
                 LobbyDataMessage lobbyDataMessage = new LobbyDataMessage();
                 lobbyDataMessage.lobbies = new HashMap<>();
                 lobbyDataMessage.maps = new HashMap<>();
+                lobbyDataMessage.maxPlayers = new HashMap<>();
+                lobbyDataMessage.playerCount = new HashMap<>();
                 lobbies.forEach((l) -> {
-                    lobbyDataMessage.lobbies.put(l.getId(), l.getStatus());
+                    lobbyDataMessage.lobbies.put(l.getId(), l.getName());
+                    lobbyDataMessage.maxPlayers.put(l.getId(), l.getMaxPlayerCount());
+                    lobbyDataMessage.playerCount.put(l.getId(), l.getPlayerCount());
                     lobbyDataMessage.maps.put(l.getId(), l.getCurrentMap());
                     l.removeDisconnected();
 

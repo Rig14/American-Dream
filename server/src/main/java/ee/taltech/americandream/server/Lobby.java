@@ -9,17 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lobby {
+    private static int id = 1;
     private final int lobbySize;
     private final String name;
-    private static int id = 1;
     private final int lobbyId;
-    private Game game;
     private final List<Connection> connections;
+    private Game game;
     private String currentMap;
 
     /**
      * Initialize new Lobby.
-     * @param name lobby name
+     *
+     * @param name      lobby name
      * @param lobbySize exact amount of players needed to start a new game
      */
     public Lobby(String name, int lobbySize) {
@@ -30,6 +31,20 @@ public class Lobby {
 
         // increment id
         id++;
+    }
+
+    /**
+     * @return amount of players in the lobby
+     */
+    public int getPlayerCount() {
+        return connections.size();
+    }
+
+    /**
+     * @return maximum amount of players in the lobby
+     */
+    public int getMaxPlayerCount() {
+        return lobbySize;
     }
 
     public String getCurrentMap() {
@@ -44,8 +59,11 @@ public class Lobby {
         return lobbyId;
     }
 
-    public String getStatus() {
-        return name + " " + connections.size() + "/" + lobbySize;
+    /**
+     * @return lobby name
+     */
+    public String getName() {
+        return name;
     }
 
     public void removeDisconnected() {
@@ -56,6 +74,7 @@ public class Lobby {
      * Check for and add new connections (clients).
      * Remove disconnected clients.
      * Receives: GameLeaveMessage - message indicating that a client has left the game instance
+     *
      * @param connection connection with a specific client
      */
     public void addConnection(Connection connection) {

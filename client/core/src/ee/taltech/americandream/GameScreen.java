@@ -33,9 +33,11 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
     private Vector2 mapCenterPoint;
+    private String selectedCharacter;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
@@ -80,6 +82,7 @@ public class GameScreen extends ScreenAdapter {
 
     /**
      * Render a new frame.
+     *
      * @param delta time passed since the rendering of the previous frame
      */
     @Override
