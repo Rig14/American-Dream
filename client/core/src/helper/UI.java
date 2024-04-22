@@ -52,10 +52,23 @@ public class UI {
         return button;
     }
 
+    /**
+     * Create a label with the given text
+     *
+     * @param text The text to be displayed on the label
+     * @return A new Label with the given text
+     */
     public static Label createLabel(String text) {
         return createLabel(text, Color.WHITE);
     }
 
+    /**
+     * Create a label with the given text and color
+     *
+     * @param text      The text to be displayed on the label
+     * @param textColor The color of the text
+     * @return A new Label with the given text and color
+     */
     public static Label createLabel(String text, Color textColor) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
