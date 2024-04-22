@@ -5,8 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -30,7 +32,6 @@ public class LobbySelectionScreen extends ScreenAdapter {
      * Initialize LobbySelectionScreen where the status of all available lobbies is displayed to the player.
      * If another (remote) player joins or leaves a lobby, the number next to lobby's name will change.
      * Receives: LobbyDataMessage
-     * Sends: LobbyJoinMessage
      *
      * @param camera used for creating the image that the player will see on the screen
      */
@@ -82,9 +83,16 @@ public class LobbySelectionScreen extends ScreenAdapter {
         }
     }
 
+    /**
+     * Updates lobby data on the screen.
+     * Sends: JoinLobbyMessage
+     *
+     * @param delta time since the last render
+     */
     private void update(float delta) {
         updateCounter += delta;
         if (updateCounter < 1f) return;
+        stage.clear();
         table.clear();
 
         Label title = createLabel("Select a Lobby:", Color.WHITE, 1.5f);
@@ -93,7 +101,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.top().left();
 
         lobbyDataMessage.lobbies.forEach((id, info) -> {
-            TextButton button = createButton(info);
+            TextButton button = createButton(info, 2);
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent changeEvent, Actor actor) {
@@ -105,6 +113,12 @@ public class LobbySelectionScreen extends ScreenAdapter {
             });
             table.add(button).left().padBottom(20).row();
         });
+
+        // add background
+        Image background = new Image(new Texture(Gdx.files.internal("screen-bg/ls.png")));
+        background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(background);
+        stage.addActor(table);
 
         updateCounter = 0;
     }
