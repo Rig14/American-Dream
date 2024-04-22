@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
@@ -21,27 +22,29 @@ import objects.player.Player;
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
+    private final RemoteManager remoteManager;
+    private final Hud hud;
+    private final OffScreenIndicator offScreenIndicator;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHelper tileMapHelper;
-
     private Player player;  // local client player
-    private final RemoteManager remoteManager;
-
     private Vector2 mapCenterPoint;
-    private final Hud hud;
-    private final OffScreenIndicator offScreenIndicator;
     private String selectedCharacter;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera, String selectedCharacter) {
         this.camera = (OrthographicCamera) camera;
+        // fix #81. bug related to previous screen input processing working on this screen.
+        Gdx.input.setInputProcessor(new Stage());
+        
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity
@@ -74,6 +77,7 @@ public class GameScreen extends ScreenAdapter {
 
     /**
      * Render a new frame.
+     *
      * @param delta time passed since the rendering of the previous frame
      */
     @Override
