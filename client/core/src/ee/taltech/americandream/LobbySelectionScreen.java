@@ -89,6 +89,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
 
         Label title = createLabel("Select a Lobby:", Color.WHITE, 1.5f);
         table.add(title).padBottom(40).row();
+        table.pad(30);
         table.top().left();
 
         lobbyDataMessage.lobbies.forEach((id, info) -> {
@@ -102,7 +103,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
                     AmericanDream.instance.setScreen(new LobbyScreen(camera));
                 }
             });
-            table.add(button).left().padBottom(20).padLeft(20).row();
+            table.add(button).left().padBottom(20).row();
         });
 
         updateCounter = 0;
