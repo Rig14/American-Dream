@@ -51,10 +51,10 @@ public class UI {
         buttonStyle.font = font;
         buttonStyle.fontColor = Color.WHITE;
         TextButton button = new TextButton(text, buttonStyle);
-        button.padLeft(Gdx.graphics.getWidth() / 20f);
-        button.padRight(Gdx.graphics.getWidth() / 20f);
-        button.padTop(Gdx.graphics.getHeight() / 30f);
-        button.padBottom(Gdx.graphics.getHeight() / 30f);
+        button.padLeft(Gdx.graphics.getWidth() / 20f / size);
+        button.padRight(Gdx.graphics.getWidth() / 20f / size);
+        button.padTop(Gdx.graphics.getHeight() / 30f / size);
+        button.padBottom(Gdx.graphics.getHeight() / 30f / size);
         button.getLabel().setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
         button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg"))).tint(Color.BLACK);
