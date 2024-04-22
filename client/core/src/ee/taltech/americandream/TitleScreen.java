@@ -34,13 +34,13 @@ public class TitleScreen extends ScreenAdapter {
         mainContainer.add(buttonsContainer).row();
 
         multiplayerButton = createButton("Multiplayer");
-        TextButton localButton = createButton("Local Play");
+        TextButton localButton = createButton("Start Game");
         disableButton(localButton);
         TextButton exitButton = createButton("Exit");
 
-        buttonsContainer.add(multiplayerButton).row();
-        buttonsContainer.add(new Container<>().height(10)).row();
         buttonsContainer.add(localButton).row();
+        buttonsContainer.add(new Container<>().height(10)).row();
+        buttonsContainer.add(multiplayerButton).row();
         buttonsContainer.add(new Container<>().height(10)).row();
         buttonsContainer.add(exitButton).row();
 
