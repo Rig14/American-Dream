@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import static helper.ButtonStyle.disableButton;
+
 
 public class TitleScreen extends ScreenAdapter {
 
@@ -84,11 +86,7 @@ public class TitleScreen extends ScreenAdapter {
         // if no connection is established, disable the multiplayer button
         // (for example this happens when server is not started)
         if (!AmericanDream.client.isConnected()) {
-            multiplayerButton.setDisabled(true);
-            TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-            textButtonStyle.font = new BitmapFont();
-            textButtonStyle.fontColor = Color.GRAY;
-            multiplayerButton.setStyle(textButtonStyle);
+            disableButton(multiplayerButton);
         }
 
         // draw all the buttons
