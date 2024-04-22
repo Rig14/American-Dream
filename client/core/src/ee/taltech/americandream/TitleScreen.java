@@ -5,9 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,6 +23,7 @@ public class TitleScreen extends ScreenAdapter {
     /**
      * Initialize TitleScreen where players can choose between multiplayer and local play
      * or exit the game.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public TitleScreen(Camera camera) {
@@ -58,6 +61,11 @@ public class TitleScreen extends ScreenAdapter {
                 AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             }
         });
+
+        // add background to the stage
+        Image background = new Image(new Texture(Gdx.files.internal("screen-bg/title.jpg")));
+        background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(background);
 
         stage.addActor(table);
     }
