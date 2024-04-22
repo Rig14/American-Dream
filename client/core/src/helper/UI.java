@@ -32,6 +32,15 @@ public class UI {
      * @return A new TextButton with the given text
      */
     public static TextButton createButton(String text) {
+        return createButton(text, 1);
+    }
+
+    /**
+     * @param text The text to be displayed on the button
+     * @param size The size of the text. Higher values -> smaller text
+     * @return A new TextButton with the given text and size
+     */
+    public static TextButton createButton(String text, float size) {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
@@ -46,7 +55,7 @@ public class UI {
         button.padRight(Gdx.graphics.getWidth() / 20f);
         button.padTop(Gdx.graphics.getHeight() / 30f);
         button.padBottom(Gdx.graphics.getHeight() / 30f);
-        button.getLabel().setFontScale(Gdx.graphics.getWidth() / FONT_SCALING_FACTOR, Gdx.graphics.getHeight() / FONT_SCALING_FACTOR);
+        button.getLabel().setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
         button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg"))).tint(Color.BLACK);
         return button;
