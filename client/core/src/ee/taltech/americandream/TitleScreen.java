@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -64,25 +65,17 @@ public class TitleScreen extends ScreenAdapter {
         versionContainer.setFillParent(true);
         versionContainer.top().left();
         versionContainer.pad(5);
-        Label version = createLabel("0.3-BETA"); // current game version number
+        Label version = createLabel("American Dream 0.3-BETA", Color.GRAY, 3); // current game version number
         versionContainer.add(version).row();
 
         // bottom content
 
-        // names
-        Table authorsContainer = new Table();
-        authorsContainer.setFillParent(true);
-        authorsContainer.bottom().left();
-        authorsContainer.pad(10);
-        Label authors = createLabel("TalTech 2024 American Dream");
-        authorsContainer.add(authors).row();
-
         // copyright
         Table copyrightContainer = new Table();
         copyrightContainer.setFillParent(true);
-        copyrightContainer.bottom().right();
+        copyrightContainer.bottom().left();
         copyrightContainer.pad(10);
-        Label crText = createLabel("RRE© all rights reserved");
+        Label crText = createLabel("© 2024 RRE Inc", Color.GRAY, 3);
         copyrightContainer.add(crText);
 
         // add background to the stage
@@ -92,7 +85,6 @@ public class TitleScreen extends ScreenAdapter {
 
         stage.addActor(versionContainer);
         stage.addActor(mainContainer);
-        stage.addActor(authorsContainer);
         stage.addActor(copyrightContainer);
     }
 
