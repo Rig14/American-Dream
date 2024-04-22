@@ -43,7 +43,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.setFillParent(true);
 
 
-        Label placeholder = createLabel("Loading lobbies Please wait. ", Color.WHITE, 1f);
+        Label placeholder = createLabel("Loading lobbies Please wait...", Color.WHITE, 1f);
         table.add(placeholder).row();
 
         AmericanDream.client.addListener(new Listener() {
@@ -87,9 +87,9 @@ public class LobbySelectionScreen extends ScreenAdapter {
         if (updateCounter < 1f) return;
         table.clear();
 
-        Label title = createLabel("Select a Lobby:");
-        table.add(title).row();
-        table.top();
+        Label title = createLabel("Select a Lobby:", Color.WHITE, 1.5f);
+        table.add(title).padBottom(40).row();
+        table.top().left();
 
         lobbyDataMessage.lobbies.forEach((id, info) -> {
             TextButton button = createButton(info);
@@ -102,7 +102,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
                     AmericanDream.instance.setScreen(new LobbyScreen(camera));
                 }
             });
-            table.add(button).row();
+            table.add(button).left().padBottom(20).padLeft(20).row();
         });
 
         updateCounter = 0;
