@@ -50,7 +50,7 @@ public class Hud {
     private final Label localPlayerName = new Label("loading...", new Label.LabelStyle(new BitmapFont(), Color.GREEN));
     private final Table localHealthTable = new Table();
     private final Label localDamage = new Label("0 %", redDefaultStyle);
-    private final Label localAmmoCount = new Label("0 %", new Label.LabelStyle(new BitmapFont(), Color.PURPLE));
+    private final Label localAmmoCount = new Label("0", new Label.LabelStyle(new BitmapFont(), Color.PURPLE));
 
     private final Label firstRemotePlayerName = new Label("loading...", whiteDefaultStyle);
     private final Table firstRemoteHealthTable = new Table();

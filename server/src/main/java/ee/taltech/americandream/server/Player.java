@@ -31,7 +31,7 @@ public class Player {
     private float bulletTimeout;
     private float velX, velY;
     private int isShooting;
-    private int ammoCount = MAX_AMMO;
+    private int ammoCount = MAX_AMMO;  // different amount could cause bugs; additional 'has game started' checking required
     private float ammoDelta = 0;
 
 
@@ -133,7 +133,6 @@ public class Player {
         }
         bulletTimeout += delta;
         ammoDelta += delta;
-        System.out.println(delta);
         if (ammoDelta >= AMMO_INCREMENTING_TIME) {
             ammoDelta = ammoDelta % AMMO_INCREMENTING_TIME;
             if (ammoCount < MAX_AMMO) {
