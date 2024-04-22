@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -40,7 +41,9 @@ public class TitleScreen extends ScreenAdapter {
         TextButton exitButton = createButton("Exit");
 
         table.add(multiplayerButton).row();
+        table.add(new Container<>().height(10)).row();
         table.add(localButton).row();
+        table.add(new Container<>().height(10)).row();
         table.add(exitButton).row();
 
         exitButton.addListener(new ChangeListener() {

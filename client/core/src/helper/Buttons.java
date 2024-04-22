@@ -33,7 +33,6 @@ public class Buttons {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont();
         buttonStyle.fontColor = Color.WHITE;
-        buttonStyle.overFontColor = Color.BLACK;
         TextButton button = new TextButton(text, buttonStyle);
         button.padLeft(Gdx.graphics.getWidth() / 20f);
         button.padRight(Gdx.graphics.getWidth() / 20f);
@@ -41,6 +40,7 @@ public class Buttons {
         button.padBottom(Gdx.graphics.getHeight() / 30f);
         button.getLabel().setFontScale(Gdx.graphics.getWidth() / FONT_SCALING_FACTOR, Gdx.graphics.getHeight() / FONT_SCALING_FACTOR);
         button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
+        button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg"))).tint(Color.BLACK);
         return button;
     }
 }
