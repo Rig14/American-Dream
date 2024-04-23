@@ -67,11 +67,8 @@ public class LobbyScreen extends ScreenAdapter {
             @Override
             public void received(Connection connection, Object object) {
                 if (object instanceof LobbyDataMessage) {
-                    System.out.println(id);
-                    System.out.println(((LobbyDataMessage) object).maps);
                     Map<Integer, String> mapsMap = ((LobbyDataMessage) object).maps;
                     selectedMap = mapsMap.get(id);
-                    System.out.println(selectedMap);
                 }
             }
         });
@@ -95,7 +92,6 @@ public class LobbyScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 // Handle character selection
                 selectedCharacter = characterName;
-                System.out.println("Selected character: " + characterName);
                 if (selectedMap == null) {
                     AmericanDream.instance.setScreen(new MapSelectionScreen(camera, selectedCharacter, id));
                 }

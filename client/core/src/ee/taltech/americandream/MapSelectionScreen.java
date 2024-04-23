@@ -29,7 +29,7 @@ public class MapSelectionScreen extends ScreenAdapter {
     private final Camera camera;
     private final String selectedCharacter;
     private String selectedMap;
-    private int id;
+    private final int id;
 
     /**
      * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
@@ -69,11 +69,8 @@ public class MapSelectionScreen extends ScreenAdapter {
             @Override
             public void received(Connection connection, Object object) {
                 if (object instanceof LobbyDataMessage) {
-                    System.out.println(id);
-                    System.out.println(((LobbyDataMessage) object).maps);
                     Map<Integer, String> mapsMap = ((LobbyDataMessage) object).maps;
                     selectedMap = mapsMap.get(id);
-                    System.out.println(selectedMap);
                 }
             }
         });
@@ -95,7 +92,6 @@ public class MapSelectionScreen extends ScreenAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 // handle map selection
                 selectedMap = mapName;
-                System.out.println("Selected map: " + mapName);
                 MapSelectionMessage mapSelectionMessage = new MapSelectionMessage();
                 mapSelectionMessage.currentMap = selectedMap;
                 AmericanDream.client.sendTCP(mapSelectionMessage);

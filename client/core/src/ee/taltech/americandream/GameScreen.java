@@ -33,7 +33,6 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
     private Vector2 mapCenterPoint;
-    private String selectedCharacter;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
@@ -53,12 +52,16 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
-        if (selectedMap.equals("Swamp")) {
-            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
-        } else if (selectedMap.equals("Desert")) {
-            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
-        } else {
-            this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+        switch (selectedMap) {
+            case "Swamp":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+                break;
+            case "Desert":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+                break;
+            default:
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+                break;
         }
         // remote player(s) manager
         this.remoteManager = new RemoteManager();

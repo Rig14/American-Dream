@@ -117,7 +117,9 @@ public class GameServer extends Thread {
                     lobbyDataMessage.playerCount.put(l.getId(), l.getPlayerCount());
                     lobbyDataMessage.maps.put(l.getId(), l.getCurrentMap());
                     l.removeDisconnected();
-
+                    if (l.getPlayerCount() < 1) {
+                        l.setCurrentMap(null);
+                    }
                     if (l.canStartGame()) {
                         // start a game if lobby is full
                         l.startGame();
