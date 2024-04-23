@@ -23,6 +23,8 @@ import java.util.Optional;
 
 import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
+import static helper.Constants.REMOTE_PLAYER_COLORS;
+import static helper.Constants.REMOTE_PLAYER_INDICATORS;
 
 public class RemoteManager {
     private List<RemotePlayer> remotePlayers = new ArrayList<>();
@@ -137,7 +139,7 @@ public class RemoteManager {
             for (RemotePlayer rp : new ArrayList<>(remotePlayers)) {
                 if (!Objects.equals(rp.getLivesCount(), 0)) {  // ignores null
                     rp.update(delta);
-                    rp.render(batch, playerDimensions);
+                    rp.render(batch, playerDimensions, remotePlayers.indexOf(rp));
                 }
             }
         }

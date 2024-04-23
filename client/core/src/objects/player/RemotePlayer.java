@@ -2,6 +2,7 @@ package objects.player;
 
 import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,6 +11,8 @@ import helper.PlayerState;
 
 import static helper.Constants.FRAME_HEIGHT;
 import static helper.Constants.FRAME_WIDTH;
+import static helper.Constants.REMOTE_PLAYER_INDICATORS;
+import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class RemotePlayer {
     private final float x;
@@ -91,13 +94,17 @@ public class RemotePlayer {
      * @param batch spritebatch where to render the player
      * @param playerDimensions player size
      */
-    public void render(SpriteBatch batch, Vector2 playerDimensions) {
+    public void render(SpriteBatch batch, Vector2 playerDimensions, Integer textureIndex) {
         // Render the remote player based on its velocity
         TextureRegion currentFrame = playerAnimations.getFrameRemote(Gdx.graphics.getDeltaTime(), this);
 
         if (currentFrame != null) {
             batch.draw(currentFrame, x - playerDimensions.x / 2 - 15, y - playerDimensions.y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-            // render the remote player
+
+            if (textureIndex != -1) {  // prevents nullPointerException during game initialization
+                batch.draw(REMOTE_PLAYER_INDICATORS.get(textureIndex),
+                        x - playerDimensions.x / 2 + 9, y - playerDimensions.y / 2 + 80, 25, 25);
+            }
         }
 
     }

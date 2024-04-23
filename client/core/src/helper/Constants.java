@@ -1,8 +1,11 @@
 package helper;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import java.awt.*;
+import java.util.Map;
 
 public class Constants {
     // debug mode
@@ -39,5 +42,12 @@ public class Constants {
     public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 
     public static final float FONT_SCALING_FACTOR = 300f;
-
+    public static final Map<Integer, Color> REMOTE_PLAYER_COLORS = Map.of(
+            0, Color.RED,
+            1, Color.BLUE,
+            2, Color.YELLOW);
+    public static final Map<Integer, Texture> REMOTE_PLAYER_INDICATORS = Map.of(
+            0, new Texture("player-indicator-red.png"),
+            1, new Texture("player-indicator-blue.png"),
+            2, new Texture("player-indicator-yellow.png"));
 }

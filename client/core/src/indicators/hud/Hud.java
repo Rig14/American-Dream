@@ -3,7 +3,6 @@ package indicators.hud;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -22,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static helper.Constants.LIVES_COUNT;
+import static helper.Constants.REMOTE_PLAYER_COLORS;
 import static helper.Textures.BLACK_HEART_TEXTURE;
 import static helper.Textures.HEALTH_TEXTURE;
 
@@ -51,15 +51,15 @@ public class Hud {
     private final Table localHealthTable = new Table();
     private final Label localDamage = UI.createLabel("0 %", Color.RED, 3);
 
-    private final Label firstRemotePlayerName = UI.createLabel("loading...");
+    private final Label firstRemotePlayerName = UI.createLabel("loading...", REMOTE_PLAYER_COLORS.get(0), 3);
     private final Table firstRemoteHealthTable = new Table();
     private final Label firstRemoteDamage = UI.createLabel("0 %", Color.RED, 3);
 
-    private final Label secondRemotePlayerName = UI.createLabel("");
+    private final Label secondRemotePlayerName = UI.createLabel("", REMOTE_PLAYER_COLORS.get(1), 3);
     private final Table secondRemoteHealthTable = new Table();
     private final Label secondRemoteDamage = UI.createLabel("", Color.RED, 3);
 
-    private final Label thirdRemotePlayerName = UI.createLabel("");
+    private final Label thirdRemotePlayerName = UI.createLabel("", REMOTE_PLAYER_COLORS.get(2), 3);
     private final Table thirdRemoteHealthTable = new Table();
     private final Label thirdRemoteDamage = UI.createLabel("", Color.RED, 3);
 
