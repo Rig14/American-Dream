@@ -33,18 +33,17 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
     private Vector2 mapCenterPoint;
-    private String selectedCharacter;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      *
      * @param camera used for creating the image that the player will see on the screen
      */
-    public GameScreen(Camera camera, String selectedCharacter) {
+    public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
         this.camera = (OrthographicCamera) camera;
         // fix #81. bug related to previous screen input processing working on this screen.
         Gdx.input.setInputProcessor(new Stage());
-        
+
         this.batch = new SpriteBatch();
         // creating a new world, vector contains the gravity constants
         // x - horizontal gravity, y - vertical gravity
@@ -53,8 +52,17 @@ public class GameScreen extends ScreenAdapter {
 
         // setting up the map
         this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
-        this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
-
+        switch (selectedMap) {
+            case "Swamp":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+                break;
+            case "Desert":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+                break;
+            default:
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+                break;
+        }
         // remote player(s) manager
         this.remoteManager = new RemoteManager();
 

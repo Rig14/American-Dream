@@ -94,6 +94,7 @@ public class GameServer extends Thread {
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
         kryo.register(AddAIMessage.class);
+        kryo.register(MapSelectionMessage.class);
     }
 
     /**
@@ -107,14 +108,18 @@ public class GameServer extends Thread {
                 // send lobby data message to all clients
                 LobbyDataMessage lobbyDataMessage = new LobbyDataMessage();
                 lobbyDataMessage.lobbies = new HashMap<>();
+                lobbyDataMessage.maps = new HashMap<>();
                 lobbyDataMessage.maxPlayers = new HashMap<>();
                 lobbyDataMessage.playerCount = new HashMap<>();
                 lobbies.forEach((l) -> {
                     lobbyDataMessage.lobbies.put(l.getId(), l.getName());
                     lobbyDataMessage.maxPlayers.put(l.getId(), l.getMaxPlayerCount());
                     lobbyDataMessage.playerCount.put(l.getId(), l.getPlayerCount());
+                    lobbyDataMessage.maps.put(l.getId(), l.getCurrentMap());
                     l.removeDisconnected();
-
+                    if (l.getPlayerCount() < 1) {
+                        l.setCurrentMap(null);
+                    }
                     if (l.canStartGame()) {
                         // start a game if lobby is full
                         l.startGame();
