@@ -160,7 +160,7 @@ public class Player extends GameEntity {
         if (livesCount > 0) {
             TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
             batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 30, 30);
+            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 35, 35);
         }
     }
 

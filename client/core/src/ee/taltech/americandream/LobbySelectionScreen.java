@@ -122,7 +122,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
                     JoinLobbyMessage message = new JoinLobbyMessage();
                     message.lobbyId = id;
                     AmericanDream.client.sendTCP(message);
-                    AmericanDream.instance.setScreen(new LobbyScreen(camera));
+                    AmericanDream.instance.setScreen(new LobbyScreen(camera, id));
                 }
             });
             if (playerCount >= maxPlayerCount) {

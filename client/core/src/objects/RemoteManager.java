@@ -10,16 +10,12 @@ import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.PlayerState;
+import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
 import objects.player.RemotePlayer;
-import helper.Textures;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static helper.Constants.AI_PLAYER_SIZE;
 import static helper.Constants.GRAVITY;
@@ -101,7 +97,7 @@ public class RemoteManager {
      * Return remote players list if it contains at least 1 remote player.
      */
     public List<RemotePlayer> getRemotePlayers() {
-            return new ArrayList<>(remotePlayers);
+        return new ArrayList<>(remotePlayers);
     }
 
     /**
@@ -128,32 +124,34 @@ public class RemoteManager {
 
     /**
      * Render remote player(s). Could theoretically handle more than one remote player.
-     * @param batch spritebatch where to render the players
+     *
+     * @param batch            spritebatch where to render the players
      * @param playerDimensions player object dimensions
-     * @param delta delta time
+     * @param delta            delta time
      */
     public void renderPlayers(SpriteBatch batch, Vector2 playerDimensions, float delta) {
         if (!remotePlayers.isEmpty()) {
             for (RemotePlayer rp : new ArrayList<>(remotePlayers)) {
                 if (!Objects.equals(rp.getLivesCount(), 0)) {  // ignores null
                     rp.update(delta);
-                    rp.render(batch, playerDimensions);
+                    rp.render(batch, playerDimensions, remotePlayers.indexOf(rp));
                 }
             }
         }
     }
 
     /**
-     Render AI player if it exists.
+     * Render AI player if it exists.
      */
     public void renderAIPlayer(SpriteBatch batch) {
         if (AIplayerX == 0 && AIplayerY == 0) return;
 
-        batch.draw(Textures.OBAMA_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+        batch.draw(Textures.ALIEN_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
     }
 
     /**
      * Render all bullets shot by remote players.
+     *
      * @param batch spritebatch
      */
     public void renderBullets(SpriteBatch batch) {
@@ -171,6 +169,7 @@ public class RemoteManager {
      * Float representing the force is received form the server only once, after that it's saved into the player object.
      * Exponentially decrement the applied force every game tick.
      * Stop applying knockback when the force becomes too small.
+     *
      * @param world world where the player moves (used for applying gravity)
      */
     public void testForHit(World world) {
