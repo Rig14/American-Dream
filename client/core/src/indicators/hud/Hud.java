@@ -189,7 +189,7 @@ public class Hud {
         int remotePlayerCount = remotePlayers.size();
         for (int i = 0; i < remotePlayerCount; i++) {
             RemotePlayer rp = remotePlayers.get(i);
-            if (rp.getLivesCount() != null) {
+            if (rp != null && rp.getLivesCount() != null) {
                 if (!nameLabels.get(i).getText().toString().equals(rp.getName())) {
                     nameLabels.get(i).setText(rp.getName());
                     healthTables.get(i).setVisible(true);  // make additional remote players tables visible
