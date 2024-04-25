@@ -7,7 +7,7 @@ public class Constants {
     public static final int TICK_RATE = 60;
     public static final int GAME_DURATION = 300;
     public static final float BOUNDS = 1000f;
-    public static final float SHOOT_DELAY = 0.3f;
+    public static final float SHOOT_DELAY = 0.1f;
     public static final float PISTOL_BULLET_SPEED = 5;
     public static final int PLAYER_HEIGHT = 64;
     public static final int PLAYER_WIDTH = 32;
@@ -25,6 +25,6 @@ public class Constants {
     public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
     public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
 
-    public static final float AMMO_INCREMENTING_TIME = 1f;
+    public static final float AMMO_INCREMENTING_TIME = 0.5f;
     public static final int MAX_AMMO = 10;
 }
