@@ -20,7 +20,7 @@ public class Constants {
     // lower value = more pushback; higher value = less pushback
     // optimal range 20-50 (10 for testing)
     // force *= 1 + (damage / x)
-    public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 10;
+    public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 50;
     // how fast the AI player shoots bullets
     public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
     public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
