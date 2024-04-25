@@ -23,7 +23,7 @@ public class Constants {
     public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 10;
     // how fast the AI player shoots bullets
     public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
-    public static final Dimension AI_PLAYER_SIZE = new Dimension(40, 40);
+    public static final Dimension AI_PLAYER_SIZE = new Dimension(60, 60);
 
     public static final float AMMO_INCREMENTING_TIME = 2f;
     public static final int MAX_AMMO = 10;
