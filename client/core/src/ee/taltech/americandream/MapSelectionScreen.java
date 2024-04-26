@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -66,6 +67,15 @@ public class MapSelectionScreen extends ScreenAdapter {
         mapSelectionTable.center();
 
         table.add(mapSelectionTable).row();
+
+        // add title text
+        Label title = createLabel("Choose the map", Color.WHITE, 1);
+        Table titleTable = new Table();
+        titleTable.setFillParent(true);
+        titleTable.add(title).padTop(Gdx.graphics.getHeight() / 4f);
+        titleTable.top();
+        stage.addActor(titleTable);
+
         stage.addActor(table);
         AmericanDream.client.addListener(new Listener() {
             @Override
