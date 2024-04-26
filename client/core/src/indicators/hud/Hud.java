@@ -23,6 +23,7 @@ import java.util.Optional;
 import static helper.Constants.LIVES_COUNT;
 import static helper.Constants.REMOTE_PLAYER_COLORS;
 import static helper.Textures.BLACK_HEART_TEXTURE;
+import static helper.Textures.BULLET_TEXTURE;
 import static helper.Textures.HEALTH_TEXTURE;
 
 public class Hud {
@@ -50,6 +51,7 @@ public class Hud {
     private final Label localPlayerName = UI.createLabel("loading...", Color.GREEN, 2);
     private final Table localHealthTable = new Table();
     private final Label localDamage = UI.createLabel("0 %", Color.RED, 2);
+    private final Label localAmmoCount = UI.createLabel("0", Color.PURPLE, 1);
 
     private final Label firstRemotePlayerName = UI.createLabel("loading...", REMOTE_PLAYER_COLORS.get(0), 2);
     private final Table firstRemoteHealthTable = new Table();
@@ -123,6 +125,14 @@ public class Hud {
         table.add(firstRemoteDamage).padTop(ROW_PADDING);
 
         table.row();
+        Table ammo = new Table();
+        Image bulletLogo = new Image(BULLET_TEXTURE);
+        bulletLogo.rotateBy(90);
+        ammo.add(bulletLogo).size(heartScaling);
+        ammo.add(localAmmoCount).padLeft(-10);
+        table.add(ammo).padTop(heartScaling).padLeft(heartScaling / 2);
+
+        table.row();
         table.add(placeHolder);
         table.add(placeHolder);
         table.add(gameOverLabel).padTop(heartScaling * 9);  // should find a better method
@@ -152,6 +162,7 @@ public class Hud {
                 updateLivesTable(localLives, localHealthTable);
             }
             localDamage.setText(localPlayer.getDamage() + " %");
+            localAmmoCount.setText(localPlayer.getAmmoCount());
 
             updateRemotePlayers(remotePlayers);
             // display game over screen
@@ -178,7 +189,7 @@ public class Hud {
         int remotePlayerCount = remotePlayers.size();
         for (int i = 0; i < remotePlayerCount; i++) {
             RemotePlayer rp = remotePlayers.get(i);
-            if (rp.getLivesCount() != null) {
+            if (rp != null && rp.getLivesCount() != null) {
                 if (!nameLabels.get(i).getText().toString().equals(rp.getName())) {
                     nameLabels.get(i).setText(rp.getName());
                     healthTables.get(i).setVisible(true);  // make additional remote players tables visible

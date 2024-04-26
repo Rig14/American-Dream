@@ -13,6 +13,7 @@ public class PlayerState {
     public int isShooting;
     public Integer damage;
     public float applyForce;
+    public int ammoCount;
 
     public float getX() {
         return this.x;
@@ -20,6 +21,14 @@ public class PlayerState {
 
     public float getY() {
         return this.y;
+    }
+
+    public int getAmmoCount() {
+        return ammoCount;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 
     /**

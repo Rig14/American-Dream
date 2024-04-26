@@ -31,6 +31,8 @@ public class Player {
     private float bulletTimeout;
     private float velX, velY;
     private int isShooting;
+    private int ammoCount = MAX_AMMO;  // different amount could cause bugs; additional 'has game started' checking required
+    private float ammoDelta = 0;
 
 
     /**
@@ -104,6 +106,7 @@ public class Player {
         state.isShooting = isShooting;
         state.damage = damage;
         state.name = name;
+        state.ammoCount = ammoCount;
         return state;
     }
 
@@ -114,9 +117,8 @@ public class Player {
      * @param delta tick rate
      */
     public void update(float delta) {
-        // update player
         // will shoot a bullet if the bulletTimeout is 0
-        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY) {
+        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY && ammoCount > 0) {
             // construct the bullet to be shot
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
@@ -124,11 +126,18 @@ public class Player {
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);
-            // reset timer and bullet shooting direction
+            ammoCount--;
+            // reset variables
             bulletTimeout = 0;
             nextBulletDirection = null;
         }
         bulletTimeout += delta;
+
+        ammoDelta += delta;
+        if (ammoDelta >= AMMO_INCREMENTING_TIME && ammoCount < MAX_AMMO) {
+            ammoDelta = ammoDelta % AMMO_INCREMENTING_TIME;
+            ammoCount++;
+        }
 
         // remove bullets that are out of bounds
         playerBullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);
