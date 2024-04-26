@@ -46,6 +46,11 @@ public class MapSelectionScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(stage);
 
+        // add background to the stage
+        Image background = new Image(new Texture(Gdx.files.internal("screen-bg/map_select.png")));
+        background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(background);
+
         Table mapSelectionTable = new Table();
         mapSelectionTable.setFillParent(true);
 
@@ -84,7 +89,6 @@ public class MapSelectionScreen extends ScreenAdapter {
         mapTable.add(createLabel(mapName, Color.WHITE, 2)).padTop(10).row();
 
         TextButton mapButton = new TextButton("", buttonStyle); // empty text for the button
-
         mapButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
