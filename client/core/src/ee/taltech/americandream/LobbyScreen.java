@@ -72,7 +72,7 @@ public class LobbyScreen extends ScreenAdapter {
         Table backTable = new Table();
         backTable.setFillParent(true);
         backTable.pad(30);
-        TextButton back = createButton("Back", 3);
+        TextButton back = createButton("Back", 2);
         back.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {

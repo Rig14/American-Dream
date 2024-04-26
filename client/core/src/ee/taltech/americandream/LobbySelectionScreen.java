@@ -99,7 +99,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         backTable.pad(30);
         table.setFillParent(true);
 
-        TextButton back = createButton("Back", 3);
+        TextButton back = createButton("Back", 2);
         back.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
