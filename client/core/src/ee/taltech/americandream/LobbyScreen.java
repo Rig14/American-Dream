@@ -53,9 +53,9 @@ public class LobbyScreen extends ScreenAdapter {
         TextButton character2Button = createCharacterButton("Trump", new Texture("trump.jpg"));
         TextButton character3Button = createCharacterButton("Biden", new Texture("biden.jpg"));
         // Add buttons to the table
-        table.add(character1Button);
-        table.add(character2Button);
-        table.add(character3Button);
+        table.add(character1Button).padLeft(10);
+        table.add(character2Button).padLeft(10);
+        table.add(character3Button).padLeft(10);
 
         characterSelectionTable.center();
 
