@@ -43,7 +43,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.setFillParent(true);
 
 
-        Label placeholder = createLabel("Loading lobbies please wait...", Color.WHITE, 1f);
+        Label placeholder = createLabel("Loading lobbies...", Color.WHITE, 1f);
         table.add(placeholder).row();
 
         AmericanDream.client.addListener(new Listener() {
