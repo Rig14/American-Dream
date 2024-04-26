@@ -81,7 +81,7 @@ public class MapSelectionScreen extends ScreenAdapter {
 
         Table mapTable = new Table();
         mapTable.add(mapPreview).size(Gdx.graphics.getWidth() / 4f, Gdx.graphics.getHeight() / 4f).row();
-        mapTable.add(createLabel(mapName)).row();
+        mapTable.add(createLabel(mapName, Color.WHITE, 2)).padTop(10).row();
 
         TextButton mapButton = new TextButton("", buttonStyle); // empty text for the button
 
