@@ -68,6 +68,21 @@ public class LobbyScreen extends ScreenAdapter {
         table.add(characterSelectionTable).row();
         stage.addActor(table);
 
+        // add back button
+        Table backTable = new Table();
+        backTable.setFillParent(true);
+        backTable.pad(30);
+        TextButton back = createButton("Back", 3);
+        back.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
+            }
+        });
+        backTable.add(back);
+        backTable.top().left();
+        stage.addActor(backTable);
+
         // add title text
         Label title = createLabel("Select your fighter!", Color.WHITE, 1);
         Table titleTable = new Table();
