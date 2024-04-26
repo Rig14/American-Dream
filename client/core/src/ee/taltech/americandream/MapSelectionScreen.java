@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,18 +20,20 @@ import helper.packet.GameLeaveMessage;
 import helper.packet.LobbyDataMessage;
 import helper.packet.MapSelectionMessage;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import static helper.UI.createLabel;
 
 public class MapSelectionScreen extends ScreenAdapter {
     private final Stage stage;
     private final Camera camera;
     private final String selectedCharacter;
-    private String selectedMap;
     private final int id;
+    private String selectedMap;
 
     /**
      * Initialize LobbyScreen that contains a button "Start game". Pressing the button will start a new game instance.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public MapSelectionScreen(Camera camera, String selectedCharacter, int id) {
@@ -44,10 +45,6 @@ public class MapSelectionScreen extends ScreenAdapter {
         table.setFillParent(true);
 
         Gdx.input.setInputProcessor(stage);
-        // buttons style
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = new BitmapFont();
-        buttonStyle.fontColor = Color.WHITE;
 
         Table mapSelectionTable = new Table();
         mapSelectionTable.setFillParent(true);
@@ -57,9 +54,9 @@ public class MapSelectionScreen extends ScreenAdapter {
         TextButton map2Button = createMapButton("Desert", new Texture("maps as .png/desert.png"));
         TextButton map3Button = createMapButton("City", new Texture("maps as .png/city.png"));
 
-        table.add(map1Button).size(200, 80).pad(10);
-        table.add(map2Button).size(200, 80).pad(10);
-        table.add(map3Button).size(200, 80).pad(10);
+        table.add(map1Button).pad(10);
+        table.add(map2Button).pad(10);
+        table.add(map3Button).pad(10);
 
         mapSelectionTable.center();
 
@@ -75,6 +72,7 @@ public class MapSelectionScreen extends ScreenAdapter {
             }
         });
     }
+
     private TextButton createMapButton(String mapName, Texture mapTexture) {
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = new BitmapFont();
@@ -82,12 +80,12 @@ public class MapSelectionScreen extends ScreenAdapter {
         Image mapPreview = new Image(mapTexture);
 
         Table mapTable = new Table();
-        mapTable.add(mapPreview).size(200, 80).pad(10).row();
-        mapTable.add(new Label(mapName, new Label.LabelStyle(new BitmapFont(), Color.WHITE))).row();
+        mapTable.add(mapPreview).size(Gdx.graphics.getWidth() / 4f, Gdx.graphics.getHeight() / 4f).row();
+        mapTable.add(createLabel(mapName)).row();
 
-        TextButton characterButton = new TextButton("", buttonStyle); // empty text for the button
+        TextButton mapButton = new TextButton("", buttonStyle); // empty text for the button
 
-        characterButton.addListener(new ChangeListener() {
+        mapButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 // handle map selection
@@ -98,8 +96,8 @@ public class MapSelectionScreen extends ScreenAdapter {
                 AmericanDream.instance.setScreen(new GameScreen(camera, selectedCharacter, selectedMap));
             }
         });
-        characterButton.add(mapTable).pad(10);
-        return characterButton;
+        mapButton.add(mapTable);
+        return mapButton;
     }
 
     /**
