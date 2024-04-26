@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -61,6 +62,15 @@ public class LobbyScreen extends ScreenAdapter {
 
         table.add(characterSelectionTable).row();
         stage.addActor(table);
+
+        // add title text
+        Label title = createLabel("Select your fighter!", Color.WHITE, 1);
+        Table titleTable = new Table();
+        titleTable.setFillParent(true);
+        titleTable.add(title).padTop(50);
+        titleTable.top();
+        stage.addActor(titleTable);
+
         AmericanDream.client.addListener(new Listener() {
             @Override
             public void received(Connection connection, Object object) {
