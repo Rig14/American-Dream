@@ -68,6 +68,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         super.render(delta);
+        stage.act(delta);
 
         // black background
         Gdx.gl.glClearColor(0, 0, 0, 1);

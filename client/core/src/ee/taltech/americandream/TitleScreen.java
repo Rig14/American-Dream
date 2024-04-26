@@ -95,6 +95,7 @@ public class TitleScreen extends ScreenAdapter {
      */
     @Override
     public void render(float delta) {
+        stage.act(delta);
         // black background
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
