@@ -40,6 +40,11 @@ public class LobbyScreen extends ScreenAdapter {
         this.stage = new Stage();
         this.camera = camera;
         this.id = id;
+
+        Image background = new Image(new Texture(Gdx.files.internal("screen-bg/char_select.jpg")));
+        background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(background);
+
         Table table = new Table();
         table.setFillParent(true);
 
