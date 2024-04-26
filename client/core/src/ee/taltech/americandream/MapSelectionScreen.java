@@ -23,6 +23,7 @@ import helper.packet.MapSelectionMessage;
 
 import java.util.Map;
 
+import static helper.UI.createButton;
 import static helper.UI.createLabel;
 
 public class MapSelectionScreen extends ScreenAdapter {
@@ -75,6 +76,21 @@ public class MapSelectionScreen extends ScreenAdapter {
         titleTable.add(title).padTop(Gdx.graphics.getHeight() / 4f);
         titleTable.top();
         stage.addActor(titleTable);
+
+        // add back button
+        Table backTable = new Table();
+        backTable.setFillParent(true);
+        backTable.pad(30);
+        TextButton back = createButton("Back", 2);
+        back.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
+            }
+        });
+        backTable.add(back);
+        backTable.top().left();
+        stage.addActor(backTable);
 
         stage.addActor(table);
         AmericanDream.client.addListener(new Listener() {
