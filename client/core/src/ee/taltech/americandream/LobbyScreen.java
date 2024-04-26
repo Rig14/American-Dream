@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,6 +21,7 @@ import helper.packet.LobbyDataMessage;
 import java.util.Map;
 
 import static helper.UI.createButton;
+import static helper.UI.createLabel;
 
 public class LobbyScreen extends ScreenAdapter {
     private final Stage stage;
@@ -76,9 +78,10 @@ public class LobbyScreen extends ScreenAdapter {
 
         // Create a table to hold the character preview and the button
         Table characterTable = new Table();
-        characterTable.add(characterPreview).size(100, 100).pad(10).row();
+        characterTable.add(characterPreview).size(Gdx.graphics.getWidth() / 10f, Gdx.graphics.getWidth() / 10f).padBottom(10).row();
+        characterTable.add(createLabel(characterName, Color.WHITE, 2)).row();
 
-        TextButton characterButton = createButton(characterName);
+        TextButton characterButton = createButton("");
 
         characterButton.addListener(new ChangeListener() {
             @Override
