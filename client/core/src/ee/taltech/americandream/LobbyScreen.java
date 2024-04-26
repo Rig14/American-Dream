@@ -4,14 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -22,6 +19,8 @@ import helper.packet.LobbyDataMessage;
 
 import java.util.Map;
 
+import static helper.UI.createButton;
+
 public class LobbyScreen extends ScreenAdapter {
     private final Stage stage;
     private final Camera camera;
@@ -31,6 +30,7 @@ public class LobbyScreen extends ScreenAdapter {
 
     /**
      * Initialize LobbyScreen that contains a buttons for selecting different characters. Pressing a button will start a new game instance.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public LobbyScreen(Camera camera, int id) {
@@ -42,10 +42,6 @@ public class LobbyScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(stage);
 
-        // buttons style
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = new BitmapFont();
-        buttonStyle.fontColor = Color.WHITE;
 
         Table characterSelectionTable = new Table();
         characterSelectionTable.setFillParent(true);
@@ -55,9 +51,9 @@ public class LobbyScreen extends ScreenAdapter {
         TextButton character2Button = createCharacterButton("Trump", new Texture("trump.jpg"));
         TextButton character3Button = createCharacterButton("Biden", new Texture("biden.jpg"));
         // Add buttons to the table
-        table.add(character1Button).size(50, 200).pad(50);
-        table.add(character2Button).size(50, 200).pad(50);
-        table.add(character3Button).size(50, 200).pad(50);
+        table.add(character1Button);
+        table.add(character2Button);
+        table.add(character3Button);
 
         characterSelectionTable.center();
 
@@ -73,19 +69,16 @@ public class LobbyScreen extends ScreenAdapter {
             }
         });
     }
+
     private TextButton createCharacterButton(String characterName, Texture characterTexture) {
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = new BitmapFont();
-        buttonStyle.fontColor = Color.WHITE;
         // Create an image with the character's texture
         Image characterPreview = new Image(characterTexture);
 
         // Create a table to hold the character preview and the button
         Table characterTable = new Table();
         characterTable.add(characterPreview).size(100, 100).pad(10).row();
-        characterTable.add(new Label(characterName, new Label.LabelStyle(new BitmapFont(), Color.WHITE))).row();
 
-        TextButton characterButton = new TextButton("", buttonStyle); // Empty text for the button
+        TextButton characterButton = createButton(characterName);
 
         characterButton.addListener(new ChangeListener() {
             @Override
