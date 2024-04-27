@@ -43,7 +43,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         table.setFillParent(true);
 
 
-        Label placeholder = createLabel("Loading lobbies please wait...", Color.WHITE, 1f);
+        Label placeholder = createLabel("Loading lobbies...", Color.WHITE, 1f);
         table.add(placeholder).row();
 
         AmericanDream.client.addListener(new Listener() {
@@ -68,6 +68,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         super.render(delta);
+        stage.act(delta);
 
         // black background
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -98,7 +99,7 @@ public class LobbySelectionScreen extends ScreenAdapter {
         backTable.pad(30);
         table.setFillParent(true);
 
-        TextButton back = createButton("Back", 3);
+        TextButton back = createButton("Back", 2);
         back.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
