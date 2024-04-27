@@ -17,6 +17,9 @@ import java.util.Objects;
 import static helper.Constants.*;
 
 public class Player {
+    public static Integer lastId;
+    private static boolean playingWithAi = false;
+    private boolean thisIsAi = false;
     private final int id;
     private final Game game;
     private final Connection connection;
@@ -45,6 +48,12 @@ public class Player {
      * @param id player id
      */
     public Player(Connection connection, Game game, int id) {
+        if (lastId.equals(id)) {
+            playingWithAi = true;
+            thisIsAi = true;
+        } else {
+            lastId = id;
+        }
         // create player
         this.id = id;
         this.game = game;
@@ -64,14 +73,25 @@ public class Player {
                 super.received(connection, object);
                 // handle incoming data
                 if (object instanceof PlayerPositionMessage positionMessage) {
-                    // handle position message
-                    handlePositionMessage(positionMessage);
+                    if (playingWithAi && thisIsAi && positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    } else if (playingWithAi && !thisIsAi && !positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    } else if (!playingWithAi) {
+                        handlePositionMessage(positionMessage);
+                    }
+
                 }
 
                 // handle bullet position message
                 if (object instanceof BulletMessage bulletMessage) {
-                    // handle bullet position message
-                    handleNewBullet(bulletMessage);
+                    if (playingWithAi && thisIsAi && bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    } else if (playingWithAi && !thisIsAi && !bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    } else if (!playingWithAi) {
+                        handleNewBullet(bulletMessage);
+                    }
                 }
 
                 // handle adding AI player

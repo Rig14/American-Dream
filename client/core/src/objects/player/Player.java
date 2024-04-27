@@ -242,6 +242,7 @@ public class Player extends GameEntity {
             bulletMessage.direction = Direction.LEFT;
             isShooting = -1;
         }
+        bulletMessage.name = name;
         AmericanDream.client.sendTCP(bulletMessage);
     }
 

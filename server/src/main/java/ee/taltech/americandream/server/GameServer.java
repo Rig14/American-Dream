@@ -57,13 +57,21 @@ public class GameServer extends Thread {
                     JoinLobbyMessage joinLobbyMessage = (JoinLobbyMessage) object;
                     // get lobby id
                     int lobbyId = joinLobbyMessage.lobbyId;
-
-                    // find lobby by id and join
-                    lobbies.forEach(l -> {
-                        if (l.getId() == lobbyId) {
-                            l.addConnection(connection);
-                        }
-                    });
+                    if (joinLobbyMessage.AIGame) {
+                        Connection[] connectionArray = new Connection[2];
+                        connectionArray[0] = connection;
+                        connectionArray[1] = connection;
+                        // create a new game and start it
+                        Game game = new Game(connectionArray, new Lobby("AILobby", 2));
+                        game.start();
+                    } else {
+                        // find lobby by id and join
+                        lobbies.forEach(l -> {
+                            if (l.getId() == lobbyId) {
+                                l.addConnection(connection);
+                            }
+                        });
+                    }
                 }
             }
         });
