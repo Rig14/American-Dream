@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import ee.taltech.americandream.GameScreen;
+import objects.player.AIPlayer;
 import objects.player.Player;
 
 import java.util.Objects;
@@ -69,6 +70,15 @@ public class TileMapHelper {
                             gameScreen.getWorld()
                     );
                     gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body, selectedCharacter));
+                    Body AIBody = BodyHelperService.createBody(
+                            rectangle.getX() + rectangle.getWidth() / 2,
+                            rectangle.getY() + rectangle.getHeight() / 2,
+                            rectangle.getWidth(),
+                            rectangle.getHeight(),
+                            false,
+                            gameScreen.getWorld()
+                    );
+                    gameScreen.setAIPlayer(new AIPlayer(rectangle.getWidth(), rectangle.getHeight(), AIBody, "AI"));
                 }
             }
             if (mapObject.getName().equals("Center")) {

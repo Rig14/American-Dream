@@ -26,19 +26,19 @@ import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class Player extends GameEntity {
 
-    private final float speed;
+    protected final float speed;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
-    private final String name;
-    private Direction direction;
-    private int jumpCounter;
-    private float keyDownTime = 0;
-    private float timeTillRespawn = 0;
-    private Integer livesCount = LIVES_COUNT;
-    private Integer damage = 0;
-    private Integer ammoCount = 0;
-    private int isShooting;
-    private float jumpCounterResetTime = 0;
+    protected final String name;
+    protected Direction direction;
+    protected int jumpCounter;
+    protected float keyDownTime = 0;
+    protected float timeTillRespawn = 0;
+    protected Integer livesCount = LIVES_COUNT;
+    protected Integer damage = 0;
+    protected Integer ammoCount = 0;
+    protected int isShooting;
+    protected float jumpCounterResetTime = 0;
 
     public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 
@@ -64,7 +64,7 @@ public class Player extends GameEntity {
             playerAnimations.generateObama();
         } else if (selectedCharacter.contains("Trump")) {
             playerAnimations.generateTrump();
-        } else {
+        } else {  // ai is biden at the moment
             playerAnimations.generateBiden();
         }
     }
@@ -168,7 +168,7 @@ public class Player extends GameEntity {
      * Handle mouse and keyboard input.
      * Update the speed of the player body according to user input.
      */
-    private void handleInput(float delta) {
+    protected void handleInput(float delta) {
         Controller controller = Controllers.getCurrent();
         velX = 0;
         // Moving right
@@ -251,7 +251,7 @@ public class Player extends GameEntity {
      * If player is above the platform, move it back to the original position
      * TODO: Make the logic less hacky
      */
-    private void handlePlatform() {
+    protected void handlePlatform() {
         Array<Body> bodies = new Array<Body>();
         body.getWorld().getBodies(bodies);
 
@@ -274,7 +274,7 @@ public class Player extends GameEntity {
     /**
      * Decrement lives and respawn the player if it's out of bounds.
      */
-    private void handleOutOfBounds(float delta, Vector2 center) {
+    protected void handleOutOfBounds(float delta, Vector2 center) {
         if (y < -BOUNDS) {
             if (timeTillRespawn <= RESPAWN_TIME) {  // delay the respawning if necessary
                 timeTillRespawn += delta;

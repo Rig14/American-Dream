@@ -17,7 +17,10 @@ import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
+import objects.player.AIPlayer;
 import objects.player.Player;
+
+import java.util.Optional;
 
 import static helper.Constants.*;
 
@@ -32,6 +35,7 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
+    private AIPlayer AIPlayer;
     private Vector2 mapCenterPoint;
 
     /**
@@ -77,6 +81,9 @@ public class GameScreen extends ScreenAdapter {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+    public void setAIPlayer(AIPlayer player) {
+        this.AIPlayer = player;
     }
 
     public void setMapCenterPoint(Vector2 vector2) {
@@ -135,6 +142,7 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
 
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
+        AIPlayer.update(delta, mapCenterPoint, Optional.empty());
         remoteManager.testForHit(world);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 
