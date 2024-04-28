@@ -5,12 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
+import static helper.UI.*;
 
 
 public class TitleScreen extends ScreenAdapter {
@@ -21,27 +22,28 @@ public class TitleScreen extends ScreenAdapter {
     /**
      * Initialize TitleScreen where players can choose between multiplayer and local play
      * or exit the game.
+     *
      * @param camera used for creating the image that the player will see on the screen
      */
     public TitleScreen(Camera camera) {
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+        Table mainContainer = new Table();
+        mainContainer.setFillParent(true);
 
-        Table table = new Table();
-        table.setFillParent(true);
+        Table buttonsContainer = new Table();
+        mainContainer.add(buttonsContainer).row();
 
-        // white texts for buttons
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = new BitmapFont();
-        textButtonStyle.fontColor = Color.WHITE;
+        multiplayerButton = createButton("Multiplayer");
+        TextButton localButton = createButton("Start Game");
+        disableButton(localButton);
+        TextButton exitButton = createButton("Exit");
 
-        multiplayerButton = new TextButton("Multiplayer", textButtonStyle);
-        TextButton localButton = new TextButton("Local play", textButtonStyle);
-        TextButton exitButton = new TextButton("Exit", textButtonStyle);
-
-        table.add(multiplayerButton).row();
-        table.add(localButton).row();
-        table.add(exitButton).row();
+        buttonsContainer.add(localButton).row();
+        buttonsContainer.add(new Container<>().height(10)).row();
+        buttonsContainer.add(multiplayerButton).row();
+        buttonsContainer.add(new Container<>().height(10)).row();
+        buttonsContainer.add(exitButton).row();
 
         exitButton.addListener(new ChangeListener() {
             @Override
@@ -58,8 +60,32 @@ public class TitleScreen extends ScreenAdapter {
                 AmericanDream.instance.setScreen(new LobbySelectionScreen(camera));
             }
         });
+        // top content
+        Table versionContainer = new Table();
+        versionContainer.setFillParent(true);
+        versionContainer.top().left();
+        versionContainer.pad(5);
+        Label version = createLabel("American Dream BETA-0.4", Color.GRAY, 3); // current game version number
+        versionContainer.add(version).row();
 
-        stage.addActor(table);
+        // bottom content
+
+        // copyright
+        Table copyrightContainer = new Table();
+        copyrightContainer.setFillParent(true);
+        copyrightContainer.bottom().left();
+        copyrightContainer.pad(10);
+        Label crText = createLabel("© 2024 RRE Inc", Color.GRAY, 3);
+        copyrightContainer.add(crText);
+
+        // add background to the stage
+        Image background = new Image(new Texture(Gdx.files.internal("screen-bg/title.jpg")));
+        background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(background);
+
+        stage.addActor(versionContainer);
+        stage.addActor(mainContainer);
+        stage.addActor(copyrightContainer);
     }
 
     /**
@@ -69,6 +95,7 @@ public class TitleScreen extends ScreenAdapter {
      */
     @Override
     public void render(float delta) {
+        stage.act(delta);
         // black background
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
@@ -76,11 +103,7 @@ public class TitleScreen extends ScreenAdapter {
         // if no connection is established, disable the multiplayer button
         // (for example this happens when server is not started)
         if (!AmericanDream.client.isConnected()) {
-            multiplayerButton.setDisabled(true);
-            TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-            textButtonStyle.font = new BitmapFont();
-            textButtonStyle.fontColor = Color.GRAY;
-            multiplayerButton.setStyle(textButtonStyle);
+            disableButton(multiplayerButton);
         }
 
         // draw all the buttons

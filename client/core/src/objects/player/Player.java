@@ -36,6 +36,7 @@ public class Player extends GameEntity {
     private float timeTillRespawn = 0;
     private Integer livesCount = LIVES_COUNT;
     private Integer damage = 0;
+    private Integer ammoCount = 0;
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
@@ -96,6 +97,10 @@ public class Player extends GameEntity {
         return damage;
     }
 
+    public Integer getAmmoCount() {
+        return ammoCount;
+    }
+
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
@@ -114,10 +119,12 @@ public class Player extends GameEntity {
      * @param center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
-        if (ps.isPresent()) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> playerState) {
+        if (playerState.isPresent()) {
+            PlayerState ps = playerState.get();
+            damage = ps.getDamage();
+            ammoCount = ps.getAmmoCount();
             // update server-sided lives here in the future
-            damage = ps.get().damage;
         }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
@@ -153,7 +160,7 @@ public class Player extends GameEntity {
         if (livesCount > 0) {
             TextureRegion currentFrame = playerAnimations.getFrame(Gdx.graphics.getDeltaTime(), this);
             batch.draw(currentFrame, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
-            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 30, 30);
+            batch.draw(PLAYER_INDICATOR_TEXTURE, getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 35, 35);
         }
     }
 
