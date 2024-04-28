@@ -25,6 +25,7 @@ import java.util.Optional;
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
+    private boolean AIGame = false;
     private final RemoteManager remoteManager;
     private final Hud hud;
     private final OffScreenIndicator offScreenIndicator;
@@ -44,6 +45,7 @@ public class GameScreen extends ScreenAdapter {
      * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
+        AIGame = selectedCharacter.equals("AI");
         this.camera = (OrthographicCamera) camera;
         // fix #81. bug related to previous screen input processing working on this screen.
         Gdx.input.setInputProcessor(new Stage());
@@ -58,13 +60,13 @@ public class GameScreen extends ScreenAdapter {
         this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
         switch (selectedMap) {
             case "Swamp":
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx", AIGame);
                 break;
             case "Desert":
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx", AIGame);
                 break;
             default:
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx", AIGame);
                 break;
         }
         // remote player(s) manager
@@ -142,7 +144,7 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
 
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
-        AIPlayer.update(delta, mapCenterPoint, Optional.empty());
+        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState());
         remoteManager.testForHit(world);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 

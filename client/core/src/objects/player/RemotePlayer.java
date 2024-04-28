@@ -37,7 +37,7 @@ public class RemotePlayer {
         this.x = ps.x;
         this.y = ps.y;
         if (ps.name != null) {
-            this.name = ps.name.split("_")[0];
+            this.name = ps.name;
         }
         this.velX = ps.velX;
         this.velY = ps.velY;

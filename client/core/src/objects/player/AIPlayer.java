@@ -1,17 +1,16 @@
 package objects.player;
 
-import animation.PlayerAnimations;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
+import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.Objects;
@@ -19,8 +18,6 @@ import java.util.Optional;
 
 import static helper.Constants.JUMP_COUNT;
 import static helper.Constants.JUMP_FORCE;
-import static helper.Constants.LIVES_COUNT;
-import static helper.Constants.PLAYER_SPEED;
 import static helper.Constants.PPM;
 
 public class AIPlayer extends Player {
@@ -68,7 +65,7 @@ public class AIPlayer extends Player {
         positionMessage.y = y;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
-        positionMessage.name = name;
+        positionMessage.name = "AI";
         positionMessage.velX = velX;
         positionMessage.velY = velY;
         positionMessage.isShooting = isShooting;
@@ -87,41 +84,41 @@ public class AIPlayer extends Player {
         Controller controller = Controllers.getCurrent();
         velX = 0;
         // Moving right
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || (controller != null &&
-                (controller.getButton(controller.getMapping().buttonDpadRight) ||
-                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
-                ))) {
-            velX = 1;
-        }
-        // Moving left
-        if (Gdx.input.isKeyPressed(Input.Keys.A) || (controller != null &&
-                (controller.getButton(controller.getMapping().buttonDpadLeft) ||
-                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f))) {
-            velX = -1;
-        }
-
-        // Jumping
-        if (jumpCounter < JUMP_COUNT && Gdx.input.isKeyJustPressed(Input.Keys.W) || (controller != null &&
-                controller.getButton(controller.getMapping().buttonA))) {
-            float force = body.getMass() * JUMP_FORCE;
-            body.setLinearVelocity(body.getLinearVelocity().x, 0);
-            body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
-            jumpCounter++;
-        }
-
-        // key down on platform
-        if (Gdx.input.isKeyPressed(Input.Keys.S) || (controller != null &&
-                (controller.getButton(controller.getMapping().buttonDpadDown) ||
-                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f))) {
-            keyDownTime += delta;
-        } else {
-            keyDownTime = 0;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-            // spawn AI player
-            AmericanDream.client.sendTCP(new AddAIMessage());
-        }
+//        if (Gdx.input.isKeyPressed(Input.Keys.D) || (controller != null &&
+//                (controller.getButton(controller.getMapping().buttonDpadRight) ||
+//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
+//                ))) {
+//            velX = 1;
+//        }
+//        // Moving left
+//        if (Gdx.input.isKeyPressed(Input.Keys.A) || (controller != null &&
+//                (controller.getButton(controller.getMapping().buttonDpadLeft) ||
+//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f))) {
+//            velX = -1;
+//        }
+//
+//        // Jumping
+//        if (jumpCounter < JUMP_COUNT && Gdx.input.isKeyJustPressed(Input.Keys.W) || (controller != null &&
+//                controller.getButton(controller.getMapping().buttonA))) {
+//            float force = body.getMass() * JUMP_FORCE;
+//            body.setLinearVelocity(body.getLinearVelocity().x, 0);
+//            body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
+//            jumpCounter++;
+//        }
+//
+//        // key down on platform
+//        if (Gdx.input.isKeyPressed(Input.Keys.S) || (controller != null &&
+//                (controller.getButton(controller.getMapping().buttonDpadDown) ||
+//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f))) {
+//            keyDownTime += delta;
+//        } else {
+//            keyDownTime = 0;
+//        }
+//
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+//            // spawn AI player
+//            AmericanDream.client.sendTCP(new AddAIMessage());
+//        }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
@@ -132,9 +129,33 @@ public class AIPlayer extends Player {
             }
             jumpCounterResetTime += delta;
         }
-        body.setLinearVelocity(velX * PLAYER_SPEED, body.getLinearVelocity().y);
+        body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // check for shooting input
-        shootingInput();
+        //shootingInput();
+    }
+
+    /**
+     * Check for shooting input.
+     * Create and send new BulletMessage if the player is shooting.
+     */
+    @Override
+    public void shootingInput() {
+        isShooting = 0;
+        BulletMessage bulletMessage = new BulletMessage();
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
+            bulletMessage.direction = Direction.RIGHT;
+            isShooting = 1;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
+                (Controllers.getCurrent() != null &&
+                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
+            bulletMessage.direction = Direction.LEFT;
+            isShooting = -1;
+        }
+        bulletMessage.name = "AI";
+        AmericanDream.client.sendTCP(bulletMessage);
     }
 }

@@ -15,6 +15,7 @@ import static helper.Constants.*;
 
 public class Game extends Thread {
 
+    private boolean AIGame;
     private final Lobby lobby;
     private Player[] alivePlayers;
     private final Player[] allPlayers;
@@ -29,6 +30,7 @@ public class Game extends Thread {
      * @param lobby lobby which manages the current game instance
      */
     public Game(Connection[] connections, Lobby lobby) {
+        AIGame = lobby.getName().equals("AILobby");
         // set game duration
         this.gameTime = GAME_DURATION;
         this.lobby = lobby;
@@ -37,8 +39,10 @@ public class Game extends Thread {
         // start game with connections
         // make players from connections
         for (int i = 0; i < connections.length; i++) {
-            alivePlayers[i] = new Player(connections[i], this, connections[i].getID());
+            alivePlayers[i] = new Player(connections[i], this, connections[i].getID(), false);
         }
+        if (AIGame) alivePlayers[1] = new Player(connections[1], this, connections[1].getID(), true);
+
         allPlayers = alivePlayers.clone();
     }
 
@@ -157,7 +161,7 @@ public class Game extends Thread {
             for (int i = 0; i < playerHitboxes.length; i++) {
                 if (playerHitboxes[i].intersects(bulletHitbox)  // hitboxes hit
                         && !bullet.isDisabled  // has already hit
-                        && bullet.id != playerStates[i].id  // is not the player who shot the bullet
+                        && !bullet.name.equals(playerStates[i].name)  // is not the player who shot the bullet
                         && !Objects.equals(playerStates[i].livesCount, 0)  // player is not dead
                 ) {
                     // remove bullet
@@ -165,7 +169,8 @@ public class Game extends Thread {
                     // find player with corresponding id
 
                     for (Player player : alivePlayers) {
-                        if (player.getId() == playerStates[i].id) {
+                        System.out.println("collsion");
+                        if (!player.getName().equals(playerStates[i].name)) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)
                             playerStates[i].applyForce = player.handleBeingHit(bullet);  // returns force

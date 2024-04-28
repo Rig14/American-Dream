@@ -14,6 +14,7 @@ public class PlayerState {
     public Integer damage;
     public float applyForce;
     public int ammoCount;
+    public boolean thisIsAI;
 
     public float getX() {
         return this.x;

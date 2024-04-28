@@ -17,9 +17,7 @@ import java.util.Objects;
 import static helper.Constants.*;
 
 public class Player {
-    public static Integer lastId;
-    private static boolean playingWithAi = false;
-    private boolean thisIsAi = false;
+    private boolean thisIsAI = false;
     private final int id;
     private final Game game;
     private final Connection connection;
@@ -47,14 +45,9 @@ public class Player {
      * @param game game instance
      * @param id player id
      */
-    public Player(Connection connection, Game game, int id) {
-        if (lastId.equals(id)) {
-            playingWithAi = true;
-            thisIsAi = true;
-        } else {
-            lastId = id;
-        }
+    public Player(Connection connection, Game game, int id, boolean thisIsAI) {
         // create player
+        this.thisIsAI = thisIsAI;
         this.id = id;
         this.game = game;
         this.connection = connection;
@@ -73,23 +66,18 @@ public class Player {
                 super.received(connection, object);
                 // handle incoming data
                 if (object instanceof PlayerPositionMessage positionMessage) {
-                    if (playingWithAi && thisIsAi && positionMessage.name.equals("AI")) {
+                    if (thisIsAI && positionMessage.name.equals("AI")) {
                         handlePositionMessage(positionMessage);
-                    } else if (playingWithAi && !thisIsAi && !positionMessage.name.equals("AI")) {
-                        handlePositionMessage(positionMessage);
-                    } else if (!playingWithAi) {
+                    } else if (!thisIsAI && !positionMessage.name.equals("AI")) {
                         handlePositionMessage(positionMessage);
                     }
-
                 }
 
                 // handle bullet position message
                 if (object instanceof BulletMessage bulletMessage) {
-                    if (playingWithAi && thisIsAi && bulletMessage.name.equals("AI")) {
+                    if (thisIsAI && bulletMessage.name.equals("AI")) {
                         handleNewBullet(bulletMessage);
-                    } else if (playingWithAi && !thisIsAi && !bulletMessage.name.equals("AI")) {
-                        handleNewBullet(bulletMessage);
-                    } else if (!playingWithAi) {
+                    } else if (!thisIsAI && !bulletMessage.name.equals("AI")) {
                         handleNewBullet(bulletMessage);
                     }
                 }
@@ -105,6 +93,10 @@ public class Player {
 
     public int getId() {
         return this.id;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public List<BulletData> getPlayerBullets() {
@@ -127,6 +119,7 @@ public class Player {
         state.damage = damage;
         state.name = name;
         state.ammoCount = ammoCount;
+        state.thisIsAI = thisIsAI;
         return state;
     }
 
@@ -143,6 +136,7 @@ public class Player {
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
             bulletData.id = id;
+            bulletData.name = name;
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);

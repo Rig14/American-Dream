@@ -26,6 +26,7 @@ public class RemoteManager {
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
     private PlayerState localPlayerState;
+    private PlayerState AIPlayerState;
     private float onHitForce;
     private float AIplayerX;
     private float AIplayerY;
@@ -57,8 +58,11 @@ public class RemoteManager {
                             // not current client
                             remotePlayers.add(new RemotePlayer(ps, textureAtlas));
                         } else {
-                            // current client
-                            localPlayerState = ps;
+                            if (ps.thisIsAI) {
+                                AIPlayerState = ps;
+                            } else {
+                                localPlayerState = ps;
+                            }
                             // get the force of the hit
                             if (ps.applyForce != 0) {
                                 onHitForce = ps.applyForce;
@@ -89,6 +93,16 @@ public class RemoteManager {
     public Optional<PlayerState> getLocalPlayerState() {
         if (localPlayerState != null) {
             return Optional.of(localPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Get playerState for updating the AI.
+     */
+    public Optional<PlayerState> getAIPlayerState() {
+        if (AIPlayerState != null) {
+            return Optional.of(AIPlayerState);
         }
         return Optional.empty();
     }
