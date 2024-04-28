@@ -13,12 +13,12 @@ import helper.PlayerState;
 import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
+import objects.player.Player;
 import objects.player.RemotePlayer;
 
 import java.util.*;
 
 import static helper.Constants.AI_PLAYER_SIZE;
-import static helper.Constants.GRAVITY;
 
 public class RemoteManager {
     private List<RemotePlayer> remotePlayers = new ArrayList<>();
@@ -27,7 +27,6 @@ public class RemoteManager {
     private PlayerState[] allPlayerStates;
     private PlayerState localPlayerState;
     private PlayerState AIPlayerState;
-    private float onHitForce;
     private float AIplayerX;
     private float AIplayerY;
 
@@ -62,10 +61,6 @@ public class RemoteManager {
                                 AIPlayerState = ps;
                             } else {
                                 localPlayerState = ps;
-                            }
-                            // get the force of the hit
-                            if (ps.applyForce != 0) {
-                                onHitForce = ps.applyForce;
                             }
                         }
                     }
@@ -175,28 +170,6 @@ public class RemoteManager {
 
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
-        }
-    }
-
-    /**
-     * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
-     * Float representing the force is received form the server only once, after that it's saved into the player object.
-     * Exponentially decrement the applied force every game tick.
-     * Stop applying knockback when the force becomes too small.
-     *
-     * @param world world where the player moves (used for applying gravity)
-     */
-    public void testForHit(World world) {
-        if (onHitForce != 0) {
-            world.setGravity(new Vector2(onHitForce, GRAVITY));
-
-            // make on hit force smaller
-            onHitForce *= 0.9f;
-        }
-        // reset gravity if hit force is small enough
-        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
-            world.setGravity(new Vector2(0, GRAVITY));
-            onHitForce = 0;
         }
     }
 }

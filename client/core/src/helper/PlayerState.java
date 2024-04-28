@@ -32,6 +32,10 @@ public class PlayerState {
         return damage;
     }
 
+    public float getApplyForce() {
+        return applyForce;
+    }
+
     /**
      * Custom getter to prevent nullPointerException in Hud.update().
      */

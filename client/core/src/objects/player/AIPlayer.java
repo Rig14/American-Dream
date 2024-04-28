@@ -48,6 +48,7 @@ public class AIPlayer extends Player {
             PlayerState ps = playerState.get();
             damage = ps.getDamage();
             ammoCount = ps.getAmmoCount();
+            if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
         }
         x = body.getPosition().x * PPM;
@@ -55,6 +56,7 @@ public class AIPlayer extends Player {
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
         }
+        super.applyBulletHitForce();
         super.handlePlatform();
         super.handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
@@ -132,7 +134,7 @@ public class AIPlayer extends Player {
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // check for shooting input
-        //shootingInput();
+        shootingInput();
     }
 
     /**

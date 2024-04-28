@@ -169,7 +169,6 @@ public class Game extends Thread {
                     // find player with corresponding id
 
                     for (Player player : alivePlayers) {
-                        System.out.println("collsion");
                         if (!player.getName().equals(playerStates[i].name)) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)

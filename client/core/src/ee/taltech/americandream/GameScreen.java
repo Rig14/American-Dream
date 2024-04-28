@@ -145,7 +145,6 @@ public class GameScreen extends ScreenAdapter {
 
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
         if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState());
-        remoteManager.testForHit(world);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 
         // if escape is pressed, the game will close

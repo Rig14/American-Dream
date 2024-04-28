@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
 import helper.Direction;
@@ -39,6 +40,7 @@ public class Player extends GameEntity {
     protected Integer ammoCount = 0;
     protected int isShooting;
     protected float jumpCounterResetTime = 0;
+    protected float bulletHitForce = 0f;
 
     public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 
@@ -124,6 +126,7 @@ public class Player extends GameEntity {
             PlayerState ps = playerState.get();
             damage = ps.getDamage();
             ammoCount = ps.getAmmoCount();
+            if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
         }
         x = body.getPosition().x * PPM;
@@ -131,6 +134,7 @@ public class Player extends GameEntity {
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
         }
+        applyBulletHitForce();
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
@@ -244,6 +248,23 @@ public class Player extends GameEntity {
         }
         bulletMessage.name = name;
         AmericanDream.client.sendTCP(bulletMessage);
+    }
+
+    /**
+     * Apply bullet hit knockback to the player if the player has been hit.
+     * Float representing the force is received form the server only once, after that it's saved into the player object.
+     * Exponentially decrement the applied force every game tick.
+     * Stop applying knockback when the force becomes too small.
+     */
+    protected void applyBulletHitForce() {
+        if (bulletHitForce != 0) {
+            body.applyForceToCenter(new Vector2(bulletHitForce, 0), true);
+            bulletHitForce *= 0.9f;  // exponentially decrement force
+        }
+        // set force to zero if its small enough
+        if (Math.abs(bulletHitForce) < Math.abs(bulletHitForce / 10f)) {
+            bulletHitForce = 0;
+        }
     }
 
     /**
