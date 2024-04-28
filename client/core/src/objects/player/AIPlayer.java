@@ -17,6 +17,7 @@ import helper.packet.PlayerPositionMessage;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static helper.Constants.JUMP_COUNT;
 import static helper.Constants.JUMP_FORCE;
@@ -44,16 +45,33 @@ public class AIPlayer extends Player {
 
     /**
      * Plan method as per SPA arhitectue.
+     * Different scenarios sorted by priority (ascending),
+     * more critical scenario will override previous "state" or "commands".
      */
     private void plan() {
-        System.out.println(x);
-        System.out.println();
+        // initial position
         if (x < 1350) movingState = "right";
+
+        // dodge bullets
+        if (bullets.isPresent() && !bullets.get().isEmpty()) {
+            List<BulletData> enemyBullets = bullets.get().stream()
+                    .filter(x -> !(x.name.equals("AI")))
+                    .collect(Collectors.toList());
+            // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
+            System.out.println(y);
+            if (enemyBullets.stream().anyMatch(bul -> (bul.y > y - 45)  // check if bullet is at the same level as AI
+                    && ((bul.speedBullet > 0 && bul.x < x + 50) || (bul.speedBullet < 0 && bul.x > x - 50))  // x coord
+                    && Math.abs(x - bul.x) < 200)) jumpingState = true;  // prevent AI from jumping too early
+        }
+
+        // recover from being hit
         if (x > 1375 && bulletHitForce != 0f) {
             movingState = "left";
             jumpingState = true;
-            if (body.getLinearVelocity().y > 0) jumpingState = false;
         }
+
+
+        if (jumpingState && body.getLinearVelocity().y > 0) jumpingState = false;  // avoid using all 3 jumps right away
     }
 
     /**
