@@ -3,8 +3,10 @@ package objects.player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import helper.BulletData;
 import helper.PlayerState;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class GameEntity {
@@ -29,7 +31,9 @@ public abstract class GameEntity {
         this.speed = 0;
     }
 
-    public abstract void update(float delta, Vector2 center, Optional<PlayerState> ps);
+    public void update(float delta, Vector2 center, Optional<PlayerState> ps){}
+
+    public void update(float delta, Vector2 center, Optional<PlayerState> ps, Optional<List<BulletData>> bullets){}
 
     public abstract void render(SpriteBatch batch);
 

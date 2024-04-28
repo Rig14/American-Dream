@@ -144,7 +144,7 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
 
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
-        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState());
+        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState(), remoteManager.getBulletData());
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 
         // if escape is pressed, the game will close

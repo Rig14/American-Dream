@@ -103,6 +103,16 @@ public class RemoteManager {
     }
 
     /**
+     * Get server-sided game time in seconds. Used for updating HUD timer.
+     */
+    public Optional<List<BulletData>> getBulletData() {
+        if (remoteBullets != null) {
+            return Optional.of(remoteBullets);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Return remote players list if it contains at least 1 remote player.
      */
     public List<RemotePlayer> getRemotePlayers() {

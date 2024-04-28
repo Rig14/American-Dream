@@ -7,12 +7,14 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
+import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,6 +24,11 @@ import static helper.Constants.PPM;
 
 public class AIPlayer extends Player {
 
+    private String movingState = "";
+    private String shootingState = "";
+    private boolean jumpingState = false;
+    private boolean dropThroughPlatformState = false;
+    private Optional<List<BulletData>> bullets;
 
     /**
      * Initialize AI Player.
@@ -35,6 +42,19 @@ public class AIPlayer extends Player {
         super(width, height, body, selectedCharacter);
     }
 
+    /**
+     * Plan method as per SPA arhitectue.
+     */
+    private void plan() {
+        System.out.println(x);
+        System.out.println();
+        if (x < 1350) movingState = "right";
+        if (x > 1375 && bulletHitForce != 0f) {
+            movingState = "left";
+            jumpingState = true;
+            if (body.getLinearVelocity().y > 0) jumpingState = false;
+        }
+    }
 
     /**
      * Update player data according to input, collisions (platforms) and respawning.
@@ -43,7 +63,8 @@ public class AIPlayer extends Player {
      * @param center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center, Optional<PlayerState> playerState) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> playerState, Optional<List<BulletData>> bullets) {
+        this.bullets = bullets;
         if (playerState.isPresent()) {
             PlayerState ps = playerState.get();
             damage = ps.getDamage();
@@ -53,6 +74,7 @@ public class AIPlayer extends Player {
         }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
+        plan();
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
         }
@@ -83,40 +105,32 @@ public class AIPlayer extends Player {
      */
     @Override
     protected void handleInput(float delta) {
-        Controller controller = Controllers.getCurrent();
+        System.out.println(movingState);
         velX = 0;
         // Moving right
-//        if (Gdx.input.isKeyPressed(Input.Keys.D) || (controller != null &&
-//                (controller.getButton(controller.getMapping().buttonDpadRight) ||
-//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) > 0.5f
-//                ))) {
-//            velX = 1;
-//        }
-//        // Moving left
-//        if (Gdx.input.isKeyPressed(Input.Keys.A) || (controller != null &&
-//                (controller.getButton(controller.getMapping().buttonDpadLeft) ||
-//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftX) < -0.5f))) {
-//            velX = -1;
-//        }
-//
-//        // Jumping
-//        if (jumpCounter < JUMP_COUNT && Gdx.input.isKeyJustPressed(Input.Keys.W) || (controller != null &&
-//                controller.getButton(controller.getMapping().buttonA))) {
-//            float force = body.getMass() * JUMP_FORCE;
-//            body.setLinearVelocity(body.getLinearVelocity().x, 0);
-//            body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
-//            jumpCounter++;
-//        }
-//
-//        // key down on platform
-//        if (Gdx.input.isKeyPressed(Input.Keys.S) || (controller != null &&
-//                (controller.getButton(controller.getMapping().buttonDpadDown) ||
-//                        Objects.requireNonNull(controller).getAxis(controller.getMapping().axisLeftY) > 0.5f))) {
-//            keyDownTime += delta;
-//        } else {
-//            keyDownTime = 0;
-//        }
-//
+        if (movingState.equals("right")) {
+            velX = 1;
+        }
+        // Moving left
+        if (movingState.equals("left")) {
+            velX = -1;
+        }
+
+        // Jumping
+        if (jumpCounter < JUMP_COUNT && jumpingState) {
+            float force = body.getMass() * JUMP_FORCE;
+            body.setLinearVelocity(body.getLinearVelocity().x, 0);
+            body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
+            jumpCounter++;
+        }
+
+        // key down on platform
+        if (dropThroughPlatformState) {
+            keyDownTime += delta;
+        } else {
+            keyDownTime = 0;
+        }
+
 //        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
 //            // spawn AI player
 //            AmericanDream.client.sendTCP(new AddAIMessage());
@@ -135,6 +149,9 @@ public class AIPlayer extends Player {
 
         // check for shooting input
         shootingInput();
+        // reset states after every "spin()" method
+        movingState = "";
+        jumpingState = false;
     }
 
     /**
@@ -145,18 +162,15 @@ public class AIPlayer extends Player {
     public void shootingInput() {
         isShooting = 0;
         BulletMessage bulletMessage = new BulletMessage();
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ||
-                (Controllers.getCurrent() != null &&
-                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) > 0.5f)) {
+        if (shootingState.equals("right")) {
             bulletMessage.direction = Direction.RIGHT;
             isShooting = 1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) ||
-                (Controllers.getCurrent() != null &&
-                        Controllers.getCurrent().getAxis(Controllers.getCurrent().getMapping().axisRightX) < -0.5f)) {
+        if (shootingState.equals("left")) {
             bulletMessage.direction = Direction.LEFT;
             isShooting = -1;
         }
+        shootingState = "";
         bulletMessage.name = "AI";
         AmericanDream.client.sendTCP(bulletMessage);
     }
