@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Connection;
 import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
+import helper.packet.GunBoxMessage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class Game extends Thread {
     private float gameTime;
     private boolean running = true;
     private boolean allJoinedMultiplayer = false;
+    private long lastGunBoxSpawnTime = 0;
+    private int gunBoxId = 0;
 
     /**
      * Create a new game instance containing specific clients.
@@ -104,6 +107,23 @@ public class Game extends Thread {
                     Arrays.stream(allPlayers).forEach(x -> x.sendGameStateTCP(gameStateMessage)); // last message
                     lobby.clearLobby();
                     this.end();
+                }
+                // spawning gunbox for weapons
+                if (System.currentTimeMillis() - lastGunBoxSpawnTime > GUNBOX_SPAWN_DELAY) {
+                    // calculate the absolute sum of x-coordinates of all players
+                    lastGunBoxSpawnTime = System.currentTimeMillis();
+                    float sumX = 0;
+                    for (Player player : allPlayers) {
+                        sumX += Math.abs(player.getState().x);
+                    }
+                    System.out.println("sent gunbox message");
+                    // calculate the average x-coordinate
+                    float averageX = sumX / allPlayers.length;
+                    GunBoxMessage gunBoxMessage = new GunBoxMessage();
+                    gunBoxMessage.x = averageX;
+                    gunBoxMessage.y = 1500;
+                    gunBoxMessage.id = gunBoxId++;
+                    Arrays.stream(allPlayers).forEach(player -> player.sendGunBoxTCP(gunBoxMessage));
                 }
 
                 Thread.sleep(1000 / TICK_RATE);

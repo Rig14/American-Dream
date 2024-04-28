@@ -95,6 +95,7 @@ public class GameServer extends Thread {
         kryo.register(GameLeaveMessage.class);
         kryo.register(AddAIMessage.class);
         kryo.register(MapSelectionMessage.class);
+        kryo.register(GunBoxMessage.class);
     }
 
     /**

@@ -24,4 +24,5 @@ public class Constants {
     // how fast the AI player shoots bullets
     public static final int AI_PLAYER_SHOOTING_INTERVAL = 2;
     public static final Dimension AI_PLAYER_SIZE = new Dimension(60, 60);
+    public static final float GUNBOX_SPAWN_DELAY = 10000; // in milliseconds
 }

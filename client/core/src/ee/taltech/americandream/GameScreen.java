@@ -17,7 +17,13 @@ import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
+import objects.gun.GunBox;
+import objects.gun.GunBoxHandler;
 import objects.player.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static helper.Constants.*;
 
@@ -33,7 +39,7 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
     private Vector2 mapCenterPoint;
-
+    private GunBoxHandler gunBoxHandler;
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      *
@@ -69,6 +75,8 @@ public class GameScreen extends ScreenAdapter {
         // visual info for player
         this.hud = new Hud(this.batch);
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
+        this.gunBoxHandler = new GunBoxHandler();
+
     }
 
     public World getWorld() {
@@ -100,13 +108,16 @@ public class GameScreen extends ScreenAdapter {
 
         // object rendering
         batch.begin();
-
+        System.out.println(gunBoxHandler.getGunBoxList());
         player.render(batch);
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
+        for (GunBox gunBox1 : gunBoxHandler.getGunBoxList()) {
+            gunBox1.render(batch, delta);
+        }
 
         batch.end();
 
@@ -114,7 +125,6 @@ public class GameScreen extends ScreenAdapter {
         if (GAMEPLAY_DEBUG) {
             debugRenderer.render(world, camera.combined.scl(PPM));
         }
-
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -129,11 +139,10 @@ public class GameScreen extends ScreenAdapter {
 
         // update the camera position
         cameraUpdate();
-
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-
+        gunBoxHandler.spawnGunBox();
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
         remoteManager.testForHit(world);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());

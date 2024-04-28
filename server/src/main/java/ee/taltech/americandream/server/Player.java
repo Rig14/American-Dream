@@ -5,10 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
-import helper.packet.BulletMessage;
-import helper.packet.GameStateMessage;
-import helper.packet.PlayerPositionMessage;
+import helper.packet.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,6 +191,9 @@ public class Player {
         connection.sendTCP(gameStateMessage);
     }
 
+    public void sendGunBoxTCP(GunBoxMessage gunBoxMessage) {
+        connection.sendTCP(gunBoxMessage);
+    }
     /**
      * End the game in case of a disconnect.
      */
