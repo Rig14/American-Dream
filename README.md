@@ -8,10 +8,21 @@ Running the game is as simple as running the client jar file in jars folder. The
 server.
 
 ```bash
-java -jar client-$VERSION_NUMBER.jar
+java -jar desktop-$VERSION_NUMBER.jar
 ```
 
 replace $VERSION_NUMBER with the version number to run.
+
+### Playing the game
+
+#### Multiplayer
+
+* Open the game and press multiplayer.
+* Choose a lobby from the selection.
+* Choose your character
+* When no map has been chosen for the current game, you can also choose a map.
+* When map is selected you are in game.
+* Wait for other players to join and have fun!
 
 ### Game keys
 
@@ -21,8 +32,9 @@ replace $VERSION_NUMBER with the version number to run.
 * 'D' - Move right
 * 'W' - Jump
 * 'S' (hold) - Drop through a platform
+* 'N' - Spawn AI player
 
-Sidenote: the game is also playable with a controller
+Sidenote: the game is also playable with a controller (screens are not navigable with a controller)
 
 ### Server setup for development
 
