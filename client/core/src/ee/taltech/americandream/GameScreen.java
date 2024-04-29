@@ -111,6 +111,7 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
 
         player.render(batch);
+        if (AIGame) AIPlayer.render(batch);
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);

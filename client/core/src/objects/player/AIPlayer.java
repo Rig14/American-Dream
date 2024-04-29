@@ -1,5 +1,8 @@
 package objects.player;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
@@ -13,9 +16,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static helper.Constants.FRAME_HEIGHT;
+import static helper.Constants.FRAME_WIDTH;
 import static helper.Constants.JUMP_COUNT;
 import static helper.Constants.JUMP_FORCE;
 import static helper.Constants.PPM;
+import static helper.Constants.REMOTE_PLAYER_INDICATORS;
+import static helper.Textures.GPT_TEXTURE;
+import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class AIPlayer extends Player {
 
@@ -189,11 +197,23 @@ public class AIPlayer extends Player {
         bulletMessage.name = "AI";
         AmericanDream.client.sendTCP(bulletMessage);
     }
+
     /**
      * Temporary solution to avoid duplicating names in single player mode.
      */
     @Override
     public String getName() {
         return "AI";
+    }
+
+    /**
+     * Render player and find the correct animation frame.
+     */
+    @Override
+    public void render(SpriteBatch batch) {
+        if (livesCount > 0) {
+            batch.draw(GPT_TEXTURE, getPosition().x - getDimensions().x / 2 - 15, getPosition().y - getDimensions().y / 2, FRAME_WIDTH, FRAME_HEIGHT);
+            batch.draw(REMOTE_PLAYER_INDICATORS.get(0), getPosition().x - getDimensions().x / 2, getPosition().y - getDimensions().y / 2 + 80, 35, 35);
+        }
     }
 }
