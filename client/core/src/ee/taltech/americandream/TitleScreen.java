@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import helper.Audio;
 
 import static helper.UI.*;
 
@@ -86,6 +87,9 @@ public class TitleScreen extends ScreenAdapter {
         stage.addActor(versionContainer);
         stage.addActor(mainContainer);
         stage.addActor(copyrightContainer);
+
+        // start playing music
+        Audio.getInstance().playMusic(Audio.MusicType.MENU);
     }
 
     /**
@@ -120,6 +124,7 @@ public class TitleScreen extends ScreenAdapter {
     public void dispose() {
         super.dispose();
         stage.dispose();
+        Audio.getInstance().dispose();
     }
 
     /**
