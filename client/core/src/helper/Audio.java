@@ -74,6 +74,10 @@ public class Audio {
         sound.put(SoundType.HIT, hit);
         Sound start = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/start.ogg"));
         sound.put(SoundType.START, start);
+        Sound lost = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/you_lose.ogg"));
+        sound.put(SoundType.YOU_LOSE, lost);
+        Sound win = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/you_win.ogg"));
+        sound.put(SoundType.YOU_WIN, win);
     }
 
     public static Audio getInstance() {
@@ -117,6 +121,8 @@ public class Audio {
         BUTTON_CLICK,
         GUNSHOT,
         HIT,
-        START
+        START,
+        YOU_LOSE,
+        YOU_WIN
     }
 }
