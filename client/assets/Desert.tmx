@@ -31,7 +31,7 @@
   <object id="38" name="solid" x="992" y="992">
    <polygon points="0,0 32,-32 160,-32 192,0"/>
   </object>
-  <object id="40" name="gunbox" x="1530.67" y="1720" width="32" height="32"/>
+  <object id="40" name="gunbox" x="1073.34" y="581.333" width="32" height="32"/>
  </objectgroup>
  <layer id="16" name="solid" width="66" height="56">
   <data encoding="base64" compression="zlib">

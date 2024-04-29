@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="66" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="25" nextobjectid="53">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="66" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="25" nextobjectid="56">
  <tileset firstgid="1" source="backrounds/backroundtmx/desert-background.tsx"/>
  <tileset firstgid="2761" name="desert" tilewidth="32" tileheight="32" tilecount="1024" columns="32">
   <image source="tilesets/desert-ruins.png" width="1024" height="1024"/>
@@ -63,5 +63,6 @@
   <object id="52" name="platform" x="1312" y="896">
    <polygon points="0,0 88.7327,0 88.7327,-32 0,-32"/>
   </object>
+  <object id="55" name="gunbox" x="1236" y="802" width="32" height="32"/>
  </objectgroup>
 </map>

@@ -13,6 +13,7 @@ import helper.PlayerState;
 import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
+import objects.gun.GunBox;
 import objects.player.RemotePlayer;
 
 import java.util.*;
@@ -172,12 +173,15 @@ public class RemoteManager {
      *
      * @param world world where the player moves (used for applying gravity)
      */
-    public void testForHit(World world) {
+    public void testForHit(World world, List<GunBox> gunBoxList) {
         if (onHitForce != 0) {
             world.setGravity(new Vector2(onHitForce, GRAVITY));
-
             // make on hit force smaller
             onHitForce *= 0.9f;
+            // is needed to reverse the gravity for the boxes to not get affected by force on the x-axis
+            for (GunBox gunBox : gunBoxList) {
+                gunBox.applyGravity(world.getGravity());
+            }
         }
         // reset gravity if hit force is small enough
         if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {

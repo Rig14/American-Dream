@@ -17,9 +17,7 @@ import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
-import objects.gun.GunBox;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 

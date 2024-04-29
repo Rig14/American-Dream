@@ -25,7 +25,7 @@ import objects.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 import static helper.Constants.*;
 
@@ -156,7 +156,7 @@ public class GameScreen extends ScreenAdapter {
             tileMapHelper.update(remoteManager.getGameTime().get());
         }
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
-        remoteManager.testForHit(world);
+        remoteManager.testForHit(world, getGunBoxList);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
 
         // if escape is pressed, the game will close

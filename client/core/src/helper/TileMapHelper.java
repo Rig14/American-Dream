@@ -30,9 +30,9 @@ public class TileMapHelper {
     private TiledMap tiledMap;
     private GameScreen gameScreen;
     private String selectedCharacter;
+    // gunbox timers for the gunbox message to work correctly
     private float lastGunBoxSpawn = 300;
     private float gunBoxSpawnDelay = 1;
-    private CollisionHandler collisionHandler;
 
     /**
      * Initialize TileMapHelper which loads the tilemap background, tile outlines and objects.
@@ -40,7 +40,6 @@ public class TileMapHelper {
     public TileMapHelper(GameScreen gameScreen, String selectedCharacter) {
         this.gameScreen = gameScreen;
         this.selectedCharacter = selectedCharacter;
-        this.collisionHandler = new CollisionHandler();
     }
 
     /**
@@ -112,7 +111,7 @@ public class TileMapHelper {
                                         false,
                                         gameScreen.getWorld(),
                                         new GunBox(gameScreen.getWorld().createBody(new BodyDef()))
-                    );
+                                );
                                 gameScreen.addGunBox(new GunBox(body));
                             }
                         }
