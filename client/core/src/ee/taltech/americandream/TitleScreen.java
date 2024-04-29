@@ -123,6 +123,7 @@ public class TitleScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         super.dispose();
+        Audio.getInstance().dispose();
         stage.dispose();
     }
 

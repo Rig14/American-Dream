@@ -3,6 +3,7 @@ package helper;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 import java.util.*;
 
@@ -13,9 +14,11 @@ public class Audio {
     private static Audio instance = null;
     private final float MUSIC_VOLUME = 0.2f;
     private final Map<MusicType, List<Music>> music;
+    private final Map<SoundType, Sound> sound;
 
     private Audio() {
         this.music = new HashMap<>();
+        this.sound = new HashMap<>();
         // setting up different audio tracks
 
         // menu music
@@ -61,6 +64,10 @@ public class Audio {
                 music.put(MusicType.SWAMP, l);
             }
         }
+
+        // sound efx
+        Sound buttonClick = Gdx.audio.newSound(Gdx.files.internal("audio/menu/button_click.mp3"));
+        sound.put(SoundType.BUTTON_CLICK, buttonClick);
     }
 
     public static Audio getInstance() {
@@ -78,12 +85,18 @@ public class Audio {
         musicList.get(0).setOnCompletionListener(music -> playMusic(type));
     }
 
+    public void playSound(SoundType type) {
+        // play sound
+        sound.get(type).play();
+    }
+
     public void stopAllMusic() {
         music.forEach((key, value) -> value.forEach(Music::stop));
     }
 
     public void dispose() {
         music.forEach((key, value) -> value.forEach(Music::dispose));
+        sound.forEach((key, value) -> value.dispose());
         instance = null;
     }
 
@@ -92,5 +105,9 @@ public class Audio {
         CITY,
         DESERT,
         SWAMP
+    }
+
+    public enum SoundType {
+        BUTTON_CLICK,
     }
 }
