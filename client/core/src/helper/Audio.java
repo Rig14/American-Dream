@@ -47,6 +47,19 @@ public class Audio {
                 music.put(AudioType.DESERT, l);
             }
         }
+
+        // swamp music
+        for (int i = 1; i < 3; i++) {
+            Music swamp = Gdx.audio.newMusic(Gdx.files.internal("audio/game/swamp/" + i + ".mp3"));
+            swamp.setVolume(0.5f);
+            if (music.containsKey(AudioType.SWAMP)) {
+                music.get(AudioType.SWAMP).add(swamp);
+            } else {
+                List<Music> l = new ArrayList<>();
+                l.add(swamp);
+                music.put(AudioType.SWAMP, l);
+            }
+        }
     }
 
     public static Audio getInstance() {
@@ -70,6 +83,7 @@ public class Audio {
 
     public void dispose() {
         music.forEach((key, value) -> value.forEach(Music::dispose));
+        instance = null;
     }
 
     public enum AudioType {

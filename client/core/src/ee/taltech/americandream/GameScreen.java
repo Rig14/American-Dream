@@ -56,6 +56,7 @@ public class GameScreen extends ScreenAdapter {
         switch (selectedMap) {
             case "Swamp":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+                Audio.getInstance().playMusic(Audio.AudioType.SWAMP);
                 break;
             case "Desert":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
@@ -184,6 +185,7 @@ public class GameScreen extends ScreenAdapter {
         super.dispose();
         world.dispose();
         batch.dispose();
+        Audio.getInstance().dispose();
         debugRenderer.dispose();
     }
 }
