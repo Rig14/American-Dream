@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
+import helper.Audio;
 import helper.BulletData;
 import helper.PlayerState;
 import helper.Textures;
@@ -47,6 +48,13 @@ public class RemoteManager {
                     // AI player
                     AIplayerX = gameStateMessage.AIplayerX;
                     AIplayerY = gameStateMessage.AIplayerY;
+
+                    // check if incoming bullets list is bigger than the current one
+                    // when it is, play gun sound effect
+                    if (remoteBullets != null && gameStateMessage.bulletData != null
+                            && gameStateMessage.bulletData.size() > remoteBullets.size()) {
+                        Audio.getInstance().playSound(Audio.SoundType.GUNSHOT);
+                    }
 
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
