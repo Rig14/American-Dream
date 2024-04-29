@@ -4,22 +4,35 @@ package helper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Audio class utilizing singleton design pattern.
  */
 public class Audio {
     private static Audio instance = null;
-    private final Map<AudioType, Music> music;
+    private final Map<AudioType, List<Music>> music;
 
     private Audio() {
         this.music = new HashMap<>();
+        // setting up different audio tracks
 
+        // menu music
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
         menu.setLooping(true);
-        music.put(AudioType.MENU, menu);
+        music.put(AudioType.MENU, Collections.singletonList(menu));
+
+        // city music
+        for (int i = 1; i < 4; i++) {
+            Music city = Gdx.audio.newMusic(Gdx.files.internal("audio/game/city/" + i + ".mp3"));
+            if (music.containsKey(AudioType.CITY)) {
+                music.get(AudioType.CITY).add(city);
+            } else {
+                List<Music> l = new ArrayList<>();
+                l.add(city);
+                music.put(AudioType.CITY, l);
+            }
+        }
     }
 
     public static Audio getInstance() {
@@ -29,22 +42,22 @@ public class Audio {
         return instance;
     }
 
-    public void playAudio(AudioType type) {
-        music.get(type).play();
+    public void playMusic(AudioType type) {
+        List<Music> musicList = music.get(type);
+        Collections.shuffle(musicList);
+        musicList.get(0).play();
     }
 
-    public void stopAudio(AudioType type) {
-        music.get(type).stop();
+    public void stopAllMusic() {
+        music.forEach((key, value) -> value.forEach(Music::stop));
     }
 
     public void dispose() {
-        for (Music m : music.values()) {
-            m.dispose();
-        }
+        music.forEach((key, value) -> value.forEach(Music::dispose));
     }
 
     public enum AudioType {
         MENU,
-        GAME
+        CITY,
     }
 }

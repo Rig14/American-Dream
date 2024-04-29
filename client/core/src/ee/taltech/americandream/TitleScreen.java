@@ -89,7 +89,7 @@ public class TitleScreen extends ScreenAdapter {
         stage.addActor(copyrightContainer);
 
         // start playing music
-        Audio.getInstance().playAudio(Audio.AudioType.MENU);
+        Audio.getInstance().playMusic(Audio.AudioType.MENU);
     }
 
     /**
@@ -124,7 +124,6 @@ public class TitleScreen extends ScreenAdapter {
     public void dispose() {
         super.dispose();
         stage.dispose();
-        Audio.getInstance().dispose();
     }
 
     /**

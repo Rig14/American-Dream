@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import helper.Audio;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
@@ -61,6 +62,8 @@ public class GameScreen extends ScreenAdapter {
                 break;
             default:
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+                Audio.getInstance().stopAllMusic();
+                Audio.getInstance().playMusic(Audio.AudioType.CITY);
                 break;
         }
         // remote player(s) manager
