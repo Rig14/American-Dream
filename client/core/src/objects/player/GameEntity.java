@@ -33,7 +33,7 @@ public abstract class GameEntity {
 
     public void update(float delta, Vector2 center, Optional<PlayerState> ps){}
 
-    public void update(float delta, Vector2 center, Optional<PlayerState> ps, Optional<List<BulletData>> bullets){}
+    public void update(float delta, Vector2 center, Optional<PlayerState> ps, Optional<List<BulletData>> bullets, Player player){}
 
     public abstract void render(SpriteBatch batch);
 

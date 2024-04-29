@@ -1,21 +1,15 @@
 package objects.player;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +24,7 @@ public class AIPlayer extends Player {
     private boolean jumpingState = false;
     private boolean dropThroughPlatformState = false;
     private Optional<List<BulletData>> bullets;
+    private Player realPlayer;
 
     /**
      * Initialize AI Player.
@@ -47,10 +42,14 @@ public class AIPlayer extends Player {
      * Plan method as per SPA arhitectue.
      * Different scenarios sorted by priority (ascending),
      * more critical scenario will override previous "state" or "commands".
+     * TODO: Rename previous AI player top "ufo" or something. This will prevent nullpointerexceptions and naming conflicts.
      */
     private void plan() {
         // initial position
         if (x < 1350) movingState = "right";
+
+        // shoot towards real player
+        shootingState = (realPlayer.getPosition().x < x) ? "left" : "right";
 
         // dodge bullets
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
@@ -58,7 +57,6 @@ public class AIPlayer extends Player {
                     .filter(x -> !(x.name.equals("AI")))
                     .collect(Collectors.toList());
             // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
-            System.out.println(y);
             if (enemyBullets.stream().anyMatch(bul -> (bul.y > y - 45)  // check if bullet is at the same level as AI
                     && ((bul.speedBullet > 0 && bul.x < x + 50) || (bul.speedBullet < 0 && bul.x > x - 50))  // x coord
                     && Math.abs(x - bul.x) < 200)) jumpingState = true;  // prevent AI from jumping too early
@@ -70,7 +68,6 @@ public class AIPlayer extends Player {
             jumpingState = true;
         }
 
-
         if (jumpingState && body.getLinearVelocity().y > 0) jumpingState = false;  // avoid using all 3 jumps right away
     }
 
@@ -81,8 +78,9 @@ public class AIPlayer extends Player {
      * @param center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center, Optional<PlayerState> playerState, Optional<List<BulletData>> bullets) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> playerState, Optional<List<BulletData>> bullets, Player player) {
         this.bullets = bullets;
+        this.realPlayer = player;  // could be set in constructor
         if (playerState.isPresent()) {
             PlayerState ps = playerState.get();
             damage = ps.getDamage();
@@ -123,7 +121,6 @@ public class AIPlayer extends Player {
      */
     @Override
     protected void handleInput(float delta) {
-        System.out.println(movingState);
         velX = 0;
         // Moving right
         if (movingState.equals("right")) {
@@ -191,5 +188,12 @@ public class AIPlayer extends Player {
         shootingState = "";
         bulletMessage.name = "AI";
         AmericanDream.client.sendTCP(bulletMessage);
+    }
+    /**
+     * Temporary solution to avoid duplicating names in single player mode.
+     */
+    @Override
+    public String getName() {
+        return "AI";
     }
 }

@@ -61,7 +61,7 @@ public class TitleScreen extends ScreenAdapter {
                 message.lobbyId = AmericanDream.id;
                 message.AIGame = true;
                 AmericanDream.client.sendTCP(message);
-                AmericanDream.instance.setScreen(new GameScreen(camera, "AI", "Desert"));
+                AmericanDream.instance.setScreen(new GameScreen(camera, "AIGame", "Desert"));
             }
         });
 

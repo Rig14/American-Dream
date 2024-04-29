@@ -169,7 +169,7 @@ public class Game extends Thread {
                     // find player with corresponding id
 
                     for (Player player : alivePlayers) {
-                        if (!player.getName().equals(playerStates[i].name)) {
+                        if (player.getName().equals(playerStates[i].name)) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)
                             playerStates[i].applyForce = player.handleBeingHit(bullet);  // returns force

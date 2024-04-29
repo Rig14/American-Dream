@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.Gdx;
 import helper.UI;
+import objects.player.AIPlayer;
 import objects.player.Player;
 import objects.player.RemotePlayer;
 
@@ -41,7 +42,7 @@ public class Hud {
     private int thirdRemoteLivesDisplayed = LIVES_COUNT;
 
     // displayed labels
-    private final Label timeTextLabel = UI.createLabel("TIME");
+    private final Label timeTextLabel = UI.createLabel("TIME", Color.WHITE, 2);
     private final Label timeCountdownLabel = UI.createLabel("Waiting for other player...",  Color.WHITE, 2);
 
     private final Label placeHolder = UI.createLabel("");
@@ -148,7 +149,7 @@ public class Hud {
      * @param localPlayer local player
      * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers) {
+    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers, Optional<AIPlayer> AIPlayer) {
         updateTime(time);
         heartScaling = (float) stage.getViewport().getScreenHeight() / 25;
         // update lives, health, damage
@@ -164,7 +165,9 @@ public class Hud {
             localDamage.setText(localPlayer.getDamage() + " %");
             localAmmoCount.setText(localPlayer.getAmmoCount());
 
+            if (AIPlayer.isPresent()) updateAIPlayer(AIPlayer.get());
             updateRemotePlayers(remotePlayers);
+
             // display game over screen
             if (localPlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("GAME OVER!\n You lost.");
@@ -201,6 +204,16 @@ public class Hud {
                 damageLabels.get(i).setText(rp.getDamage() + " %");
             }
         }
+    }
+
+    private void updateAIPlayer(AIPlayer AI) {
+            nameLabels.get(0).setText(AI.getName());
+            healthTables.get(0).setVisible(true);
+        if (livesDisplayed.get(0) != AI.getLivesCount()) {
+            livesDisplayed.add(0, AI.getLivesCount());
+            updateLivesTable(AI.getLivesCount(), healthTables.get(0));
+        }
+        damageLabels.get(0).setText(AI.getDamage() + " %");
     }
 
     /**

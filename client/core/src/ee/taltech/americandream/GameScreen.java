@@ -45,7 +45,7 @@ public class GameScreen extends ScreenAdapter {
      * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
-        AIGame = selectedCharacter.equals("AI");
+        AIGame = selectedCharacter.equals("AIGame");
         this.camera = (OrthographicCamera) camera;
         // fix #81. bug related to previous screen input processing working on this screen.
         Gdx.input.setInputProcessor(new Stage());
@@ -144,8 +144,8 @@ public class GameScreen extends ScreenAdapter {
         orthogonalTiledMapRenderer.setView(camera);
 
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
-        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState(), remoteManager.getBulletData());
-        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
+        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState(), remoteManager.getBulletData(), player);
+        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers(), Optional.ofNullable(AIPlayer));
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
