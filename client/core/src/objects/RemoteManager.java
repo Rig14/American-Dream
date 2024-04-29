@@ -74,6 +74,11 @@ public class RemoteManager {
                             }
                         }
                     }
+                    // play begin sound effect when game starts
+                    if (gameStateMessage.gameTime != 0 && gameTime == null) {
+                        Audio.getInstance().playSound(Audio.SoundType.START);
+                    }
+
                     // Game duration in seconds, changes occur in server
                     gameTime = (gameStateMessage.gameTime);
                 }

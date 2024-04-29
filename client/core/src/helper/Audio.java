@@ -72,6 +72,8 @@ public class Audio {
         sound.put(SoundType.GUNSHOT, shoot);
         Sound hit = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/hit.mp3"));
         sound.put(SoundType.HIT, hit);
+        Sound start = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/start.ogg"));
+        sound.put(SoundType.START, start);
     }
 
     public static Audio getInstance() {
@@ -114,6 +116,7 @@ public class Audio {
     public enum SoundType {
         BUTTON_CLICK,
         GUNSHOT,
-        HIT
+        HIT,
+        START
     }
 }
