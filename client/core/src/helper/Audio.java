@@ -19,7 +19,6 @@ public class Audio {
 
         // menu music
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
-        menu.setLooping(true);
         music.put(AudioType.MENU, Collections.singletonList(menu));
 
         // city music
@@ -43,9 +42,11 @@ public class Audio {
     }
 
     public void playMusic(AudioType type) {
+        stopAllMusic();
         List<Music> musicList = music.get(type);
         Collections.shuffle(musicList);
         musicList.get(0).play();
+        musicList.get(0).setOnCompletionListener(music -> playMusic(type));
     }
 
     public void stopAllMusic() {
