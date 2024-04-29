@@ -19,17 +19,32 @@ public class Audio {
 
         // menu music
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
+        menu.setVolume(0.5f);
         music.put(AudioType.MENU, Collections.singletonList(menu));
 
         // city music
         for (int i = 1; i < 4; i++) {
             Music city = Gdx.audio.newMusic(Gdx.files.internal("audio/game/city/" + i + ".mp3"));
+            city.setVolume(0.5f);
             if (music.containsKey(AudioType.CITY)) {
                 music.get(AudioType.CITY).add(city);
             } else {
                 List<Music> l = new ArrayList<>();
                 l.add(city);
                 music.put(AudioType.CITY, l);
+            }
+        }
+
+        // desert music
+        for (int i = 1; i < 4; i++) {
+            Music desert = Gdx.audio.newMusic(Gdx.files.internal("audio/game/desert/" + i + ".mp3"));
+            desert.setVolume(0.5f);
+            if (music.containsKey(AudioType.DESERT)) {
+                music.get(AudioType.DESERT).add(desert);
+            } else {
+                List<Music> l = new ArrayList<>();
+                l.add(desert);
+                music.put(AudioType.DESERT, l);
             }
         }
     }
@@ -60,5 +75,7 @@ public class Audio {
     public enum AudioType {
         MENU,
         CITY,
+        DESERT,
+        SWAMP
     }
 }
