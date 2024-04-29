@@ -10,8 +10,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import helper.CollisionHandler;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
@@ -39,7 +41,8 @@ public class GameScreen extends ScreenAdapter {
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
     private Vector2 mapCenterPoint;
-    private GunBoxHandler gunBoxHandler;
+    private final List<GunBox> getGunBoxList = new ArrayList<>();
+    private CollisionHandler collisionHandler;
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      *
@@ -75,8 +78,8 @@ public class GameScreen extends ScreenAdapter {
         // visual info for player
         this.hud = new Hud(this.batch);
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
-        this.gunBoxHandler = new GunBoxHandler();
-
+        this.collisionHandler = new CollisionHandler();
+        this.world.setContactFilter(collisionHandler);
     }
 
     public World getWorld() {
@@ -85,6 +88,10 @@ public class GameScreen extends ScreenAdapter {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void addGunBox(GunBox gunBox) {
+        getGunBoxList.add(gunBox);
     }
 
     public void setMapCenterPoint(Vector2 vector2) {
@@ -108,15 +115,16 @@ public class GameScreen extends ScreenAdapter {
 
         // object rendering
         batch.begin();
-        System.out.println(gunBoxHandler.getGunBoxList());
+        // System.out.println(gunBoxHandler.getGunBoxList());
         player.render(batch);
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
-        for (GunBox gunBox1 : gunBoxHandler.getGunBoxList()) {
-            gunBox1.render(batch, delta);
+        // System.out.println(getGunBoxList);
+        for (GunBox gunBox : getGunBoxList) {
+            gunBox.render(batch);
         }
 
         batch.end();
@@ -142,7 +150,9 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-        gunBoxHandler.spawnGunBox();
+        if (remoteManager.getGameTime().isPresent()) {
+            tileMapHelper.update(remoteManager.getGameTime().get());
+        }
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
         remoteManager.testForHit(world);
         hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());

@@ -17,7 +17,9 @@ import helper.PlayerState;
 import helper.packet.AddAIMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
+import objects.gun.GunBox;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -199,6 +201,9 @@ public class Player extends GameEntity {
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             // spawn AI player
             AmericanDream.client.sendTCP(new AddAIMessage());
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+            // pickup
         }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
