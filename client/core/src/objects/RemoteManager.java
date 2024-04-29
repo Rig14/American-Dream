@@ -69,6 +69,7 @@ public class RemoteManager {
                             localPlayerState = ps;
                             // get the force of the hit
                             if (ps.applyForce != 0) {
+                                Audio.getInstance().playSound(Audio.SoundType.HIT);
                                 onHitForce = ps.applyForce;
                             }
                         }
