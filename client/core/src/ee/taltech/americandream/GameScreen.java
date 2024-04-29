@@ -56,15 +56,15 @@ public class GameScreen extends ScreenAdapter {
         switch (selectedMap) {
             case "Swamp":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
-                Audio.getInstance().playMusic(Audio.AudioType.SWAMP);
+                Audio.getInstance().playMusic(Audio.MusicType.SWAMP);
                 break;
             case "Desert":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
-                Audio.getInstance().playMusic(Audio.AudioType.DESERT);
+                Audio.getInstance().playMusic(Audio.MusicType.DESERT);
                 break;
             default:
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
-                Audio.getInstance().playMusic(Audio.AudioType.CITY);
+                Audio.getInstance().playMusic(Audio.MusicType.CITY);
                 break;
         }
         // remote player(s) manager

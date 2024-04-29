@@ -12,7 +12,7 @@ import java.util.*;
 public class Audio {
     private static Audio instance = null;
     private final float MUSIC_VOLUME = 0.2f;
-    private final Map<AudioType, List<Music>> music;
+    private final Map<MusicType, List<Music>> music;
 
     private Audio() {
         this.music = new HashMap<>();
@@ -21,18 +21,18 @@ public class Audio {
         // menu music
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
         menu.setVolume(MUSIC_VOLUME);
-        music.put(AudioType.MENU, Collections.singletonList(menu));
+        music.put(MusicType.MENU, Collections.singletonList(menu));
 
         // city music
         for (int i = 1; i < 4; i++) {
             Music city = Gdx.audio.newMusic(Gdx.files.internal("audio/game/city/" + i + ".mp3"));
             city.setVolume(MUSIC_VOLUME);
-            if (music.containsKey(AudioType.CITY)) {
-                music.get(AudioType.CITY).add(city);
+            if (music.containsKey(MusicType.CITY)) {
+                music.get(MusicType.CITY).add(city);
             } else {
                 List<Music> l = new ArrayList<>();
                 l.add(city);
-                music.put(AudioType.CITY, l);
+                music.put(MusicType.CITY, l);
             }
         }
 
@@ -40,12 +40,12 @@ public class Audio {
         for (int i = 1; i < 4; i++) {
             Music desert = Gdx.audio.newMusic(Gdx.files.internal("audio/game/desert/" + i + ".mp3"));
             desert.setVolume(MUSIC_VOLUME);
-            if (music.containsKey(AudioType.DESERT)) {
-                music.get(AudioType.DESERT).add(desert);
+            if (music.containsKey(MusicType.DESERT)) {
+                music.get(MusicType.DESERT).add(desert);
             } else {
                 List<Music> l = new ArrayList<>();
                 l.add(desert);
-                music.put(AudioType.DESERT, l);
+                music.put(MusicType.DESERT, l);
             }
         }
 
@@ -53,12 +53,12 @@ public class Audio {
         for (int i = 1; i < 3; i++) {
             Music swamp = Gdx.audio.newMusic(Gdx.files.internal("audio/game/swamp/" + i + ".mp3"));
             swamp.setVolume(MUSIC_VOLUME);
-            if (music.containsKey(AudioType.SWAMP)) {
-                music.get(AudioType.SWAMP).add(swamp);
+            if (music.containsKey(MusicType.SWAMP)) {
+                music.get(MusicType.SWAMP).add(swamp);
             } else {
                 List<Music> l = new ArrayList<>();
                 l.add(swamp);
-                music.put(AudioType.SWAMP, l);
+                music.put(MusicType.SWAMP, l);
             }
         }
     }
@@ -70,7 +70,7 @@ public class Audio {
         return instance;
     }
 
-    public void playMusic(AudioType type) {
+    public void playMusic(MusicType type) {
         stopAllMusic();
         List<Music> musicList = music.get(type);
         Collections.shuffle(musicList);
@@ -87,7 +87,7 @@ public class Audio {
         instance = null;
     }
 
-    public enum AudioType {
+    public enum MusicType {
         MENU,
         CITY,
         DESERT,
