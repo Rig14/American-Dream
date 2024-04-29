@@ -59,6 +59,7 @@ public class AmericanDream extends Game {
         kryo.register(AddAIMessage.class);
         kryo.register(MapSelectionMessage.class);
         kryo.register(GunBoxMessage.class);
+        kryo.register(GunPickupMessage.class);
     }
 
     /**

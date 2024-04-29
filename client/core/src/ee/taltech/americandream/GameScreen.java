@@ -16,11 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import helper.CollisionHandler;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
+import helper.packet.GunPickupMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
 import objects.gun.GunBox;
-import objects.gun.GunBoxHandler;
 import objects.player.Player;
 
 import java.util.ArrayList;
@@ -115,18 +115,20 @@ public class GameScreen extends ScreenAdapter {
 
         // object rendering
         batch.begin();
-        // System.out.println(gunBoxHandler.getGunBoxList());
         player.render(batch);
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
         remoteManager.renderAIPlayer(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
-        // System.out.println(getGunBoxList);
-        for (GunBox gunBox : getGunBoxList) {
-            gunBox.render(batch);
+        // render gunboxes, remove if they are null (they are null if the remove method is called in the gunbox class)
+        for (int i = 0; i < getGunBoxList.size(); i++) {
+            if (getGunBoxList.get(i).getBody() == null) {
+                getGunBoxList.remove(getGunBoxList.get(i));
+            } else {
+                getGunBoxList.get(i).render(batch);
+            }
         }
-
         batch.end();
 
         // for debugging
@@ -163,6 +165,13 @@ public class GameScreen extends ScreenAdapter {
 
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+            GunPickupMessage gunPickupMessage = collisionHandler.removeGunBoxTouchingPlayer(player.getBody().getFixtureList(), getGunBoxList);
+            if (gunPickupMessage.id != null) {
+                gunPickupMessage.character = player.getName();
+                AmericanDream.client.sendTCP(gunPickupMessage);
+            }
         }
     }
 

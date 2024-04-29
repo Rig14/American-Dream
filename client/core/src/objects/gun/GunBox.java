@@ -36,6 +36,7 @@ public class GunBox {
     public Body getBody() {
         return body;
     }
+
     public Vector2 getPosition() {
         return new Vector2(body.getPosition().x, body.getPosition().y);
     }

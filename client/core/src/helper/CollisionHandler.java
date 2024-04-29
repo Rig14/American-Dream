@@ -3,6 +3,8 @@ package helper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
+import helper.packet.GunPickupMessage;
 import objects.gun.GunBox;
 import objects.player.Player;
 
@@ -26,13 +28,15 @@ public class CollisionHandler implements ContactFilter {
         }
         return true;
     }
-    public boolean isPlayerTouchingGunBox(Fixture playerFixture, List<GunBox> gunBoxes) {
+    public GunPickupMessage removeGunBoxTouchingPlayer(Array<Fixture> playerFixtureArray, List<GunBox> gunBoxes) {
+        GunPickupMessage gunPickupMessage = new GunPickupMessage();
         for (GunBox gunBox : gunBoxes) {
-            if (playerFixture.testPoint(gunBox.getPosition())) {
-                return true;
+            if (playerFixtureArray.get(0).testPoint(gunBox.getPosition())) {
+                gunBox.remove();
+                gunPickupMessage.id = gunBox.getId();
             }
         }
-        return false;
+        return gunPickupMessage;
     }
 
 
