@@ -12,14 +12,14 @@ import java.util.Map;
  */
 public class Audio {
     private static Audio instance = null;
-    private final Map<MusicType, Music> music;
+    private final Map<AudioType, Music> music;
 
     private Audio() {
         this.music = new HashMap<>();
 
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
         menu.setLooping(true);
-        music.put(MusicType.MENU, menu);
+        music.put(AudioType.MENU, menu);
     }
 
     public static Audio getInstance() {
@@ -29,8 +29,12 @@ public class Audio {
         return instance;
     }
 
-    public void playMusic(MusicType type) {
+    public void playAudio(AudioType type) {
         music.get(type).play();
+    }
+
+    public void stopAudio(AudioType type) {
+        music.get(type).stop();
     }
 
     public void dispose() {
@@ -39,7 +43,7 @@ public class Audio {
         }
     }
 
-    public enum MusicType {
+    public enum AudioType {
         MENU,
         GAME
     }
