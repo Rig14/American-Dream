@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
+import helper.Audio;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
@@ -40,13 +41,12 @@ public class Player extends GameEntity {
     private int isShooting;
     private float jumpCounterResetTime = 0;
 
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
-
     /**
      * Initialize Player.
-     * @param width width of the player object/body
+     *
+     * @param width  width of the player object/body
      * @param height height
-     * @param body object that moves around in the world and collides with other bodies
+     * @param body   object that moves around in the world and collides with other bodies
      */
     public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
@@ -115,7 +115,8 @@ public class Player extends GameEntity {
     /**
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
-     * @param delta delta time
+     *
+     * @param delta  delta time
      * @param center point of the map/world
      */
     @Override
@@ -192,6 +193,7 @@ public class Player extends GameEntity {
             body.setLinearVelocity(body.getLinearVelocity().x, 0);
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
             jumpCounter++;
+            Audio.getInstance().playSound(Audio.SoundType.JUMP);
         }
 
         // key down on platform
@@ -287,4 +289,6 @@ public class Player extends GameEntity {
             }
         }
     }
+
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }

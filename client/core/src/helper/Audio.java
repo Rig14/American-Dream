@@ -78,6 +78,8 @@ public class Audio {
         sound.put(SoundType.YOU_LOSE, lost);
         Sound win = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/you_win.ogg"));
         sound.put(SoundType.YOU_WIN, win);
+        Sound jump = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/jump.mp3"));
+        sound.put(SoundType.JUMP, jump);
     }
 
     public static Audio getInstance() {
@@ -123,6 +125,7 @@ public class Audio {
         HIT,
         START,
         YOU_LOSE,
-        YOU_WIN
+        YOU_WIN,
+        JUMP
     }
 }
