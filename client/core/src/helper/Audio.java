@@ -83,6 +83,8 @@ public class Audio {
         sound.put(SoundType.JUMP, jump);
         Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.wav"));
         sound.put(SoundType.DEATH, death);
+        Sound chooseYourCharacter = Gdx.audio.newSound(Gdx.files.internal("audio/menu/choose_your_character.ogg"));
+        sound.put(SoundType.CHOOSE_YOUR_CHARACTER, chooseYourCharacter);
 
 
         // walking sound effect as music
@@ -156,6 +158,7 @@ public class Audio {
         YOU_LOSE,
         YOU_WIN,
         JUMP,
-        DEATH
+        DEATH,
+        CHOOSE_YOUR_CHARACTER
     }
 }

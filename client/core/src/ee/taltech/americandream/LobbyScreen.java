@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import helper.Audio;
 import helper.packet.GameLeaveMessage;
 import helper.packet.LobbyDataMessage;
 
@@ -100,6 +101,8 @@ public class LobbyScreen extends ScreenAdapter {
                 }
             }
         });
+
+        Audio.getInstance().playSound(Audio.SoundType.CHOOSE_YOUR_CHARACTER);
     }
 
     private TextButton createCharacterButton(String characterName, Texture characterTexture) {
