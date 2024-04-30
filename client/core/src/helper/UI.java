@@ -104,9 +104,10 @@ public class UI {
     public static Slider createSlider(float min, float max, float stepSize, boolean vertical) {
         Slider.SliderStyle style = new Slider.SliderStyle();
         style.background = new TextureRegionDrawable(new TextureRegion(new Texture("slider_background.png")));
-        style.background.setMinWidth(Gdx.graphics.getWidth());
         style.background.setMinHeight(Gdx.graphics.getHeight() / 25f);
         style.knob = new TextureRegionDrawable(new TextureRegion(new Texture("slider_knob.png")));
+        style.knob.setMinHeight(Gdx.graphics.getHeight() / 20f);
+        style.knob.setMinWidth(Gdx.graphics.getHeight() / 20f);
         return new Slider(min, max, stepSize, vertical, style);
     }
 }
