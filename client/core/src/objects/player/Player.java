@@ -301,6 +301,7 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
+                Audio.getInstance().playSound(Audio.SoundType.DEATH);
             }
         }
     }

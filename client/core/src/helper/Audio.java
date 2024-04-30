@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Audio {
     private static Audio instance = null;
-    private final float MUSIC_VOLUME = 0.0f;
+    private final float MUSIC_VOLUME = 0.1f;
     private final float SOUND_VOLUME = 0.5f;
     private final Map<MusicType, List<Music>> music;
     private final Map<SoundType, Sound> sound;
@@ -81,6 +81,9 @@ public class Audio {
         sound.put(SoundType.YOU_WIN, win);
         Sound jump = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/jump.mp3"));
         sound.put(SoundType.JUMP, jump);
+        Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.wav"));
+        sound.put(SoundType.DEATH, death);
+
 
         // walking sound effect as music
         for (int i = 0; i < 8; i++) {
@@ -152,6 +155,7 @@ public class Audio {
         START,
         YOU_LOSE,
         YOU_WIN,
-        JUMP
+        JUMP,
+        DEATH
     }
 }
