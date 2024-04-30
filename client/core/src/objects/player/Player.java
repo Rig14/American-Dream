@@ -40,6 +40,8 @@ public class Player extends GameEntity {
     private Integer ammoCount = 0;
     private int isShooting;
     private float jumpCounterResetTime = 0;
+    private boolean onGround = false;
+    private boolean walkSoundStarted = false;
 
     /**
      * Initialize Player.
@@ -212,17 +214,30 @@ public class Player extends GameEntity {
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
+            onGround = true;
             // body y velocity must main 0 for some time to reset jump counter
             if (jumpCounterResetTime > 0.1f) {
                 jumpCounter = 0;
                 jumpCounterResetTime = 0;
             }
             jumpCounterResetTime += delta;
+        } else {
+            onGround = false;
         }
+
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // check for shooting input
         shootingInput();
+
+        // walking sound
+        if (onGround && !walkSoundStarted && velX != 0) {
+            Audio.getInstance().startWalkSound();
+            walkSoundStarted = true;
+        } else if (!onGround || velX == 0) {
+            Audio.getInstance().stopWalkSound();
+            walkSoundStarted = false;
+        }
     }
 
     /**

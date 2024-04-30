@@ -12,7 +12,8 @@ import java.util.*;
  */
 public class Audio {
     private static Audio instance = null;
-    private final float MUSIC_VOLUME = 0.2f;
+    private final float MUSIC_VOLUME = 0.0f;
+    private final float SOUND_VOLUME = 0.5f;
     private final Map<MusicType, List<Music>> music;
     private final Map<SoundType, Sound> sound;
 
@@ -80,6 +81,19 @@ public class Audio {
         sound.put(SoundType.YOU_WIN, win);
         Sound jump = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/jump.mp3"));
         sound.put(SoundType.JUMP, jump);
+
+        // walking sound effect as music
+        for (int i = 0; i < 8; i++) {
+            Music walk = Gdx.audio.newMusic(Gdx.files.internal("audio/game/sound/walk/Footstep_Dirt_0" + i + ".mp3"));
+            walk.setVolume(SOUND_VOLUME);
+            if (music.containsKey(MusicType.WALK)) {
+                music.get(MusicType.WALK).add(walk);
+            } else {
+                List<Music> l = new ArrayList<>();
+                l.add(walk);
+                music.put(MusicType.WALK, l);
+            }
+        }
     }
 
     public static Audio getInstance() {
@@ -102,6 +116,17 @@ public class Audio {
         sound.get(type).play();
     }
 
+    public void startWalkSound() {
+        List<Music> musicList = music.get(MusicType.WALK);
+        Collections.shuffle(musicList);
+        musicList.get(0).play();
+        musicList.get(0).setOnCompletionListener(music -> startWalkSound());
+    }
+
+    public void stopWalkSound() {
+        music.get(MusicType.WALK).forEach(Music::stop);
+    }
+
     public void stopAllMusic() {
         music.forEach((key, value) -> value.forEach(Music::stop));
     }
@@ -116,7 +141,8 @@ public class Audio {
         MENU,
         CITY,
         DESERT,
-        SWAMP
+        SWAMP,
+        WALK
     }
 
     public enum SoundType {
