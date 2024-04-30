@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -97,5 +98,15 @@ public class UI {
         label.setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         generator.dispose();
         return label;
+    }
+
+
+    public static Slider createSlider(float min, float max, float stepSize, boolean vertical) {
+        Slider.SliderStyle style = new Slider.SliderStyle();
+        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("slider_background.png")));
+        style.background.setMinWidth(Gdx.graphics.getWidth());
+        style.background.setMinHeight(Gdx.graphics.getHeight() / 25f);
+        style.knob = new TextureRegionDrawable(new TextureRegion(new Texture("slider_knob.png")));
+        return new Slider(min, max, stepSize, vertical, style);
     }
 }

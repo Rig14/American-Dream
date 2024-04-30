@@ -12,10 +12,10 @@ import java.util.*;
  */
 public class Audio {
     private static Audio instance = null;
-    private final float MUSIC_VOLUME = 0.1f;
-    private final float SOUND_VOLUME = 0.5f;
     private final Map<MusicType, List<Music>> music;
     private final Map<SoundType, Sound> sound;
+    private float musicVolume = .4f;
+    private float soundVolume = 1f;
 
     private Audio() {
         this.music = new HashMap<>();
@@ -24,13 +24,13 @@ public class Audio {
 
         // menu music
         Music menu = Gdx.audio.newMusic(Gdx.files.internal("audio/menu/menu.mp3"));
-        menu.setVolume(MUSIC_VOLUME);
+        menu.setVolume(musicVolume);
         music.put(MusicType.MENU, Collections.singletonList(menu));
 
         // city music
         for (int i = 1; i < 4; i++) {
             Music city = Gdx.audio.newMusic(Gdx.files.internal("audio/game/city/" + i + ".mp3"));
-            city.setVolume(MUSIC_VOLUME);
+            city.setVolume(musicVolume / 2);
             if (music.containsKey(MusicType.CITY)) {
                 music.get(MusicType.CITY).add(city);
             } else {
@@ -43,7 +43,7 @@ public class Audio {
         // desert music
         for (int i = 1; i < 4; i++) {
             Music desert = Gdx.audio.newMusic(Gdx.files.internal("audio/game/desert/" + i + ".mp3"));
-            desert.setVolume(MUSIC_VOLUME);
+            desert.setVolume(musicVolume / 2);
             if (music.containsKey(MusicType.DESERT)) {
                 music.get(MusicType.DESERT).add(desert);
             } else {
@@ -56,7 +56,7 @@ public class Audio {
         // swamp music
         for (int i = 1; i < 3; i++) {
             Music swamp = Gdx.audio.newMusic(Gdx.files.internal("audio/game/swamp/" + i + ".mp3"));
-            swamp.setVolume(MUSIC_VOLUME);
+            swamp.setVolume(musicVolume / 2);
             if (music.containsKey(MusicType.SWAMP)) {
                 music.get(MusicType.SWAMP).add(swamp);
             } else {
@@ -90,7 +90,7 @@ public class Audio {
         // walking sound effect as music
         for (int i = 0; i < 8; i++) {
             Music walk = Gdx.audio.newMusic(Gdx.files.internal("audio/game/sound/walk/Footstep_Dirt_0" + i + ".mp3"));
-            walk.setVolume(SOUND_VOLUME);
+            walk.setVolume(soundVolume);
             if (music.containsKey(MusicType.WALK)) {
                 music.get(MusicType.WALK).add(walk);
             } else {
@@ -118,7 +118,15 @@ public class Audio {
 
     public void playSound(SoundType type) {
         // play sound
-        sound.get(type).play();
+        long id = sound.get(type).play(soundVolume);
+
+        switch (type) {
+            case BUTTON_CLICK:
+                sound.get(type).setVolume(id, soundVolume / 3);
+            case GUNSHOT:
+                sound.get(type).setVolume(id, soundVolume / 3);
+                break;
+        }
     }
 
     public void startWalkSound() {
@@ -140,6 +148,24 @@ public class Audio {
         music.forEach((key, value) -> value.forEach(Music::dispose));
         sound.forEach((key, value) -> value.dispose());
         instance = null;
+    }
+
+    public float getSoundVolume() {
+        return soundVolume;
+    }
+
+    public void setSoundVolume(float soundVolume) {
+        this.soundVolume = soundVolume;
+    }
+
+    public float getMusicVolume() {
+        return musicVolume;
+    }
+
+    public void setMusicVolume(float musicVolume) {
+        this.musicVolume = musicVolume;
+
+        music.forEach((key, value) -> value.forEach(m -> m.setVolume(musicVolume)));
     }
 
     public enum MusicType {
