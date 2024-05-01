@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import helper.Audio;
 
 import static helper.UI.*;
 
@@ -32,7 +33,7 @@ public class TitleScreen extends ScreenAdapter {
         mainContainer.setFillParent(true);
 
         Table buttonsContainer = new Table();
-        mainContainer.add(buttonsContainer).row();
+        mainContainer.add(buttonsContainer).center();
 
         multiplayerButton = createButton("Multiplayer");
         TextButton localButton = createButton("Start Game");
@@ -81,11 +82,48 @@ public class TitleScreen extends ScreenAdapter {
         // add background to the stage
         Image background = new Image(new Texture(Gdx.files.internal("screen-bg/title.jpg")));
         background.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        stage.addActor(background);
 
+        // sliders
+        Table sliderContainer = new Table();
+        sliderContainer.setFillParent(true);
+        sliderContainer.bottom().right();
+        sliderContainer.pad(10);
+        Slider volume = createSlider(0f, 1f, 0.01f, false);
+        Label volumeLabel = createLabel("Volume", Color.GRAY, 2);
+        volume.setValue(Audio.getInstance().getSoundVolume());
+        volume.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Audio.getInstance().setSoundVolume(volume.getValue());
+            }
+        });
+        Table volumeContainer = new Table();
+        volumeContainer.add(volumeLabel).padRight(10);
+        volumeContainer.add(volume);
+        sliderContainer.add(volumeContainer).row();
+
+        Slider music = createSlider(0f, 1f, 0.01f, false);
+        music.setValue(Audio.getInstance().getMusicVolume());
+        music.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Audio.getInstance().setMusicVolume(music.getValue());
+            }
+        });
+        Table musicContainer = new Table();
+        Label musicLabel = createLabel("Music", Color.GRAY, 2);
+        musicContainer.add(musicLabel).padRight(10);
+        musicContainer.add(music);
+        sliderContainer.add(musicContainer).bottom().right().row();
+
+        stage.addActor(background);
         stage.addActor(versionContainer);
         stage.addActor(mainContainer);
+        stage.addActor(sliderContainer);
         stage.addActor(copyrightContainer);
+
+        // start playing music
+        Audio.getInstance().playMusic(Audio.MusicType.MENU);
     }
 
     /**
