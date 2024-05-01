@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
+import helper.Audio;
 import helper.BulletData;
 import helper.PlayerState;
 import helper.Textures;
@@ -46,6 +47,13 @@ public class RemoteManager {
                     AIplayerX = gameStateMessage.AIplayerX;
                     AIplayerY = gameStateMessage.AIplayerY;
 
+                    // check if incoming bullets list is bigger than the current one
+                    // when it is, play gun sound effect
+                    if (remoteBullets != null && gameStateMessage.bulletData != null
+                            && gameStateMessage.bulletData.size() > remoteBullets.size()) {
+                        Audio.getInstance().playSound(Audio.SoundType.GUNSHOT);
+                    }
+
                     // overwrite the remote bullets list with new data
                     remoteBullets = gameStateMessage.bulletData;
 
@@ -59,9 +67,17 @@ public class RemoteManager {
                                 AIPlayerState = ps;
                             } else {
                                 localPlayerState = ps;
+                                if (ps.applyForce != 0) {
+                                    Audio.getInstance().playSound(Audio.SoundType.HIT);
+                                }
                             }
                         }
                     }
+                    // play begin sound effect when game starts
+                    if (gameStateMessage.gameTime != 0 && gameTime == null) {
+                        Audio.getInstance().playSound(Audio.SoundType.START);
+                    }
+
                     // Game duration in seconds, changes occur in server
                     gameTime = (gameStateMessage.gameTime);
                 }

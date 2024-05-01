@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
+import helper.Audio;
 import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddAIMessage;
@@ -40,14 +41,15 @@ public class Player extends GameEntity {
     protected int isShooting;
     protected float jumpCounterResetTime = 0;
     protected float bulletHitForce = 0f;
-
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
+    private boolean onGround = false;
+    private boolean walkSoundStarted = false;
 
     /**
      * Initialize Player.
-     * @param width width of the player object/body
+     *
+     * @param width  width of the player object/body
      * @param height height
-     * @param body object that moves around in the world and collides with other bodies
+     * @param body   object that moves around in the world and collides with other bodies
      */
     public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
@@ -116,7 +118,8 @@ public class Player extends GameEntity {
     /**
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
-     * @param delta delta time
+     *
+     * @param delta  delta time
      * @param center point of the map/world
      */
     @Override
@@ -195,6 +198,7 @@ public class Player extends GameEntity {
             body.setLinearVelocity(body.getLinearVelocity().x, 0);
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
             jumpCounter++;
+            Audio.getInstance().playSound(Audio.SoundType.JUMP);
         }
 
         // key down on platform
@@ -213,17 +217,30 @@ public class Player extends GameEntity {
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
+            onGround = true;
             // body y velocity must main 0 for some time to reset jump counter
             if (jumpCounterResetTime > 0.1f) {
                 jumpCounter = 0;
                 jumpCounterResetTime = 0;
             }
             jumpCounterResetTime += delta;
+        } else {
+            onGround = false;
         }
+
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // check for shooting input
         shootingInput();
+
+        // walking sound
+        if (onGround && !walkSoundStarted && velX != 0) {
+            Audio.getInstance().startWalkSound();
+            walkSoundStarted = true;
+        } else if (!onGround || velX == 0) {
+            Audio.getInstance().stopWalkSound();
+            walkSoundStarted = false;
+        }
     }
 
     /**
@@ -305,7 +322,10 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
+                Audio.getInstance().playSound(Audio.SoundType.DEATH);
             }
         }
     }
+
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }

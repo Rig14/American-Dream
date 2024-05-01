@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import helper.Audio;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
 import indicators.OffScreenIndicator;
@@ -61,12 +62,15 @@ public class GameScreen extends ScreenAdapter {
         switch (selectedMap) {
             case "Swamp":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.SWAMP);
                 break;
             case "Desert":
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.DESERT);
                 break;
             default:
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.CITY);
                 break;
         }
         // remote player(s) manager
@@ -84,6 +88,7 @@ public class GameScreen extends ScreenAdapter {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
     public void setAIPlayer(AIPlayer player) {
         this.AIPlayer = player;
     }
@@ -191,6 +196,7 @@ public class GameScreen extends ScreenAdapter {
         super.dispose();
         world.dispose();
         batch.dispose();
+        Audio.getInstance().dispose();
         debugRenderer.dispose();
     }
 }
