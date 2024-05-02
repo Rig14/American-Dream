@@ -7,6 +7,7 @@ import helper.Direction;
 import helper.PlayerState;
 import helper.packet.AddUfoMessage;
 import helper.packet.BulletMessage;
+import helper.packet.GameLeaveMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -17,7 +18,7 @@ import java.util.Objects;
 import static helper.Constants.*;
 
 public class Player {
-    private boolean thisIsAI = false;
+    private final boolean thisIsAI;
     private final int id;
     private final Game game;
     private final Connection connection;
@@ -71,6 +72,8 @@ public class Player {
                     } else if (!thisIsAI && !positionMessage.name.equals("AI")) {
                         handlePositionMessage(positionMessage);
                     }
+                } else if (object instanceof GameLeaveMessage && thisIsAI) {  // end AIGame instance
+                    game.end();
                 }
 
                 // handle bullet position message
