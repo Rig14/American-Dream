@@ -19,7 +19,7 @@ public class Game extends Thread {
     private final Lobby lobby;
     private Player[] alivePlayers;
     private final Player[] allPlayers;
-    private AIPlayer aiPlayer;
+    private ee.taltech.americandream.server.UFO UFO;
     private float gameTime;
     private boolean running = true;
     private boolean allJoinedMultiplayer = false;
@@ -60,9 +60,9 @@ public class Game extends Thread {
                     player.update(1000f / TICK_RATE / 1000f);
                 }
 
-                // update AI player
-                if (aiPlayer != null) {
-                    aiPlayer.update(1000f / TICK_RATE / 1000f, alivePlayers);
+                // update UFO
+                if (UFO != null) {
+                    UFO.update(1000f / TICK_RATE / 1000f, alivePlayers);
                 }
 
                 // construct game state message
@@ -78,13 +78,13 @@ public class Game extends Thread {
                     gameStateMessage.bulletData.addAll(allPlayers[i].getPlayerBullets());
                 }
 
-                // ai logic
-                if (aiPlayer != null) {
-                    // add AI player bullet data
-                    gameStateMessage.bulletData.addAll(aiPlayer.getBullets());
-                    // add AI player position
-                    gameStateMessage.AIplayerX = aiPlayer.getX();
-                    gameStateMessage.AIplayerY = aiPlayer.getY();
+                // UFO logic
+                if (UFO != null) {
+                    // add UFO bullet data
+                    gameStateMessage.bulletData.addAll(UFO.getBullets());
+                    // add UFO position
+                    gameStateMessage.ufoPlayerX = UFO.getX();
+                    gameStateMessage.ufoPlayerY = UFO.getY();
                 }
 
                 // handle bullets hitting players
@@ -132,7 +132,7 @@ public class Game extends Thread {
     }
 
     /**
-     * Generate a hitbox for each player (including AI player). Iterate through all bullets and check if any of them
+     * Generate a hitbox for each player (including UFO). Iterate through all bullets and check if any of them
      * intersects the player's hitbox.
      * Handle bullet hits by disabling the bullet, calculating bullet force and applying force to the player.
      * @param gameStateMessage contains data about players' and bullets' locations
@@ -147,10 +147,10 @@ public class Game extends Thread {
             playerHitboxes[i] = new Rectangle((int) playerStates[i].x - PLAYER_WIDTH / 2, (int) playerStates[i].y - PLAYER_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT);
         }
 
-        // if AI player exists, construct hitbox for AI player
-        Rectangle aiPlayerHitbox = null;
-        if (aiPlayer != null) {
-            aiPlayerHitbox = new Rectangle((int) aiPlayer.getX(), (int) aiPlayer.getY(), AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+        // if UFO exists, construct hitbox for UFO
+        Rectangle ufoHitbox = null;
+        if (UFO != null) {
+            ufoHitbox = new Rectangle((int) UFO.getX(), (int) UFO.getY(), UFO_SIZE.width, UFO_SIZE.height);
         }
 
         // check if bullets hit players
@@ -178,13 +178,13 @@ public class Game extends Thread {
                 }
             }
 
-            // AI player hit
-            if (aiPlayerHitbox != null
-                    && aiPlayerHitbox.intersects(bulletHitbox)
+            // UFO collision with bullets
+            if (ufoHitbox != null
+                    && ufoHitbox.intersects(bulletHitbox)
                     && !bullet.isDisabled && bullet.id != -1
             ) {
                 bullet.isDisabled = true;
-                aiPlayer.bulletHit(bullet);
+                UFO.bulletHit(bullet);
             }
         }
     }
@@ -198,16 +198,16 @@ public class Game extends Thread {
     }
 
     /**
-     * Add an AI player to the current game instance.
+     * Add an UFO to the current game instance.
      */
-    public void addAIPlayer() {
-        // check if AI player already exists
-        if (aiPlayer != null) return;
+    public void addUFO() {
+        // check if UFO already exists
+        if (UFO != null) return;
 
-        // find point between players and spawn the AI player there
+        // find point between players and spawn the UFO there
         float x = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().x, Float::sum) / alivePlayers.length;
         float y = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / alivePlayers.length;
 
-        aiPlayer = new AIPlayer(x, y);
+        UFO = new UFO(x, y);
     }
 }

@@ -5,7 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
+import helper.packet.AddUfoMessage;
 import helper.packet.BulletMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
@@ -83,9 +83,9 @@ public class Player {
                 }
 
                 // handle adding AI player
-                if (object instanceof AddAIMessage addAIMessage) {
+                if (object instanceof AddUfoMessage addAIMessage) {
                     // handle adding AI player
-                    game.addAIPlayer();
+                    game.addUFO();
                 }
             }
         });

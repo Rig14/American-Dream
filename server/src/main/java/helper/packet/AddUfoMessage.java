@@ -1,5 +1,5 @@
 package helper.packet;
 
-public class AddAIMessage {
+public class AddUfoMessage {
     // no body needed
 }

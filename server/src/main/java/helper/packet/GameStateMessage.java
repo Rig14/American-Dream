@@ -9,6 +9,6 @@ public class GameStateMessage {
     public PlayerState[] playerStates;
     public List<BulletData> bulletData;
     public int gameTime;
-    public float AIplayerX;
-    public float AIplayerY;
+    public float ufoPlayerX;
+    public float ufoPlayerY;
 }

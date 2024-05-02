@@ -15,7 +15,7 @@ import ee.taltech.americandream.AmericanDream;
 import helper.Audio;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
+import helper.packet.AddUfoMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -211,8 +211,8 @@ public class Player extends GameEntity {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-            // spawn AI player
-            AmericanDream.client.sendTCP(new AddAIMessage());
+            // spawn UFO
+            AmericanDream.client.sendTCP(new AddUfoMessage());
         }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)

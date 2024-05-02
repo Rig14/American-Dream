@@ -101,7 +101,7 @@ public class GameServer extends Thread {
         kryo.register(HashMap.class);
         kryo.register(JoinLobbyMessage.class);
         kryo.register(GameLeaveMessage.class);
-        kryo.register(AddAIMessage.class);
+        kryo.register(AddUfoMessage.class);
         kryo.register(MapSelectionMessage.class);
     }
 

@@ -17,7 +17,7 @@ import objects.player.RemotePlayer;
 
 import java.util.*;
 
-import static helper.Constants.AI_PLAYER_SIZE;
+import static helper.Constants.UFO_SIZE;
 
 public class RemoteManager {
     private List<RemotePlayer> remotePlayers = new ArrayList<>();
@@ -26,8 +26,8 @@ public class RemoteManager {
     private PlayerState[] allPlayerStates;
     private PlayerState localPlayerState;
     private PlayerState AIPlayerState;
-    private float AIplayerX;
-    private float AIplayerY;
+    private float ufoPlayerX;
+    private float ufoPlayerY;
 
     /**
      * Initialize RemoteManager that controls all data and functionality regarding remote players.
@@ -43,9 +43,9 @@ public class RemoteManager {
                     // handle game state message
                     remotePlayers = new ArrayList<>();
 
-                    // AI player
-                    AIplayerX = gameStateMessage.AIplayerX;
-                    AIplayerY = gameStateMessage.AIplayerY;
+                    // UFO
+                    ufoPlayerX = gameStateMessage.ufoPlayerX;
+                    ufoPlayerY = gameStateMessage.ufoPlayerY;
 
                     // check if incoming bullets list is bigger than the current one
                     // when it is, play gun sound effect
@@ -134,22 +134,22 @@ public class RemoteManager {
     }
 
     /**
-     * Get all players' state if none of them is null. Check for AI player.
+     * Get all players' state if none of them is null. Check for ufoPlayer.
      */
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            if (AIplayerX == 0 && AIplayerY == 0) {
+            if (ufoPlayerX == 0 && ufoPlayerY == 0) {
                 return Optional.of(allPlayerStates);
             }
-            // add AI player to the list if it exists
+            // add ufoPlayer to the list if it exists
             PlayerState[] newAllPlayerStates = Arrays.copyOf(allPlayerStates, allPlayerStates.length + 1);
-            PlayerState AIplayer = new PlayerState();
-            AIplayer.x = AIplayerX;
-            AIplayer.y = AIplayerY;
-            AIplayer.name = "AI";
-            newAllPlayerStates[allPlayerStates.length] = AIplayer;
+            PlayerState ufoPlayerState = new PlayerState();
+            ufoPlayerState.x = ufoPlayerX;
+            ufoPlayerState.y = ufoPlayerY;
+            ufoPlayerState.name = "UFO";
+            newAllPlayerStates[allPlayerStates.length] = ufoPlayerState;
             return Optional.of(newAllPlayerStates);
         }
         return Optional.empty();
@@ -174,12 +174,12 @@ public class RemoteManager {
     }
 
     /**
-     * Render AI player if it exists.
+     * Render UFO if it exists.
      */
-    public void renderAIPlayer(SpriteBatch batch) {
-        if (AIplayerX == 0 && AIplayerY == 0) return;
+    public void renderUFO(SpriteBatch batch) {
+        if (ufoPlayerX == 0 && ufoPlayerY == 0) return;
 
-        batch.draw(Textures.ALIEN_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+        batch.draw(Textures.ALIEN_TEXTURE, ufoPlayerX, ufoPlayerY, UFO_SIZE.width, UFO_SIZE.height);
     }
 
     /**

@@ -174,17 +174,20 @@ public class Hud {
                     finalSoundPlayed = true;
                 }
                 gameOverLabel.setColor(Color.RED);
-                // check if all remote players are defeated  &&  the game has already started
-            } else if (!remotePlayers.isEmpty() &&
-                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) {
+                gameOverLabel.setFontScale(1);
+                // check if all remote players are defeated  &&  the game has already started  || AIPlayer has 0 luves
+            } else if ((!remotePlayers.isEmpty() &&
+                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) ||
+                    AIPlayer.isPresent() && Objects.equals(AIPlayer.get().getLivesCount(), 0)) {
                 gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setFontScale(1);
                 if (!finalSoundPlayed) {
                     Audio.getInstance().playSound(Audio.SoundType.YOU_WIN);
                     finalSoundPlayed = true;
                 }
                 gameOverLabel.setColor(Color.GREEN);
             } else {
-                gameOverLabel.setText("");  // prevents  error caused by UDP losses
+                gameOverLabel.setText("");  // prevents errors caused by UDP losses
             }
         }
     }
