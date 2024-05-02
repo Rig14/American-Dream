@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import helper.Audio;
 import helper.UI;
+import objects.player.AIPlayer;
 import objects.player.Player;
 import objects.player.RemotePlayer;
 
@@ -30,23 +31,29 @@ public class Hud {
     private final Integer TOP_ROW_PADDING = 25;
     private final Integer ROW_PADDING = 10;
     // displayed labels
-    private final Label timeTextLabel = UI.createLabel("TIME");
-    private final Label timeCountdownLabel = UI.createLabel("Waiting for other player...", Color.WHITE, 2);
+    private final Label timeTextLabel = UI.createLabel("TIME", Color.WHITE, 2);
+    private final Label timeCountdownLabel = UI.createLabel("Waiting for other player...",  Color.WHITE, 2);
+
     private final Label placeHolder = UI.createLabel("");
     private final Label gameOverLabel = UI.createLabel("");
+
     private final Label localPlayerName = UI.createLabel("loading...", Color.GREEN, 2);
     private final Table localHealthTable = new Table();
     private final Label localDamage = UI.createLabel("0 %", Color.RED, 2);
     private final Label localAmmoCount = UI.createLabel("0", Color.PURPLE, 1);
+
     private final Label firstRemotePlayerName = UI.createLabel("loading...", REMOTE_PLAYER_COLORS.get(0), 2);
     private final Table firstRemoteHealthTable = new Table();
     private final Label firstRemoteDamage = UI.createLabel("0 %", Color.RED, 2);
+
     private final Label secondRemotePlayerName = UI.createLabel("", REMOTE_PLAYER_COLORS.get(1), 2);
     private final Table secondRemoteHealthTable = new Table();
     private final Label secondRemoteDamage = UI.createLabel("", Color.RED, 2);
+
     private final Label thirdRemotePlayerName = UI.createLabel("", REMOTE_PLAYER_COLORS.get(2), 2);
     private final Table thirdRemoteHealthTable = new Table();
     private final Label thirdRemoteDamage = UI.createLabel("", Color.RED, 2);
+
     // lists of changing values
     private final List<Label> nameLabels = List.of(firstRemotePlayerName, secondRemotePlayerName, thirdRemotePlayerName);
     private final List<Label> damageLabels = List.of(firstRemoteDamage, secondRemoteDamage, thirdRemoteDamage);
@@ -70,7 +77,6 @@ public class Hud {
      * "game over" message.
      * Some table slots are empty at first or contain "loading..." style placeholders.
      * Game time and player names placeholders are filled as soon as the client receives remote player's state object.
-     *
      * @param spritebatch spritebatch where to render all information
      */
     public Hud(SpriteBatch spritebatch) {
@@ -141,7 +147,7 @@ public class Hud {
      * @param localPlayer   local player
      * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers) {
+    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers, Optional<AIPlayer> AIPlayer) {
         updateTime(time);
         heartScaling = (float) stage.getViewport().getScreenHeight() / 25;
         // update lives, health, damage
@@ -157,7 +163,9 @@ public class Hud {
             localDamage.setText(localPlayer.getDamage() + " %");
             localAmmoCount.setText(localPlayer.getAmmoCount());
 
+            if (AIPlayer.isPresent()) updateAIPlayer(AIPlayer.get());
             updateRemotePlayers(remotePlayers);
+
             // display game over screen
             if (localPlayer.getLivesCount() == 0) {
                 gameOverLabel.setText("GAME OVER!\n You lost.");
@@ -166,17 +174,20 @@ public class Hud {
                     finalSoundPlayed = true;
                 }
                 gameOverLabel.setColor(Color.RED);
-                // check if all remote players are defeated  &&  the game has already started
-            } else if (!remotePlayers.isEmpty() &&
-                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) {
+                gameOverLabel.setFontScale(1);
+                // check if all remote players are defeated  &&  the game has already started  || AIPlayer has 0 luves
+            } else if ((!remotePlayers.isEmpty() &&
+                    remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) ||
+                    AIPlayer.isPresent() && Objects.equals(AIPlayer.get().getLivesCount(), 0)) {
                 gameOverLabel.setText("Congratulations you won!");
+                gameOverLabel.setFontScale(1);
                 if (!finalSoundPlayed) {
                     Audio.getInstance().playSound(Audio.SoundType.YOU_WIN);
                     finalSoundPlayed = true;
                 }
                 gameOverLabel.setColor(Color.GREEN);
             } else {
-                gameOverLabel.setText("");  // prevents  error caused by UDP losses
+                gameOverLabel.setText("");  // prevents errors caused by UDP losses
             }
         }
     }
@@ -203,6 +214,16 @@ public class Hud {
                 damageLabels.get(i).setText(rp.getDamage() + " %");
             }
         }
+    }
+
+    private void updateAIPlayer(AIPlayer AI) {
+            nameLabels.get(0).setText(AI.getName());
+            healthTables.get(0).setVisible(true);
+        if (livesDisplayed.get(0) != AI.getLivesCount()) {
+            livesDisplayed.add(0, AI.getLivesCount());
+            updateLivesTable(AI.getLivesCount(), healthTables.get(0));
+        }
+        damageLabels.get(0).setText(AI.getDamage() + " %");
     }
 
     /**

@@ -7,7 +7,7 @@ import java.util.List;
 
 import static helper.Constants.*;
 
-public class AIPlayer {
+public class UFO {
     private final List<BulletData> bullets;
     private float x;
     private float y;
@@ -16,11 +16,11 @@ public class AIPlayer {
     private float knockback = 0;
 
     /**
-     * Create AI player.
-     * It will slowly move towards the closest player and randomly shoot bullets. Ai player doesn't have any lives
+     * Create UFO.
+     * It will slowly move towards the closest player and randomly shoot bullets. The UFO doesn't have any lives
      * and can't fall off the platforms.
      */
-    public AIPlayer(float x, float y) {
+    public UFO(float x, float y) {
         this.x = x;
         this.y = y;
         this.bullets = new ArrayList<>();
@@ -39,7 +39,7 @@ public class AIPlayer {
     }
 
     /**
-     * Update the AI player's position (move towards the closest player), shoot bullets and check for bullet hits.
+     * Update the UFO's position (move towards the closest player), shoot bullets and check for bullet hits.
      * @param players all regular players of the current game instance
      */
     public void update(float delta, Player[] players) {
@@ -70,12 +70,13 @@ public class AIPlayer {
         y += (float) (Math.sin(angle) * velocity * delta);
 
         // shoot a bullet if countdown is over
-        if (shootCountdown >= AI_PLAYER_SHOOTING_INTERVAL) {
+        if (shootCountdown >= UFO_SHOOTING_INTERVAL) {
             BulletData bullet = new BulletData();
             bullet.x = x;
             bullet.y = y;
             bullet.speedBullet = PISTOL_BULLET_SPEED * (closestPlayer.getState().x < x ? -1 : 1);
             bullet.id = -1;
+            bullet.name = "UFO";
             bullets.add(bullet);
             shootCountdown = 0;
         }
@@ -100,7 +101,7 @@ public class AIPlayer {
     }
 
     /**
-     * AI player can be hit by bullets just like a regular player.
+     * UFO can be hit by bullets just like a regular player.
      * Except it doesn't have a damage percentage which means that the applied force is constant.
      */
     public void bulletHit(BulletData bullet) {

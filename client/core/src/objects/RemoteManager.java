@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
@@ -18,8 +17,7 @@ import objects.player.RemotePlayer;
 
 import java.util.*;
 
-import static helper.Constants.AI_PLAYER_SIZE;
-import static helper.Constants.GRAVITY;
+import static helper.Constants.UFO_SIZE;
 
 public class RemoteManager {
     private List<RemotePlayer> remotePlayers = new ArrayList<>();
@@ -27,9 +25,9 @@ public class RemoteManager {
     private List<BulletData> remoteBullets;
     private PlayerState[] allPlayerStates;
     private PlayerState localPlayerState;
-    private float onHitForce;
-    private float AIplayerX;
-    private float AIplayerY;
+    private PlayerState AIPlayerState;
+    private float ufoPlayerX;
+    private float ufoPlayerY;
 
     /**
      * Initialize RemoteManager that controls all data and functionality regarding remote players.
@@ -45,9 +43,9 @@ public class RemoteManager {
                     // handle game state message
                     remotePlayers = new ArrayList<>();
 
-                    // AI player
-                    AIplayerX = gameStateMessage.AIplayerX;
-                    AIplayerY = gameStateMessage.AIplayerY;
+                    // UFO
+                    ufoPlayerX = gameStateMessage.ufoPlayerX;
+                    ufoPlayerY = gameStateMessage.ufoPlayerY;
 
                     // check if incoming bullets list is bigger than the current one
                     // when it is, play gun sound effect
@@ -65,12 +63,13 @@ public class RemoteManager {
                             // not current client
                             remotePlayers.add(new RemotePlayer(ps, textureAtlas));
                         } else {
-                            // current client
-                            localPlayerState = ps;
-                            // get the force of the hit
-                            if (ps.applyForce != 0) {
-                                Audio.getInstance().playSound(Audio.SoundType.HIT);
-                                onHitForce = ps.applyForce;
+                            if (ps.thisIsAI) {
+                                AIPlayerState = ps;
+                            } else {
+                                localPlayerState = ps;
+                                if (ps.applyForce != 0) {
+                                    Audio.getInstance().playSound(Audio.SoundType.HIT);
+                                }
                             }
                         }
                     }
@@ -108,6 +107,26 @@ public class RemoteManager {
     }
 
     /**
+     * Get playerState for updating the AI.
+     */
+    public Optional<PlayerState> getAIPlayerState() {
+        if (AIPlayerState != null) {
+            return Optional.of(AIPlayerState);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Get server-sided game time in seconds. Used for updating HUD timer.
+     */
+    public Optional<List<BulletData>> getBulletData() {
+        if (remoteBullets != null) {
+            return Optional.of(remoteBullets);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Return remote players list if it contains at least 1 remote player.
      */
     public List<RemotePlayer> getRemotePlayers() {
@@ -115,22 +134,22 @@ public class RemoteManager {
     }
 
     /**
-     * Get all players' state if none of them is null. Check for AI player.
+     * Get all players' state if none of them is null. Check for ufoPlayer.
      */
     public Optional<PlayerState[]> getAllPlayerStates() {
         // does not contain null -> contains info about both players
         if (allPlayerStates != null
                 && allPlayerStates.length == Arrays.stream(allPlayerStates).filter(x -> x != null).toArray().length) {
-            if (AIplayerX == 0 && AIplayerY == 0) {
+            if (ufoPlayerX == 0 && ufoPlayerY == 0) {
                 return Optional.of(allPlayerStates);
             }
-            // add AI player to the list if it exists
+            // add ufoPlayer to the list if it exists
             PlayerState[] newAllPlayerStates = Arrays.copyOf(allPlayerStates, allPlayerStates.length + 1);
-            PlayerState AIplayer = new PlayerState();
-            AIplayer.x = AIplayerX;
-            AIplayer.y = AIplayerY;
-            AIplayer.name = "AI";
-            newAllPlayerStates[allPlayerStates.length] = AIplayer;
+            PlayerState ufoPlayerState = new PlayerState();
+            ufoPlayerState.x = ufoPlayerX;
+            ufoPlayerState.y = ufoPlayerY;
+            ufoPlayerState.name = "UFO";
+            newAllPlayerStates[allPlayerStates.length] = ufoPlayerState;
             return Optional.of(newAllPlayerStates);
         }
         return Optional.empty();
@@ -155,12 +174,12 @@ public class RemoteManager {
     }
 
     /**
-     * Render AI player if it exists.
+     * Render UFO if it exists.
      */
-    public void renderAIPlayer(SpriteBatch batch) {
-        if (AIplayerX == 0 && AIplayerY == 0) return;
+    public void renderUFO(SpriteBatch batch) {
+        if (ufoPlayerX == 0 && ufoPlayerY == 0) return;
 
-        batch.draw(Textures.ALIEN_TEXTURE, AIplayerX, AIplayerY, AI_PLAYER_SIZE.width, AI_PLAYER_SIZE.height);
+        batch.draw(Textures.ALIEN_TEXTURE, ufoPlayerX, ufoPlayerY, UFO_SIZE.width, UFO_SIZE.height);
     }
 
     /**
@@ -175,28 +194,6 @@ public class RemoteManager {
 
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
-        }
-    }
-
-    /**
-     * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
-     * Float representing the force is received form the server only once, after that it's saved into the player object.
-     * Exponentially decrement the applied force every game tick.
-     * Stop applying knockback when the force becomes too small.
-     *
-     * @param world world where the player moves (used for applying gravity)
-     */
-    public void testForHit(World world) {
-        if (onHitForce != 0) {
-            world.setGravity(new Vector2(onHitForce, GRAVITY));
-
-            // make on hit force smaller
-            onHitForce *= 0.9f;
-        }
-        // reset gravity if hit force is small enough
-        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
-            world.setGravity(new Vector2(0, GRAVITY));
-            onHitForce = 0;
         }
     }
 }

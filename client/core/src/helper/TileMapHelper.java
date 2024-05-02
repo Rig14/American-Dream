@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import ee.taltech.americandream.GameScreen;
+import objects.player.AIPlayer;
 import objects.player.Player;
 
 import java.util.Objects;
@@ -36,17 +37,17 @@ public class TileMapHelper {
     /**
      * Load tilemap from a .tmx file.
      */
-    public OrthogonalTiledMapRenderer setupMap(String fileName) {
+    public OrthogonalTiledMapRenderer setupMap(String fileName, boolean AIGame) {
         // load map
         tiledMap = new TmxMapLoader().load(fileName);
-        parseMapObjects(tiledMap.getLayers().get("objects").getObjects());
+        parseMapObjects(tiledMap.getLayers().get("objects").getObjects(), AIGame);
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
 
     /**
      * Load tilemap objects such as the player itself to enable collisions.
      */
-    private void parseMapObjects(MapObjects mapObjects) {
+    private void parseMapObjects(MapObjects mapObjects, boolean AIGame) {
         // parsing map objects
         for (MapObject mapObject : mapObjects) {
             // these are platforms
@@ -69,6 +70,17 @@ public class TileMapHelper {
                             gameScreen.getWorld()
                     );
                     gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body, selectedCharacter));
+                    if (AIGame) {
+                        Body AIBody = BodyHelperService.createBody(
+                                rectangle.getX() + rectangle.getWidth() / 2,
+                                rectangle.getY() + rectangle.getHeight() / 2,
+                                rectangle.getWidth(),
+                                rectangle.getHeight(),
+                                false,
+                                gameScreen.getWorld()
+                        );
+                        gameScreen.setAIPlayer(new AIPlayer(rectangle.getWidth(), rectangle.getHeight(), AIBody, "AI"));
+                    }
                 }
             }
             if (mapObject.getName().equals("Center")) {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import helper.packet.JoinLobbyMessage;
 import helper.Audio;
 
 import static helper.UI.*;
@@ -37,7 +38,6 @@ public class TitleScreen extends ScreenAdapter {
 
         multiplayerButton = createButton("Multiplayer");
         TextButton localButton = createButton("Start Game");
-        disableButton(localButton);
         TextButton exitButton = createButton("Exit");
 
         buttonsContainer.add(localButton).row();
@@ -51,6 +51,18 @@ public class TitleScreen extends ScreenAdapter {
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 // exit the app
                 Gdx.app.exit();
+            }
+        });
+
+        localButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                // start ai game
+                JoinLobbyMessage message = new JoinLobbyMessage();
+                message.lobbyId = AmericanDream.id;
+                message.AIGame = true;
+                AmericanDream.client.sendTCP(message);
+                AmericanDream.instance.setScreen(new GameScreen(camera, "AIGame", "Desert"));
             }
         });
 
@@ -117,6 +129,7 @@ public class TitleScreen extends ScreenAdapter {
         sliderContainer.add(musicContainer).bottom().right().row();
 
         stage.addActor(background);
+
         stage.addActor(versionContainer);
         stage.addActor(mainContainer);
         stage.addActor(sliderContainer);

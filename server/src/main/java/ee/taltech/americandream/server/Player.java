@@ -5,8 +5,9 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
+import helper.packet.AddUfoMessage;
 import helper.packet.BulletMessage;
+import helper.packet.GameLeaveMessage;
 import helper.packet.GameStateMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 import static helper.Constants.*;
 
 public class Player {
+    private final boolean thisIsAI;
     private final int id;
     private final Game game;
     private final Connection connection;
@@ -44,8 +46,9 @@ public class Player {
      * @param game game instance
      * @param id player id
      */
-    public Player(Connection connection, Game game, int id) {
+    public Player(Connection connection, Game game, int id, boolean thisIsAI) {
         // create player
+        this.thisIsAI = thisIsAI;
         this.id = id;
         this.game = game;
         this.connection = connection;
@@ -64,20 +67,28 @@ public class Player {
                 super.received(connection, object);
                 // handle incoming data
                 if (object instanceof PlayerPositionMessage positionMessage) {
-                    // handle position message
-                    handlePositionMessage(positionMessage);
+                    if (thisIsAI && positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    } else if (!thisIsAI && !positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    }
+                } else if (object instanceof GameLeaveMessage && thisIsAI) {  // end AIGame instance
+                    game.end();
                 }
 
                 // handle bullet position message
                 if (object instanceof BulletMessage bulletMessage) {
-                    // handle bullet position message
-                    handleNewBullet(bulletMessage);
+                    if (thisIsAI && bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    } else if (!thisIsAI && !bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    }
                 }
 
                 // handle adding AI player
-                if (object instanceof AddAIMessage addAIMessage) {
+                if (object instanceof AddUfoMessage addAIMessage) {
                     // handle adding AI player
-                    game.addAIPlayer();
+                    game.addUFO();
                 }
             }
         });
@@ -85,6 +96,10 @@ public class Player {
 
     public int getId() {
         return this.id;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public List<BulletData> getPlayerBullets() {
@@ -107,6 +122,7 @@ public class Player {
         state.damage = damage;
         state.name = name;
         state.ammoCount = ammoCount;
+        state.thisIsAI = thisIsAI;
         return state;
     }
 
@@ -123,6 +139,7 @@ public class Player {
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
             bulletData.id = id;
+            bulletData.name = name;
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);
