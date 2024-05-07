@@ -81,7 +81,7 @@ public class Audio {
         sound.put(SoundType.YOU_WIN, win);
         Sound jump = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/jump.mp3"));
         sound.put(SoundType.JUMP, jump);
-        Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.wav"));
+        Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.mp3"));
         sound.put(SoundType.DEATH, death);
         Sound chooseYourCharacter = Gdx.audio.newSound(Gdx.files.internal("audio/menu/choose_your_character.ogg"));
         sound.put(SoundType.CHOOSE_YOUR_CHARACTER, chooseYourCharacter);
