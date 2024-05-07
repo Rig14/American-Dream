@@ -156,6 +156,7 @@ public class Audio {
 
     public void setSoundVolume(float soundVolume) {
         this.soundVolume = soundVolume;
+        music.get(MusicType.WALK).forEach(sfx -> sfx.setVolume(soundVolume));
     }
 
     public float getMusicVolume() {
@@ -165,7 +166,11 @@ public class Audio {
     public void setMusicVolume(float musicVolume) {
         this.musicVolume = musicVolume;
 
-        music.forEach((key, value) -> value.forEach(m -> m.setVolume(musicVolume)));
+        music.forEach((key, value) -> value.forEach(m -> {
+            if (key != MusicType.WALK) {
+                m.setVolume(musicVolume);
+            }
+        }));
     }
 
     public enum MusicType {
