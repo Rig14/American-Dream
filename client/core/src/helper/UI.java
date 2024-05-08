@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -24,6 +26,12 @@ public class UI {
         button.setDisabled(true);
         button.getStyle().fontColor = Color.GRAY;
         button.getStyle().overFontColor = Color.GRAY;
+    }
+
+    public static void enableButton(TextButton button) {
+        button.setDisabled(false);
+        button.getStyle().fontColor = Color.WHITE;
+        button.getStyle().overFontColor = Color.WHITE;
     }
 
     /**
@@ -107,44 +115,5 @@ public class UI {
         style.knob.setMinHeight(Gdx.graphics.getHeight() / 20f);
         style.knob.setMinWidth(Gdx.graphics.getHeight() / 20f);
         return new Slider(min, max, stepSize, vertical, style);
-    }
-
-    public static Table createTextFieldWithButton(String placeholder, String buttonText) {
-        Table table = new Table();
-        table.setFillParent(true);
-
-        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 16;
-        BitmapFont theFont = generator.generateFont(parameter);
-        style.font = theFont;
-        style.fontColor = Color.WHITE;
-        style.cursor = new TextureRegionDrawable(new TextureRegion(new Texture("blinker.png")));
-        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("textfield.png")));
-        style.selection = new TextureRegionDrawable(new TextureRegion(new Texture("selected.png")));
-        TextField textField = new TextField(placeholder, style);
-        textField.setAlignment(1);
-        textField.setMaxLength(15);
-
-        table.add(textField);
-
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = theFont;
-        buttonStyle.fontColor = Color.WHITE;
-        TextButton button = new TextButton(buttonText, buttonStyle);
-        button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("special_button_ip.png")));
-        button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("special_button_ip.png"))).tint(Color.BLACK);
-        button.addListener(new ChangeListener() {
-
-            @Override
-            public void changed(ChangeEvent changeEvent, Actor actor) {
-                Audio.getInstance().playSound(Audio.SoundType.BUTTON_CLICK);
-            }
-        });
-        table.add(button);
-
-        generator.dispose();
-        return table;
     }
 }
