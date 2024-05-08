@@ -81,7 +81,7 @@ public class Audio {
         sound.put(SoundType.YOU_WIN, win);
         Sound jump = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/jump.mp3"));
         sound.put(SoundType.JUMP, jump);
-        Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.wav"));
+        Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.mp3"));
         sound.put(SoundType.DEATH, death);
         Sound chooseYourCharacter = Gdx.audio.newSound(Gdx.files.internal("audio/menu/choose_your_character.ogg"));
         sound.put(SoundType.CHOOSE_YOUR_CHARACTER, chooseYourCharacter);
@@ -156,6 +156,7 @@ public class Audio {
 
     public void setSoundVolume(float soundVolume) {
         this.soundVolume = soundVolume;
+        music.get(MusicType.WALK).forEach(sfx -> sfx.setVolume(soundVolume));
     }
 
     public float getMusicVolume() {
@@ -165,7 +166,11 @@ public class Audio {
     public void setMusicVolume(float musicVolume) {
         this.musicVolume = musicVolume;
 
-        music.forEach((key, value) -> value.forEach(m -> m.setVolume(musicVolume)));
+        music.forEach((key, value) -> value.forEach(m -> {
+            if (key != MusicType.WALK) {
+                m.setVolume(musicVolume);
+            }
+        }));
     }
 
     public enum MusicType {
