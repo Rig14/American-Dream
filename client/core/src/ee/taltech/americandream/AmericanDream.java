@@ -21,27 +21,26 @@ public class AmericanDream extends Game {
     public static AmericanDream instance;
 
     /**
-     * This method is called when the game is created.
-     * e.g. when user opens the game.
+     * This method sets up the connection to the server.
      */
-    @Override
-    public void create() {
-        instance = this;
-        setupConnection(IP_ADDRESS);
+    public static void setupConnection(String IPAddress) {
+        client = new Client();
+        registerClasses();
+        client.start();
+        try {
+            client.connect(5000, IPAddress, PORTS[0], PORTS[1]);
+        } catch (Exception e) {
+            Gdx.app.log("Client", "Failed to connect to server");
+        }
 
-        // setting up camera
-        OrthographicCamera camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.zoom = CAMERA_ZOOM;
-        // navigating to the title screen
-        setScreen(new TitleScreen(camera));
+        id = client.getID();
     }
 
     /**
      * This method registers classes for serialization.
      * Classes that are sent over the network need to be registered.
      */
-    private void registerClasses() {
+    private static void registerClasses() {
         // register classes for serialization
         Kryo kryo = client.getKryo();
         kryo.register(GameStateMessage.class);
@@ -61,19 +60,20 @@ public class AmericanDream extends Game {
     }
 
     /**
-     * This method sets up the connection to the server.
+     * This method is called when the game is created.
+     * e.g. when user opens the game.
      */
-    public void setupConnection(String IPAddress) {
-        client = new Client();
-        registerClasses();
-        client.start();
-        try {
-            client.connect(5000, IPAddress, PORTS[0], PORTS[1]);
-        } catch (Exception e) {
-            Gdx.app.log("Client", "Failed to connect to server");
-        }
+    @Override
+    public void create() {
+        instance = this;
+        setupConnection(IP_ADDRESS);
 
-        id = client.getID();
+        // setting up camera
+        OrthographicCamera camera = new OrthographicCamera();
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.zoom = CAMERA_ZOOM;
+        // navigating to the title screen
+        setScreen(new TitleScreen(camera));
     }
 
     /**

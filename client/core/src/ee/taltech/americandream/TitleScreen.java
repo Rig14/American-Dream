@@ -129,13 +129,9 @@ public class TitleScreen extends ScreenAdapter {
         musicContainer.add(music);
         sliderContainer.add(musicContainer).bottom().right().row();
 
-        // IP address settings
-        Table ipContainer = new Table();
-        ipContainer.setFillParent(true);
+        // ip settings
+        Table ipContainer = createTextFieldWithButton(IP_ADDRESS, "Set IP");
         ipContainer.top().right();
-        TextField ipField = createTextField(IP_ADDRESS);
-        ipContainer.add(ipField).pad(10).row();
-
 
         stage.addActor(background);
 

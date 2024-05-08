@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -112,21 +109,42 @@ public class UI {
         return new Slider(min, max, stepSize, vertical, style);
     }
 
-    public static TextField createTextField(String text) {
+    public static Table createTextFieldWithButton(String placeholder, String buttonText) {
+        Table table = new Table();
+        table.setFillParent(true);
+
         TextField.TextFieldStyle style = new TextField.TextFieldStyle();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 16;
-        style.font = generator.generateFont(parameter);
+        BitmapFont theFont = generator.generateFont(parameter);
+        style.font = theFont;
         style.fontColor = Color.WHITE;
         style.cursor = new TextureRegionDrawable(new TextureRegion(new Texture("blinker.png")));
-        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
+        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("textfield.png")));
         style.selection = new TextureRegionDrawable(new TextureRegion(new Texture("selected.png")));
-        TextField textField = new TextField(text, style);
+        TextField textField = new TextField(placeholder, style);
         textField.setAlignment(1);
         textField.setMaxLength(15);
-        textField.setText(text);
+
+        table.add(textField);
+
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = theFont;
+        buttonStyle.fontColor = Color.WHITE;
+        TextButton button = new TextButton(buttonText, buttonStyle);
+        button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("special_button_ip.png")));
+        button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("special_button_ip.png"))).tint(Color.BLACK);
+        button.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                Audio.getInstance().playSound(Audio.SoundType.BUTTON_CLICK);
+            }
+        });
+        table.add(button);
+
         generator.dispose();
-        return textField;
+        return table;
     }
 }
