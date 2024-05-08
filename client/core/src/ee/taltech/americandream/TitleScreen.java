@@ -10,9 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import helper.packet.JoinLobbyMessage;
 import helper.Audio;
+import helper.packet.JoinLobbyMessage;
 
+import static helper.Constants.IP_ADDRESS;
 import static helper.UI.*;
 
 
@@ -128,12 +129,21 @@ public class TitleScreen extends ScreenAdapter {
         musicContainer.add(music);
         sliderContainer.add(musicContainer).bottom().right().row();
 
+        // IP address settings
+        Table ipContainer = new Table();
+        ipContainer.setFillParent(true);
+        ipContainer.top().right();
+        TextField ipField = createTextField(IP_ADDRESS);
+        ipContainer.add(ipField).pad(10).row();
+
+
         stage.addActor(background);
 
         stage.addActor(versionContainer);
         stage.addActor(mainContainer);
         stage.addActor(sliderContainer);
         stage.addActor(copyrightContainer);
+        stage.addActor(ipContainer);
 
         // start playing music
         Audio.getInstance().playMusic(Audio.MusicType.MENU);

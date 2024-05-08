@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -109,5 +110,23 @@ public class UI {
         style.knob.setMinHeight(Gdx.graphics.getHeight() / 20f);
         style.knob.setMinWidth(Gdx.graphics.getHeight() / 20f);
         return new Slider(min, max, stepSize, vertical, style);
+    }
+
+    public static TextField createTextField(String text) {
+        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Minecraft.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 16;
+        style.font = generator.generateFont(parameter);
+        style.fontColor = Color.WHITE;
+        style.cursor = new TextureRegionDrawable(new TextureRegion(new Texture("blinker.png")));
+        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
+        style.selection = new TextureRegionDrawable(new TextureRegion(new Texture("selected.png")));
+        TextField textField = new TextField(text, style);
+        textField.setAlignment(1);
+        textField.setMaxLength(15);
+        textField.setText(text);
+        generator.dispose();
+        return textField;
     }
 }

@@ -27,7 +27,7 @@ public class AmericanDream extends Game {
     @Override
     public void create() {
         instance = this;
-        setupConnection();
+        setupConnection(IP_ADDRESS);
 
         // setting up camera
         OrthographicCamera camera = new OrthographicCamera();
@@ -63,12 +63,12 @@ public class AmericanDream extends Game {
     /**
      * This method sets up the connection to the server.
      */
-    private void setupConnection() {
+    public void setupConnection(String IPAddress) {
         client = new Client();
         registerClasses();
         client.start();
         try {
-            client.connect(5000, IP_ADDRESS, PORTS[0], PORTS[1]);
+            client.connect(5000, IPAddress, PORTS[0], PORTS[1]);
         } catch (Exception e) {
             Gdx.app.log("Client", "Failed to connect to server");
         }
