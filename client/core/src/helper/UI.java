@@ -28,6 +28,12 @@ public class UI {
         button.getStyle().overFontColor = Color.GRAY;
     }
 
+    public static void enableButton(TextButton button) {
+        button.setDisabled(false);
+        button.getStyle().fontColor = Color.WHITE;
+        button.getStyle().overFontColor = Color.WHITE;
+    }
+
     /**
      * Create a text button with the given text
      *
