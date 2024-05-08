@@ -28,7 +28,7 @@ public class AmericanDream extends Game {
         registerClasses();
         client.start();
         try {
-            client.connect(5000, IPAddress, PORTS[0], PORTS[1]);
+            client.connect(CONNECTION_TIMEOUT, IPAddress, PORTS[0], PORTS[1]);
         } catch (Exception e) {
             Gdx.app.log("Client", "Failed to connect to server");
         }

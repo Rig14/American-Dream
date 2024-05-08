@@ -26,7 +26,9 @@ public class TitleScreen extends ScreenAdapter {
 
     private final TextButton multiplayerButton;
     private final TextButton localButton;
+    private final TextField textField;
     private final Stage stage;
+    private final Table errorTable = new Table();
 
     /**
      * Initialize TitleScreen where players can choose between multiplayer and local play
@@ -150,7 +152,7 @@ public class TitleScreen extends ScreenAdapter {
         style.background = new TextureRegionDrawable(new TextureRegion(new Texture("textfield.png")));
         style.selection = new TextureRegionDrawable(new TextureRegion(new Texture("selected.png")));
         InetSocketAddress socketAddress = AmericanDream.client.getRemoteAddressTCP();
-        TextField textField = new TextField(socketAddress == null ? "" : socketAddress.getHostName(), style);
+        textField = new TextField(socketAddress == null ? "" : socketAddress.getHostName(), style);
         textField.setAlignment(1);
         textField.setMaxLength(15);
 
@@ -169,13 +171,18 @@ public class TitleScreen extends ScreenAdapter {
                 // disable the multiplayer and singleplayer button until connection is established
                 disableButton(multiplayerButton);
                 disableButton(localButton);
-                // connect to the new ip
+
                 AmericanDream.setupConnection(textField.getText());
             }
         });
         ipTable.add(button);
         ipTable.top().right();
         generator.dispose();
+
+        errorTable.setFillParent(true);
+        errorTable.bottom();
+        Label errorLabel = createLabel("Could not connect", Color.RED, 1);
+        errorTable.add(errorLabel);
 
         stage.addActor(background);
 
@@ -184,6 +191,7 @@ public class TitleScreen extends ScreenAdapter {
         stage.addActor(sliderContainer);
         stage.addActor(copyrightContainer);
         stage.addActor(ipTable);
+        stage.addActor(errorTable);
 
         // start playing music
         Audio.getInstance().playMusic(Audio.MusicType.MENU);
@@ -206,9 +214,12 @@ public class TitleScreen extends ScreenAdapter {
         if (!AmericanDream.client.isConnected()) {
             disableButton(multiplayerButton);
             disableButton(localButton);
+            // display error message
+            errorTable.setVisible(true);
         } else {
             enableButton(multiplayerButton);
             enableButton(localButton);
+            errorTable.setVisible(false);
         }
 
         // draw all the buttons
