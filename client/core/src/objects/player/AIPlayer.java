@@ -1,8 +1,6 @@
 package objects.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
@@ -23,10 +21,10 @@ import static helper.Constants.JUMP_FORCE;
 import static helper.Constants.PPM;
 import static helper.Constants.REMOTE_PLAYER_INDICATORS;
 import static helper.Textures.GPT_TEXTURE;
-import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class AIPlayer extends Player {
 
+    public static final int BUFFER = 45;
     private String movingState = "";
     private String shootingState = "";
     private boolean jumpingState = false;
@@ -48,30 +46,30 @@ public class AIPlayer extends Player {
 
     /**
      * Plan method as per SPA arhitectue.
-     * Different scenarios sorted by priority (ascending),
-     * more critical scenario will override previous "state" or "commands".
-     * TODO: Rename previous AI player top "ufo" or something. This will prevent nullpointerexceptions and naming conflicts.
+     * Different scenarios sorted by priority (ascending), more critical scenario will override previous "state"
+     * or "commands".
      */
     private void plan() {
         // initial position
-        if (x < 1350) movingState = "right";
+        if (thisX < 1350) movingState = "right";
 
         // shoot towards real player
-        shootingState = (realPlayer.getPosition().x < x) ? "left" : "right";
+        shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
 
         // dodge bullets
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
+
             List<BulletData> enemyBullets = bullets.get().stream()
                     .filter(x -> !(x.name.equals("AI")))
                     .collect(Collectors.toList());
             // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
-            if (enemyBullets.stream().anyMatch(bul -> (bul.y > y - 45)  // check if bullet is at the same level as AI
-                    && ((bul.speedBullet > 0 && bul.x < x + 50) || (bul.speedBullet < 0 && bul.x > x - 50))  // x coord
-                    && Math.abs(x - bul.x) < 200)) jumpingState = true;  // prevent AI from jumping too early
+            if (enemyBullets.stream().anyMatch(bul -> (bul.y > thisY - BUFFER && bul.y < thisY + BUFFER)  // check if bullet is at the same level as AI
+                    && ((bul.speedBullet > 0 && bul.x < thisX + 50) || (bul.speedBullet < 0 && bul.x > thisX - 50))  // x coord
+                    && Math.abs(thisX - bul.x) < 175)) jumpingState = true;  // prevent AI from jumping too early
         }
 
         // recover from being hit
-        if (x > 1375 && bulletHitForce != 0f) {
+        if (thisX > 1375 && bulletHitForce != 0f) {
             movingState = "left";
             jumpingState = true;
         }
@@ -84,6 +82,9 @@ public class AIPlayer extends Player {
      * Construct and send new playerPositionMessage.
      * @param delta delta time
      * @param center point of the map/world
+     * @param playerState optional of AI player's state
+     * @param bullets all bullets in current world
+     * @param player real player
      */
     @Override
     public void update(float delta, Vector2 center, Optional<PlayerState> playerState, Optional<List<BulletData>> bullets, Player player) {
@@ -96,8 +97,8 @@ public class AIPlayer extends Player {
             if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
         }
-        x = body.getPosition().x * PPM;
-        y = body.getPosition().y * PPM;
+        thisX = body.getPosition().x * PPM;
+        thisY = body.getPosition().y * PPM;
         plan();
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
@@ -109,8 +110,8 @@ public class AIPlayer extends Player {
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
-        positionMessage.x = x;
-        positionMessage.y = y;
+        positionMessage.x = thisX;
+        positionMessage.y = thisY;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
         positionMessage.name = "AI";
@@ -124,8 +125,8 @@ public class AIPlayer extends Player {
 
 
     /**
-     * Handle mouse and keyboard input.
-     * Update the speed of the player body according to user input.
+     * Act method as per SPA architecture.
+     * Implement commands that were given in the plan method.
      */
     @Override
     protected void handleInput(float delta) {
@@ -178,7 +179,7 @@ public class AIPlayer extends Player {
     }
 
     /**
-     * Check for shooting input.
+     * Extension of Act (handleInput) method.
      * Create and send new BulletMessage if the player is shooting.
      */
     @Override
