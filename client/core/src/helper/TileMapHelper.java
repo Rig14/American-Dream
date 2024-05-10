@@ -110,9 +110,10 @@ public class TileMapHelper {
                                         rectangle.getHeight(),
                                         false,
                                         gameScreen.getWorld(),
-                                        new GunBox(gameScreen.getWorld().createBody(new BodyDef()))
+                                        new GunBox(gameScreen.getWorld().createBody(new BodyDef()),
+                                                ((GunBoxMessage) object).id)
                                 );
-                                gameScreen.addGunBox(new GunBox(body));
+                                gameScreen.addGunBox(new GunBox(body, ((GunBoxMessage) object).id));
                             }
                         }
                     }

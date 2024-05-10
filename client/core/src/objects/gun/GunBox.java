@@ -12,8 +12,9 @@ public class GunBox {
     private Integer id;
     private Body body;
 
-    public GunBox(Body body) {
+    public GunBox(Body body, Integer id) {
         this.body = body;
+        this.id = id;
         body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
 
