@@ -5,4 +5,5 @@ import helper.Direction;
 public class BulletMessage {
     // shoot direction
     public Direction direction;
+    public String name;
 }

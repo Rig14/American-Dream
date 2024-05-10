@@ -32,14 +32,15 @@ public class Constants {
     public static final float RESPAWN_TIME = 0f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
-    public static final String IP_ADDRESS = "127.0.0.1";
+    public static final int CONNECTION_TIMEOUT = 5000;
+    public static final String IP_ADDRESS = "localhost";
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static final int LIVES_COUNT = 3;
     public static final int FRAME_WIDTH = 64;
     public static final int FRAME_HEIGHT = 74;
     public static final float FRAME_DURATION = 0.3f;
 
-    public static final Dimension AI_PLAYER_SIZE = new Dimension(60, 60);
+    public static final Dimension UFO_SIZE = new Dimension(60, 60);
 
     public static final float FONT_SCALING_FACTOR = 300f;
     public static final Map<Integer, Color> REMOTE_PLAYER_COLORS = Map.of(

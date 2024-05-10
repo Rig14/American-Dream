@@ -12,9 +12,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.americandream.AmericanDream;
+import helper.Audio;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.AddAIMessage;
+import helper.packet.AddUfoMessage;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
@@ -26,26 +27,29 @@ import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class Player extends GameEntity {
 
-    private final float speed;
+    protected final float speed;
     private final TextureAtlas textureAtlas;
     private final PlayerAnimations playerAnimations;
-    private final String name;
-    private Direction direction;
-    private int jumpCounter;
-    private float keyDownTime = 0;
-    private float timeTillRespawn = 0;
-    private Integer livesCount = LIVES_COUNT;
-    private Integer damage = 0;
-    private int isShooting;
-    private float jumpCounterResetTime = 0;
-
-    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
+    protected final String name;
+    protected Direction direction;
+    protected int jumpCounter;
+    protected float keyDownTime = 0;
+    protected float timeTillRespawn = 0;
+    protected Integer livesCount = LIVES_COUNT;
+    protected Integer damage = 0;
+    protected Integer ammoCount = 0;
+    protected int isShooting;
+    protected float jumpCounterResetTime = 0;
+    protected float bulletHitForce = 0f;
+    private boolean onGround = false;
+    private boolean walkSoundStarted = false;
 
     /**
      * Initialize Player.
-     * @param width width of the player object/body
+     *
+     * @param width  width of the player object/body
      * @param height height
-     * @param body object that moves around in the world and collides with other bodies
+     * @param body   object that moves around in the world and collides with other bodies
      */
     public Player(float width, float height, Body body, String selectedCharacter) {
         super(width, height, body);
@@ -63,7 +67,7 @@ public class Player extends GameEntity {
             playerAnimations.generateObama();
         } else if (selectedCharacter.contains("Trump")) {
             playerAnimations.generateTrump();
-        } else {
+        } else {  // ai is biden at the moment
             playerAnimations.generateBiden();
         }
     }
@@ -96,6 +100,10 @@ public class Player extends GameEntity {
         return damage;
     }
 
+    public Integer getAmmoCount() {
+        return ammoCount;
+    }
+
     public Vector2 getPosition() {
         return body.getPosition().scl(PPM);
     }
@@ -110,20 +118,25 @@ public class Player extends GameEntity {
     /**
      * Update player data according to input, collisions (platforms) and respawning.
      * Construct and send new playerPositionMessage.
-     * @param delta delta time
+     *
+     * @param delta  delta time
      * @param center point of the map/world
      */
     @Override
-    public void update(float delta, Vector2 center, Optional<PlayerState> ps) {
-        if (ps.isPresent()) {
+    public void update(float delta, Vector2 center, Optional<PlayerState> playerState) {
+        if (playerState.isPresent()) {
+            PlayerState ps = playerState.get();
+            damage = ps.getDamage();
+            ammoCount = ps.getAmmoCount();
+            if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
-            damage = ps.get().damage;
         }
         x = body.getPosition().x * PPM;
         y = body.getPosition().y * PPM;
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
         }
+        applyBulletHitForce();
         handlePlatform();
         handleOutOfBounds(delta, center);  // respawning and decrementing lives
         direction = velX > 0 ? Direction.RIGHT : Direction.LEFT;
@@ -161,7 +174,7 @@ public class Player extends GameEntity {
      * Handle mouse and keyboard input.
      * Update the speed of the player body according to user input.
      */
-    private void handleInput(float delta) {
+    protected void handleInput(float delta) {
         Controller controller = Controllers.getCurrent();
         velX = 0;
         // Moving right
@@ -185,6 +198,7 @@ public class Player extends GameEntity {
             body.setLinearVelocity(body.getLinearVelocity().x, 0);
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
             jumpCounter++;
+            Audio.getInstance().playSound(Audio.SoundType.JUMP);
         }
 
         // key down on platform
@@ -197,8 +211,8 @@ public class Player extends GameEntity {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-            // spawn AI player
-            AmericanDream.client.sendTCP(new AddAIMessage());
+            // spawn UFO
+            AmericanDream.client.sendTCP(new AddUfoMessage());
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
             // pickup
@@ -206,17 +220,30 @@ public class Player extends GameEntity {
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
+            onGround = true;
             // body y velocity must main 0 for some time to reset jump counter
             if (jumpCounterResetTime > 0.1f) {
                 jumpCounter = 0;
                 jumpCounterResetTime = 0;
             }
             jumpCounterResetTime += delta;
+        } else {
+            onGround = false;
         }
+
         body.setLinearVelocity(velX * speed, body.getLinearVelocity().y);
 
         // check for shooting input
         shootingInput();
+
+        // walking sound
+        if (onGround && !walkSoundStarted && velX != 0) {
+            Audio.getInstance().startWalkSound();
+            walkSoundStarted = true;
+        } else if (!onGround || velX == 0) {
+            Audio.getInstance().stopWalkSound();
+            walkSoundStarted = false;
+        }
     }
 
     /**
@@ -238,7 +265,25 @@ public class Player extends GameEntity {
             bulletMessage.direction = Direction.LEFT;
             isShooting = -1;
         }
+        bulletMessage.name = name;
         AmericanDream.client.sendTCP(bulletMessage);
+    }
+
+    /**
+     * Apply bullet hit knockback to the player if the player has been hit.
+     * Float representing the force is received form the server only once, after that it's saved into the player object.
+     * Exponentially decrement the applied force every game tick.
+     * Stop applying knockback when the force becomes too small.
+     */
+    protected void applyBulletHitForce() {
+        if (bulletHitForce != 0) {
+            body.applyForceToCenter(new Vector2(bulletHitForce, 0), true);
+            bulletHitForce *= 0.9f;  // exponentially decrement force
+        }
+        // set force to zero if its small enough
+        if (Math.abs(bulletHitForce) < Math.abs(bulletHitForce / 10f)) {
+            bulletHitForce = 0;
+        }
     }
 
     /**
@@ -247,7 +292,7 @@ public class Player extends GameEntity {
      * If player is above the platform, move it back to the original position
      * TODO: Make the logic less hacky
      */
-    private void handlePlatform() {
+    protected void handlePlatform() {
         Array<Body> bodies = new Array<Body>();
         body.getWorld().getBodies(bodies);
 
@@ -270,7 +315,7 @@ public class Player extends GameEntity {
     /**
      * Decrement lives and respawn the player if it's out of bounds.
      */
-    private void handleOutOfBounds(float delta, Vector2 center) {
+    protected void handleOutOfBounds(float delta, Vector2 center) {
         if (y < -BOUNDS) {
             if (timeTillRespawn <= RESPAWN_TIME) {  // delay the respawning if necessary
                 timeTillRespawn += delta;
@@ -280,7 +325,10 @@ public class Player extends GameEntity {
                 body.setTransform(center.x / PPM, center.y / PPM + 30, 0);
                 body.setLinearVelocity(0, 0);
                 timeTillRespawn = 0;
+                Audio.getInstance().playSound(Audio.SoundType.DEATH);
             }
         }
     }
+
+    public enum State {WALKING, IDLE, JUMPING, SHOOTING}
 }

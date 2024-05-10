@@ -5,7 +5,11 @@ import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
 import helper.PlayerState;
-import helper.packet.*;
+import helper.packet.AddUfoMessage;
+import helper.packet.BulletMessage;
+import helper.packet.GameLeaveMessage;
+import helper.packet.GameStateMessage;
+import helper.packet.PlayerPositionMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +18,7 @@ import java.util.Objects;
 import static helper.Constants.*;
 
 public class Player {
+    private final boolean thisIsAI;
     private final int id;
     private final Game game;
     private final Connection connection;
@@ -28,6 +33,8 @@ public class Player {
     private float bulletTimeout;
     private float velX, velY;
     private int isShooting;
+    private int ammoCount = MAX_AMMO;  // different amount could cause bugs; additional 'has game started' checking required
+    private float ammoDelta = 0;
 
 
     /**
@@ -39,8 +46,9 @@ public class Player {
      * @param game game instance
      * @param id player id
      */
-    public Player(Connection connection, Game game, int id) {
+    public Player(Connection connection, Game game, int id, boolean thisIsAI) {
         // create player
+        this.thisIsAI = thisIsAI;
         this.id = id;
         this.game = game;
         this.connection = connection;
@@ -59,20 +67,28 @@ public class Player {
                 super.received(connection, object);
                 // handle incoming data
                 if (object instanceof PlayerPositionMessage positionMessage) {
-                    // handle position message
-                    handlePositionMessage(positionMessage);
+                    if (thisIsAI && positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    } else if (!thisIsAI && !positionMessage.name.equals("AI")) {
+                        handlePositionMessage(positionMessage);
+                    }
+                } else if (object instanceof GameLeaveMessage && thisIsAI) {  // end AIGame instance
+                    game.end();
                 }
 
                 // handle bullet position message
                 if (object instanceof BulletMessage bulletMessage) {
-                    // handle bullet position message
-                    handleNewBullet(bulletMessage);
+                    if (thisIsAI && bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    } else if (!thisIsAI && !bulletMessage.name.equals("AI")) {
+                        handleNewBullet(bulletMessage);
+                    }
                 }
 
                 // handle adding AI player
-                if (object instanceof AddAIMessage addAIMessage) {
+                if (object instanceof AddUfoMessage addAIMessage) {
                     // handle adding AI player
-                    game.addAIPlayer();
+                    game.addUFO();
                 }
             }
         });
@@ -80,6 +96,10 @@ public class Player {
 
     public int getId() {
         return this.id;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public List<BulletData> getPlayerBullets() {
@@ -101,6 +121,8 @@ public class Player {
         state.isShooting = isShooting;
         state.damage = damage;
         state.name = name;
+        state.ammoCount = ammoCount;
+        state.thisIsAI = thisIsAI;
         return state;
     }
 
@@ -111,21 +133,28 @@ public class Player {
      * @param delta tick rate
      */
     public void update(float delta) {
-        // update player
         // will shoot a bullet if the bulletTimeout is 0
-        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY) {
+        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY && ammoCount > 0) {
             // construct the bullet to be shot
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
             bulletData.id = id;
+            bulletData.name = name;
             bulletData.y = y;
             bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
             playerBullets.add(bulletData);
-            // reset timer and bullet shooting direction
+            ammoCount--;
+            // reset variables
             bulletTimeout = 0;
             nextBulletDirection = null;
         }
         bulletTimeout += delta;
+
+        ammoDelta += delta;
+        if (ammoDelta >= AMMO_INCREMENTING_TIME && ammoCount < MAX_AMMO) {
+            ammoDelta = ammoDelta % AMMO_INCREMENTING_TIME;
+            ammoCount++;
+        }
 
         // remove bullets that are out of bounds
         playerBullets.removeIf(bullet -> bullet.x < x - BOUNDS || bullet.x > x + BOUNDS);

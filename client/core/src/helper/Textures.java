@@ -16,5 +16,6 @@ public class Textures {
     public final static Texture BLACK_HEART_TEXTURE = new Texture(Gdx.files.internal("black_heart.png"));
     public final static Texture PLAYER_INDICATOR_TEXTURE = new Texture("player-indicator.png");
     public final static Texture GUNBOX_TEXTURE = new Texture("guns/ammobox1.png");
+    public final static Texture GPT_TEXTURE = new Texture("gpt.png");
 
 }

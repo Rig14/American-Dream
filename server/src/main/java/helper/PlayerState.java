@@ -12,4 +12,6 @@ public class PlayerState {
     public int isShooting;
     public Integer damage;
     public float applyForce;
+    public int ammoCount;
+    public boolean thisIsAI;
 }
