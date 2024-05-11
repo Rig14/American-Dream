@@ -5,6 +5,7 @@ import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
 import helper.packet.GunBoxMessage;
+import helper.packet.GunPickupMessage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -192,7 +193,7 @@ public class Game extends Thread {
                         if (player.getName().equals(playerStates[i].name)) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)
-                            playerStates[i].applyForce = player.handleBeingHit(bullet);  // returns force
+                            playerStates[i].applyForce = player.handleBeingHit(bullet, bullet.name, bullet.shotWithGun);  // returns force
                         }
                     }
                 }
@@ -229,5 +230,12 @@ public class Game extends Thread {
         float y = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / alivePlayers.length;
 
         UFO = new UFO(x, y);
+    }
+    public void sendToAllExcept(Player player, GunPickupMessage gunPickupMessage) {
+        for (Player player1 : allPlayers) {
+            if (!player1.getName().equals(player.getName())) {
+                player1.sendGunPickupMessage(gunPickupMessage);
+            }
+        }
     }
 }

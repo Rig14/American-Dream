@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
@@ -18,6 +19,7 @@ import objects.player.RemotePlayer;
 
 import java.util.*;
 
+import static helper.Constants.GRAVITY;
 import static helper.Constants.UFO_SIZE;
 
 public class RemoteManager {
@@ -29,6 +31,7 @@ public class RemoteManager {
     private PlayerState AIPlayerState;
     private float ufoPlayerX;
     private float ufoPlayerY;
+    private float onHitForce;
 
     /**
      * Initialize RemoteManager that controls all data and functionality regarding remote players.
@@ -70,6 +73,7 @@ public class RemoteManager {
                                 localPlayerState = ps;
                                 if (ps.applyForce != 0) {
                                     Audio.getInstance().playSound(Audio.SoundType.HIT);
+                                    onHitForce = ps.applyForce;
                                 }
                             }
                         }

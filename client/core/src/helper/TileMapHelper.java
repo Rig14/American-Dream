@@ -90,7 +90,8 @@ public class TileMapHelper {
                                 rectangle.getWidth(),
                                 rectangle.getHeight(),
                                 false,
-                                gameScreen.getWorld()
+                                gameScreen.getWorld(),
+                                new AIPlayer(0, 0, gameScreen.getWorld().createBody(new BodyDef()), "")
                         );
                         gameScreen.setAIPlayer(new AIPlayer(rectangle.getWidth(), rectangle.getHeight(), AIBody, "AI"));
                     }
@@ -110,7 +111,8 @@ public class TileMapHelper {
                 if (object instanceof GunBoxMessage && (lastGunBoxSpawn - gameTime) > gunBoxSpawnDelay) {
                     lastGunBoxSpawn = gameTime;
                     System.out.println("received gunbox message");
-                    for (MapObject mapObject : mapObjects) {
+                    for (int i = 0; i < mapObjects.getCount(); i++) {
+                        MapObject mapObject = mapObjects.get(i);
                         if (mapObject instanceof RectangleMapObject) {
                             Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
                             String rectangleName = mapObject.getName();

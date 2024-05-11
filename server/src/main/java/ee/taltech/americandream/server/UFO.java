@@ -14,6 +14,9 @@ public class UFO {
     private float velocity = 100;
     private float shootCountdown = 0;
     private float knockback = 0;
+    private float bulletForce = 1000;
+    private float bulletSpeed = 5;
+
 
     /**
      * Create UFO.
@@ -74,7 +77,7 @@ public class UFO {
             BulletData bullet = new BulletData();
             bullet.x = x;
             bullet.y = y;
-            bullet.speedBullet = PISTOL_BULLET_SPEED * (closestPlayer.getState().x < x ? -1 : 1);
+            bullet.speedBullet = bulletSpeed * (closestPlayer.getState().x < x ? -1 : 1);
             bullet.id = -1;
             bullet.name = "UFO";
             bullets.add(bullet);
@@ -105,6 +108,6 @@ public class UFO {
      * Except it doesn't have a damage percentage which means that the applied force is constant.
      */
     public void bulletHit(BulletData bullet) {
-        knockback = (bullet.speedBullet < 0 ? -1 : 1) * PISTOL_BULLET_FORCE;
+        knockback = (bullet.speedBullet < 0 ? -1 : 1) * bulletForce;
     }
 }

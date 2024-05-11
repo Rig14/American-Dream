@@ -1,6 +1,8 @@
 package helper.packet;
 
+import java.util.List;
+
 public class GunPickupMessage {
     public String character;
-    public Integer id;
+    public List<Integer> ids;
 }

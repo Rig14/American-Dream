@@ -83,6 +83,8 @@ public class Audio {
         sound.put(SoundType.JUMP, jump);
         Sound death = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/death.mp3"));
         sound.put(SoundType.DEATH, death);
+        Sound gunPickup = Gdx.audio.newSound(Gdx.files.internal("audio/game/sound/gun_pickup.mp3"));
+        sound.put(SoundType.GUN_PICKUP, gunPickup);
         Sound chooseYourCharacter = Gdx.audio.newSound(Gdx.files.internal("audio/menu/choose_your_character.ogg"));
         sound.put(SoundType.CHOOSE_YOUR_CHARACTER, chooseYourCharacter);
 
@@ -190,6 +192,7 @@ public class Audio {
         YOU_WIN,
         JUMP,
         DEATH,
-        CHOOSE_YOUR_CHARACTER
+        CHOOSE_YOUR_CHARACTER,
+        GUN_PICKUP
     }
 }

@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import helper.CollisionHandler;
@@ -45,8 +44,9 @@ public class GameScreen extends ScreenAdapter {
     private Player player;  // local client player
     private AIPlayer AIPlayer;
     private Vector2 mapCenterPoint;
-    private final List<GunBox> getGunBoxList = new ArrayList<>();
+    private final List<GunBox> gunBoxList = new ArrayList<>();
     private CollisionHandler collisionHandler;
+    private GunBox onStageGunBox;
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      *
@@ -102,7 +102,7 @@ public class GameScreen extends ScreenAdapter {
         this.AIPlayer = player;
     }
     public void addGunBox(GunBox gunBox) {
-        getGunBoxList.add(gunBox);
+        gunBoxList.add(gunBox);
     }
 
     public void setMapCenterPoint(Vector2 vector2) {
@@ -135,11 +135,12 @@ public class GameScreen extends ScreenAdapter {
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
         // render gunboxes, remove if they are null (they are null if the remove method is called in the gunbox class)
-        for (int i = 0; i < getGunBoxList.size(); i++) {
-            if (getGunBoxList.get(i).getBody() == null) {
-                getGunBoxList.remove(getGunBoxList.get(i));
+        for (int i = 0; i < gunBoxList.size(); i++) {
+            if (gunBoxList.get(i).getBody() == null) {
+                gunBoxList.remove(gunBoxList.get(i));
             } else {
-                getGunBoxList.get(i).render(batch);
+                gunBoxList.get(i).update();
+                gunBoxList.get(i).render(batch);
             }
         }
         batch.end();
@@ -181,12 +182,15 @@ public class GameScreen extends ScreenAdapter {
             AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
         if (Gdx.input.isKeyPressed(Input.Keys.J)) {
-            GunPickupMessage gunPickupMessage = collisionHandler.removeGunBoxTouchingPlayer(player.getBody().getFixtureList(), getGunBoxList);
-            if (gunPickupMessage.id != null) {
+            GunPickupMessage gunPickupMessage = collisionHandler.removeGunBoxTouchingPlayer(player.getBody().getFixtureList(), gunBoxList);
+            if (!gunPickupMessage.ids.isEmpty()) {
                 gunPickupMessage.character = player.getName();
                 AmericanDream.client.sendTCP(gunPickupMessage);
+                Audio.getInstance().playSound(Audio.SoundType.GUN_PICKUP);
+                System.out.println("send gun pickup message");
             }
         }
+        collisionHandler.removeGunBoxTaken(gunBoxList, player.getName());
     }
 
     /**
