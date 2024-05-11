@@ -42,7 +42,7 @@ public class UFO {
      * Update the UFO's position (move towards the closest player), shoot bullets and check for bullet hits.
      * @param players all regular players of the current game instance
      */
-    public void update(float delta, Player[] players) {
+    public void update(float delta, Player[] players, float gameTime) {
         // select player closest to
         Player closestPlayer = null;
         float closestDistance = Float.MAX_VALUE;
@@ -70,7 +70,7 @@ public class UFO {
         y += (float) (Math.sin(angle) * velocity * delta);
 
         // shoot a bullet if countdown is over
-        if (shootCountdown >= UFO_SHOOTING_INTERVAL) {
+        if (shootCountdown >= ((gameTime / 60) + 0.075f) / UFO_SHOOTING_INTERVAL) {
             BulletData bullet = new BulletData();
             bullet.x = x;
             bullet.y = y;
