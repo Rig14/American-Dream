@@ -93,6 +93,7 @@ public class Player extends GameEntity {
     }
 
     public Integer getLivesCount() {
+        if (livesCount < 0) return 0;  // fixes negative lives in hud
         return livesCount;
     }
 
