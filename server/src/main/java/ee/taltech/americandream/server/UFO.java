@@ -48,7 +48,7 @@ public class UFO {
         float closestDistance = Float.MAX_VALUE;
         for (Player player : players) {
             float distance = (float) Math.sqrt(Math.pow(player.getState().x - x, 2) + Math.pow(player.getState().y - y, 2));
-            if (distance < closestDistance) {
+            if (distance < closestDistance && !player.getName().equals("AI")) {
                 closestDistance = distance;
                 closestPlayer = player;
             }

@@ -28,7 +28,6 @@ public class AIPlayer extends Player {
     private String movingState = "";
     private String shootingState = "";
     private boolean jumpingState = false;
-    private boolean dropThroughPlatformState = false;
     private Optional<List<BulletData>> bullets;
     private Player realPlayer;
 
@@ -147,18 +146,6 @@ public class AIPlayer extends Player {
             body.applyLinearImpulse(new Vector2(0, force), body.getWorldCenter(), true);
             jumpCounter++;
         }
-
-        // key down on platform
-        if (dropThroughPlatformState) {
-            keyDownTime += delta;
-        } else {
-            keyDownTime = 0;
-        }
-
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-//            // spawn AI player
-//            AmericanDream.client.sendTCP(new AddAIMessage());
-//        }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
