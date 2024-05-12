@@ -46,7 +46,7 @@ public class PlayerListener extends Listener {
                 player.setAmmoIncrementingTime(0f);
                 player.setGunPickedUp(true);
                 if (player.getName().contains("Biden")) {
-                    player.changeGun(5, 3500, 9, 1);
+                    player.changeGun(5, 4000, 9, 1);
                 } else if (player.getName().contains("Trump")) {
                     player.changeGun(20, 800, 6, 0.1f);
                 } else if (player.getName().contains("Obama")) {

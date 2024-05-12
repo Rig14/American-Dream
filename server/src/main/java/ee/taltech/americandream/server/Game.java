@@ -121,7 +121,6 @@ public class Game extends Thread {
                     for (Player player : allPlayers) {
                         sumX += Math.abs(player.getState().x);
                     }
-                    System.out.println("sent gunbox message");
                     // calculate the average x-coordinate
                     float averageX = sumX / allPlayers.length;
                     GunBoxMessage gunBoxMessage = new GunBoxMessage();
