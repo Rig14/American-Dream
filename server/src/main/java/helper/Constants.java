@@ -13,10 +13,6 @@ public class Constants {
     public static final int BULLET_HITBOX = 20;
     // will send lobby data to clients every N seconds
     public static final int LOBBY_UPDATE_RATE_IN_SECONDS = 1;
-
-    // lower value = more pushback; higher value = less pushback
-    // optimal range 20-50 (10 for testing)
-    // force *= 1 + (damage / x)
     public static final int DAMAGE_INCREASES_PUSHBACK_COEFFICIENT = 40;
     // how fast the AI player shoots bullets
     public static final int UFO_SHOOTING_INTERVAL = 2;

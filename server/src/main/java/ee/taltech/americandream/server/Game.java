@@ -128,7 +128,9 @@ public class Game extends Thread {
                     gunBoxMessage.x = averageX;
                     gunBoxMessage.y = 1500;
                     gunBoxMessage.id = gunBoxId++;
-                    Arrays.stream(allPlayers).forEach(player -> player.sendGunBoxTCP(gunBoxMessage));
+                    Arrays.stream(allPlayers)
+                            .filter(player -> !player.getName().contains("AI"))
+                            .forEach(player -> player.sendGunBoxTCP(gunBoxMessage));
                 }
 
                 Thread.sleep(1000 / TICK_RATE);
