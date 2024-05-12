@@ -98,7 +98,7 @@ public class AIPlayer extends Player {
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
             enemyBullets = bullets.get().stream()
                     .filter(x -> !(x.name.equals("AI")))
-                    .collect(Collectors.toList());;
+                    .collect(Collectors.toList());
             dangeriousBullets = enemyBullets.stream()
                     .filter(bul ->
                             (bul.speedBullet > 0 && bul.x < thisX + X_BUFFER) ||
