@@ -202,10 +202,10 @@ public class Player {
                 this.damage += 8;
             } else if (characterName.contains("Trump")) {
                 // smg damage
-                this.damage += 3;
+                this.damage += 2;
             } else if (characterName.contains("Obama")) {
                 // ar damage
-                this.damage += 4;
+                this.damage += 3;
             }
         } else {
             this.damage += 2;
