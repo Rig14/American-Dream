@@ -32,7 +32,8 @@ public class AIPlayer extends Player {
     private Optional<List<BulletData>> bullets;
     private Player realPlayer;
 
-    private int ammoReserve = 9;
+    private int ammoReserve = 10;
+    private float shotExtraBulletsDelta = 10f;
 
     /**
      * Initialize AI Player.
@@ -47,28 +48,48 @@ public class AIPlayer extends Player {
     }
 
     /**
-     * Plan method as per SPA arhitectue.
+     * Plan method as per SPA architecture.
      * Different scenarios sorted by priority (ascending), more critical scenario will override previous "state"
      * or "commands".
      */
     private void plan() {
         float realPlayerVelY = realPlayer.getBody().getLinearVelocity().y;
-        int desiredPosition = 1375 - damage;
+        int desiredPosition = 1375 - (damage * 2);
         List<BulletData> enemyBullets = new ArrayList<>();
         List<BulletData> dangeriousBullets = new ArrayList<>();
         List<BulletData> bulletsGoingToHit = new ArrayList<>();
-        // initial position
-        if (thisX < desiredPosition - 25) movingState = "right";
 
-        // shoot more bullets if the realPLayer will fall into them
-//        // if (Math.abs(thisX - realPlayer.thisX) < 200)
-//        if (realPlayer.jumpCounter >= 3 && realPlayerVelY < -3 && jumpCounter == 0) {
-//            ammoReserve -= 1;
-//        // normally keep a bullet reserve
-//        }
-//        if (ammoCount > ammoReserve) {
-//            shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
-//        }
+        // initial position
+        if (thisX < desiredPosition - 25) {
+            movingState = "right";
+        } else if (thisX > desiredPosition + 10) { movingState = "left"; }
+
+        // shoot extra bullets when the realPlayer comes too close (by decreasing ammo reserve)
+        if (shotExtraBulletsDelta > 10f &&
+                Math.abs(thisX - realPlayer.thisX) < 300 &&
+                Math.abs(thisY - realPlayer.thisY) < 20 && realPlayerVelY == 0f) {
+            jumpingState = true;
+            shotExtraBulletsDelta = 0f;
+            ammoReserve -= 3;
+        }
+
+        boolean someBodyIsRespawning =
+                (thisY > 1150f || thisY < 600f || realPlayer.thisY > 1150f || realPlayer.thisY < 600f)
+                && !(thisY > 1200f && realPlayer.thisY > 1200f);  // excludes game start
+
+        // shoot bullets towards the real player  ||  increase ammoReserve during respawning
+        if (ammoCount >= ammoReserve && !someBodyIsRespawning) {
+            shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
+        } else if (someBodyIsRespawning && ammoCount < 9) {
+            ammoReserve = ammoCount + 1;
+        }
+
+        // realPLayer is on top of AI  (avoid running too far)
+        if (Math.abs(thisX - realPlayer.thisX) < 45 &&
+                Math.abs(thisY - realPlayer.thisY) < 80 &&
+                !(Math.abs(thisX - desiredPosition) > 200)) {
+            movingState = "left";
+        }
 
         // analyze bullets
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
@@ -83,31 +104,29 @@ public class AIPlayer extends Player {
             bulletsGoingToHit = dangeriousBullets.stream()
                     .filter(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER))
                     .toList();
-            // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
         }
 
+        // recover from being hit  (and overcompensate when in the air, for safety)
+        if (Math.abs(thisX - desiredPosition) < 500 && Math.abs(bulletHitForce) > 1) {
+            movingState = bulletHitForce > 0 ? "left" : "right";
+            jumpingState = true;
+        }
+
+        // jump away from enemy bullets
         if (enemyBullets.stream().anyMatch(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER)  // check if bullet is at the same level as AI
                 && ((bul.speedBullet > 0 && bul.x < thisX + 50) || (bul.speedBullet < 0 && bul.x > thisX - 50))  // x coord
                 && Math.abs(thisX - bul.x) < 200)) {
             jumpingState = true;
-        }  // prevent AI from jumping too early
+        }
 
-        // avoid "wall of bullets"
+        // avoid "wall of bullets"  (avoid jumping into bullets above the AI)
         if (dangeriousBullets.size() >= 7 && bulletsGoingToHit.size() <= 3) {
             jumpingState = false;
             movingState = dangeriousBullets.getFirst().speedBullet > 0 ? "left" : "right";
         }
 
-
-        // (Math.abs(thisX - realPlayer.thisX) < 200 && velY == 0)
-
-        // recover from being hit
-        if (thisX > desiredPosition && bulletHitForce != 0f) {
-            movingState = "left";
-            jumpingState = true;
-        }
-
-        if (jumpingState && body.getLinearVelocity().y > 0) jumpingState = false;  // avoid using all 3 jumps right away
+        // avoid using all 3 jumps right away
+        if (jumpingState && body.getLinearVelocity().y > 0) { jumpingState = false; }
     }
 
     /**
@@ -132,6 +151,7 @@ public class AIPlayer extends Player {
         }
         thisX = body.getPosition().x * PPM;
         thisY = body.getPosition().y * PPM;
+        shotExtraBulletsDelta += delta;
         plan();
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
