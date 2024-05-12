@@ -10,9 +10,9 @@ import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static helper.Constants.FRAME_HEIGHT;
 import static helper.Constants.FRAME_WIDTH;
@@ -24,12 +24,15 @@ import static helper.Textures.GPT_TEXTURE;
 
 public class AIPlayer extends Player {
 
-    public static final int BUFFER = 45;
+    public static final int Y_BUFFER = 45;
+    public static final int X_BUFFER = 100;
     private String movingState = "";
     private String shootingState = "";
     private boolean jumpingState = false;
     private Optional<List<BulletData>> bullets;
     private Player realPlayer;
+
+    private int ammoReserve = 9;
 
     /**
      * Initialize AI Player.
@@ -49,26 +52,57 @@ public class AIPlayer extends Player {
      * or "commands".
      */
     private void plan() {
+        float realPlayerVelY = realPlayer.getBody().getLinearVelocity().y;
+        int desiredPosition = 1375 - damage;
+        List<BulletData> enemyBullets = new ArrayList<>();
+        List<BulletData> dangeriousBullets = new ArrayList<>();
+        List<BulletData> bulletsGoingToHit = new ArrayList<>();
         // initial position
-        if (thisX < 1350) movingState = "right";
+        if (thisX < desiredPosition - 25) movingState = "right";
 
-        // shoot towards real player
-        shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
+        // shoot more bullets if the realPLayer will fall into them
+//        // if (Math.abs(thisX - realPlayer.thisX) < 200)
+//        if (realPlayer.jumpCounter >= 3 && realPlayerVelY < -3 && jumpCounter == 0) {
+//            ammoReserve -= 1;
+//        // normally keep a bullet reserve
+//        }
+//        if (ammoCount > ammoReserve) {
+//            shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
+//        }
 
-        // dodge bullets
+        // analyze bullets
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
-
-            List<BulletData> enemyBullets = bullets.get().stream()
+            enemyBullets = bullets.get().stream()
                     .filter(x -> !(x.name.equals("AI")))
-                    .collect(Collectors.toList());
+                    .toList();
+            dangeriousBullets = enemyBullets.stream()
+                    .filter(bul ->
+                            (bul.speedBullet > 0 && bul.x < thisX + X_BUFFER) ||
+                            (bul.speedBullet < 0 && bul.x > thisX - X_BUFFER))
+                    .toList();
+            bulletsGoingToHit = dangeriousBullets.stream()
+                    .filter(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER))
+                    .toList();
             // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
-            if (enemyBullets.stream().anyMatch(bul -> (bul.y > thisY - BUFFER && bul.y < thisY + BUFFER)  // check if bullet is at the same level as AI
-                    && ((bul.speedBullet > 0 && bul.x < thisX + 50) || (bul.speedBullet < 0 && bul.x > thisX - 50))  // x coord
-                    && Math.abs(thisX - bul.x) < 175)) jumpingState = true;  // prevent AI from jumping too early
         }
 
+        if (enemyBullets.stream().anyMatch(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER)  // check if bullet is at the same level as AI
+                && ((bul.speedBullet > 0 && bul.x < thisX + 50) || (bul.speedBullet < 0 && bul.x > thisX - 50))  // x coord
+                && Math.abs(thisX - bul.x) < 200)) {
+            jumpingState = true;
+        }  // prevent AI from jumping too early
+
+        // avoid "wall of bullets"
+        if (dangeriousBullets.size() >= 7 && bulletsGoingToHit.size() <= 3) {
+            jumpingState = false;
+            movingState = dangeriousBullets.getFirst().speedBullet > 0 ? "left" : "right";
+        }
+
+
+        // (Math.abs(thisX - realPlayer.thisX) < 200 && velY == 0)
+
         // recover from being hit
-        if (thisX > 1375 && bulletHitForce != 0f) {
+        if (thisX > desiredPosition && bulletHitForce != 0f) {
             movingState = "left";
             jumpingState = true;
         }
