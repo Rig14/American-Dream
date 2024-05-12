@@ -129,7 +129,7 @@ public class Game extends Thread {
                     gunBoxMessage.y = 1500;
                     gunBoxMessage.id = gunBoxId++;
                     Arrays.stream(allPlayers)
-                            .filter(player -> !player.getName().contains("AI"))
+                            .filter(player -> player.getName() != null && !player.getName().contains("AI"))
                             .forEach(player -> player.sendGunBoxTCP(gunBoxMessage));
                 }
 
