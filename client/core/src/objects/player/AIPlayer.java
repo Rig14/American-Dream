@@ -13,6 +13,7 @@ import helper.packet.PlayerPositionMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static helper.Constants.FRAME_HEIGHT;
 import static helper.Constants.FRAME_WIDTH;
@@ -53,8 +54,10 @@ public class AIPlayer extends Player {
      * or "commands".
      */
     private void plan() {
+
         float realPlayerVelY = realPlayer.getBody().getLinearVelocity().y;
         int desiredPosition = 1375 - (damage * 2);
+
         List<BulletData> enemyBullets = new ArrayList<>();
         List<BulletData> dangeriousBullets = new ArrayList<>();
         List<BulletData> bulletsGoingToHit = new ArrayList<>();
@@ -95,15 +98,15 @@ public class AIPlayer extends Player {
         if (bullets.isPresent() && !bullets.get().isEmpty()) {
             enemyBullets = bullets.get().stream()
                     .filter(x -> !(x.name.equals("AI")))
-                    .toList();
+                    .collect(Collectors.toList());;
             dangeriousBullets = enemyBullets.stream()
                     .filter(bul ->
                             (bul.speedBullet > 0 && bul.x < thisX + X_BUFFER) ||
                             (bul.speedBullet < 0 && bul.x > thisX - X_BUFFER))
-                    .toList();
+                    .collect(Collectors.toList());
             bulletsGoingToHit = dangeriousBullets.stream()
                     .filter(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER))
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         // recover from being hit  (and overcompensate when in the air, for safety)
@@ -122,7 +125,7 @@ public class AIPlayer extends Player {
         // avoid "wall of bullets"  (avoid jumping into bullets above the AI)
         if (dangeriousBullets.size() >= 7 && bulletsGoingToHit.size() <= 3) {
             jumpingState = false;
-            movingState = dangeriousBullets.getFirst().speedBullet > 0 ? "left" : "right";
+            movingState = dangeriousBullets.get(0).speedBullet > 0 ? "left" : "right";
         }
 
         // avoid using all 3 jumps right away
