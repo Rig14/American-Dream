@@ -93,6 +93,7 @@ public class Player extends GameEntity {
     }
 
     public Integer getLivesCount() {
+        if (livesCount < 0) return 0;  // fixes negative lives in hud
         return livesCount;
     }
 
@@ -131,8 +132,8 @@ public class Player extends GameEntity {
             if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
         }
-        x = body.getPosition().x * PPM;
-        y = body.getPosition().y * PPM;
+        thisX = body.getPosition().x * PPM;
+        thisY = body.getPosition().y * PPM;
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
         }
@@ -143,8 +144,8 @@ public class Player extends GameEntity {
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
-        positionMessage.x = x;
-        positionMessage.y = y;
+        positionMessage.x = thisX;
+        positionMessage.y = thisY;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
         positionMessage.name = name;
@@ -313,7 +314,7 @@ public class Player extends GameEntity {
      * Decrement lives and respawn the player if it's out of bounds.
      */
     protected void handleOutOfBounds(float delta, Vector2 center) {
-        if (y < -BOUNDS) {
+        if (thisY < -BOUNDS) {
             if (timeTillRespawn <= RESPAWN_TIME) {  // delay the respawning if necessary
                 timeTillRespawn += delta;
             } else {

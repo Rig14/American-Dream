@@ -1,8 +1,6 @@
 package objects.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.americandream.AmericanDream;
@@ -12,6 +10,7 @@ import helper.PlayerState;
 import helper.packet.BulletMessage;
 import helper.packet.PlayerPositionMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,16 +22,19 @@ import static helper.Constants.JUMP_FORCE;
 import static helper.Constants.PPM;
 import static helper.Constants.REMOTE_PLAYER_INDICATORS;
 import static helper.Textures.GPT_TEXTURE;
-import static helper.Textures.PLAYER_INDICATOR_TEXTURE;
 
 public class AIPlayer extends Player {
 
+    public static final int Y_BUFFER = 45;
+    public static final int X_BUFFER = 100;
     private String movingState = "";
     private String shootingState = "";
     private boolean jumpingState = false;
-    private boolean dropThroughPlatformState = false;
     private Optional<List<BulletData>> bullets;
     private Player realPlayer;
+
+    private int ammoReserve = 10;
+    private float shotExtraBulletsDelta = 10f;
 
     /**
      * Initialize AI Player.
@@ -47,36 +49,87 @@ public class AIPlayer extends Player {
     }
 
     /**
-     * Plan method as per SPA arhitectue.
-     * Different scenarios sorted by priority (ascending),
-     * more critical scenario will override previous "state" or "commands".
-     * TODO: Rename previous AI player top "ufo" or something. This will prevent nullpointerexceptions and naming conflicts.
+     * Plan method as per SPA architecture.
+     * Different scenarios sorted by priority (ascending), more critical scenario will override previous "state"
+     * or "commands".
      */
     private void plan() {
+
+        float realPlayerVelY = realPlayer.getBody().getLinearVelocity().y;
+        int desiredPosition = 1375 - (damage * 2);
+
+        List<BulletData> enemyBullets = new ArrayList<>();
+        List<BulletData> dangeriousBullets = new ArrayList<>();
+        List<BulletData> bulletsGoingToHit = new ArrayList<>();
+
         // initial position
-        if (x < 1350) movingState = "right";
+        if (thisX < desiredPosition - 25) {
+            movingState = "right";
+        } else if (thisX > desiredPosition + 10) { movingState = "left"; }
 
-        // shoot towards real player
-        shootingState = (realPlayer.getPosition().x < x) ? "left" : "right";
-
-        // dodge bullets
-        if (bullets.isPresent() && !bullets.get().isEmpty()) {
-            List<BulletData> enemyBullets = bullets.get().stream()
-                    .filter(x -> !(x.name.equals("AI")))
-                    .collect(Collectors.toList());
-            // enemyBullets.forEach(x -> System.out.println(x.x + "   " + x.y + "   " + x.speedBullet));
-            if (enemyBullets.stream().anyMatch(bul -> (bul.y > y - 45)  // check if bullet is at the same level as AI
-                    && ((bul.speedBullet > 0 && bul.x < x + 50) || (bul.speedBullet < 0 && bul.x > x - 50))  // x coord
-                    && Math.abs(x - bul.x) < 200)) jumpingState = true;  // prevent AI from jumping too early
+        // shoot extra bullets when the realPlayer comes too close (by decreasing ammo reserve)
+        if (shotExtraBulletsDelta > 10f &&
+                Math.abs(thisX - realPlayer.thisX) < 300 &&
+                Math.abs(thisY - realPlayer.thisY) < 20 && realPlayerVelY == 0f) {
+            jumpingState = true;
+            shotExtraBulletsDelta = 0f;
+            ammoReserve -= 3;
         }
 
-        // recover from being hit
-        if (x > 1375 && bulletHitForce != 0f) {
+        boolean someBodyIsRespawning =
+                (thisY > 1150f || thisY < 600f || realPlayer.thisY > 1150f || realPlayer.thisY < 600f)
+                && !(thisY > 1200f && realPlayer.thisY > 1200f);  // excludes game start
+
+        // shoot bullets towards the real player  ||  increase ammoReserve during respawning
+        if (ammoCount >= ammoReserve && !someBodyIsRespawning) {
+            shootingState = (realPlayer.getPosition().x < thisX) ? "left" : "right";
+        } else if (someBodyIsRespawning && ammoCount < 9) {
+            ammoReserve = ammoCount + 1;
+        }
+
+        // realPLayer is on top of AI  (avoid running too far)
+        if (Math.abs(thisX - realPlayer.thisX) < 45 &&
+                Math.abs(thisY - realPlayer.thisY) < 80 &&
+                !(Math.abs(thisX - desiredPosition) > 200)) {
             movingState = "left";
+        }
+
+        // analyze bullets
+        if (bullets.isPresent() && !bullets.get().isEmpty()) {
+            enemyBullets = bullets.get().stream()
+                    .filter(x -> !(x.name.equals("AI")))
+                    .collect(Collectors.toList());
+            dangeriousBullets = enemyBullets.stream()
+                    .filter(bul ->
+                            (bul.speedBullet > 0 && bul.x < thisX + X_BUFFER) ||
+                            (bul.speedBullet < 0 && bul.x > thisX - X_BUFFER))
+                    .collect(Collectors.toList());
+            bulletsGoingToHit = dangeriousBullets.stream()
+                    .filter(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER))
+                    .collect(Collectors.toList());
+        }
+
+        // recover from being hit  (and overcompensate when in the air, for safety)
+        if (Math.abs(thisX - desiredPosition) < 500 && Math.abs(bulletHitForce) > 1) {
+            movingState = bulletHitForce > 0 ? "left" : "right";
             jumpingState = true;
         }
 
-        if (jumpingState && body.getLinearVelocity().y > 0) jumpingState = false;  // avoid using all 3 jumps right away
+        // jump away from enemy bullets
+        if (enemyBullets.stream().anyMatch(bul -> (bul.y > thisY - Y_BUFFER && bul.y < thisY + Y_BUFFER)  // check if bullet is at the same level as AI
+                && ((bul.speedBullet > 0 && bul.x < thisX + 50) || (bul.speedBullet < 0 && bul.x > thisX - 50))  // x coord
+                && Math.abs(thisX - bul.x) < 200)) {
+            jumpingState = true;
+        }
+
+        // avoid "wall of bullets"  (avoid jumping into bullets above the AI)
+        if (dangeriousBullets.size() >= 7 && bulletsGoingToHit.size() <= 3) {
+            jumpingState = false;
+            movingState = dangeriousBullets.get(0).speedBullet > 0 ? "left" : "right";
+        }
+
+        // avoid using all 3 jumps right away
+        if (jumpingState && body.getLinearVelocity().y > 0) { jumpingState = false; }
     }
 
     /**
@@ -84,6 +137,9 @@ public class AIPlayer extends Player {
      * Construct and send new playerPositionMessage.
      * @param delta delta time
      * @param center point of the map/world
+     * @param playerState optional of AI player's state
+     * @param bullets all bullets in current world
+     * @param player real player
      */
     @Override
     public void update(float delta, Vector2 center, Optional<PlayerState> playerState, Optional<List<BulletData>> bullets, Player player) {
@@ -96,8 +152,9 @@ public class AIPlayer extends Player {
             if (ps.getApplyForce() != 0) bulletHitForce = ps.getApplyForce();
             // update server-sided lives here in the future
         }
-        x = body.getPosition().x * PPM;
-        y = body.getPosition().y * PPM;
+        thisX = body.getPosition().x * PPM;
+        thisY = body.getPosition().y * PPM;
+        shotExtraBulletsDelta += delta;
         plan();
         if (livesCount > 0) {  // let the dead player spectate, but ignore its input
             handleInput(delta);
@@ -109,8 +166,8 @@ public class AIPlayer extends Player {
 
         // construct player position message to be sent to the server
         PlayerPositionMessage positionMessage = new PlayerPositionMessage();
-        positionMessage.x = x;
-        positionMessage.y = y;
+        positionMessage.x = thisX;
+        positionMessage.y = thisY;
         positionMessage.direction = Direction.LEFT;
         positionMessage.livesCount = livesCount;
         positionMessage.name = "AI";
@@ -124,8 +181,8 @@ public class AIPlayer extends Player {
 
 
     /**
-     * Handle mouse and keyboard input.
-     * Update the speed of the player body according to user input.
+     * Act method as per SPA architecture.
+     * Implement commands that were given in the plan method.
      */
     @Override
     protected void handleInput(float delta) {
@@ -147,18 +204,6 @@ public class AIPlayer extends Player {
             jumpCounter++;
         }
 
-        // key down on platform
-        if (dropThroughPlatformState) {
-            keyDownTime += delta;
-        } else {
-            keyDownTime = 0;
-        }
-
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-//            // spawn AI player
-//            AmericanDream.client.sendTCP(new AddAIMessage());
-//        }
-
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {
             // body y velocity must main 0 for some time to reset jump counter
@@ -178,7 +223,7 @@ public class AIPlayer extends Player {
     }
 
     /**
-     * Check for shooting input.
+     * Extension of Act (handleInput) method.
      * Create and send new BulletMessage if the player is shooting.
      */
     @Override
