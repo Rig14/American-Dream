@@ -25,7 +25,6 @@ import objects.player.Player;
 import java.util.Objects;
 
 import static helper.Constants.PPM;
-import static java.lang.System.currentTimeMillis;
 
 public class TileMapHelper {
     private TiledMap tiledMap;
@@ -110,7 +109,6 @@ public class TileMapHelper {
             public void received(Connection connection, Object object) {
                 if (object instanceof GunBoxMessage && (lastGunBoxSpawn - gameTime) > gunBoxSpawnDelay) {
                     lastGunBoxSpawn = gameTime;
-                    System.out.println("received gunbox message");
                     for (int i = 0; i < mapObjects.getCount(); i++) {
                         MapObject mapObject = mapObjects.get(i);
                         if (mapObject instanceof RectangleMapObject) {

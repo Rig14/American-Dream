@@ -42,21 +42,16 @@ public class PlayerListener extends Listener {
         } else if (object instanceof AddUfoMessage addAIMessage) {
             game.addUFO();
         } else if (object instanceof GunPickupMessage gunPickupMessage) {
-            System.out.println(gunPickupMessage.character);
             if (player.getName().contains(gunPickupMessage.character)) {
                 player.setAmmoIncrementingTime(0f);
                 player.setGunPickedUp(true);
                 if (player.getName().contains("Biden")) {
-                    System.out.println("picked up sniper");
-                    player.changeGun(5, 2000, 8, 1);
+                    player.changeGun(5, 3500, 9, 1);
                 } else if (player.getName().contains("Trump")) {
-                    System.out.println("picked up smg");
                     player.changeGun(20, 800, 6, 0.1f);
                 } else if (player.getName().contains("Obama")) {
-                    System.out.println("picked up ar");
-                    player.changeGun(25, 1000, 6, 0.2f);
+                    player.changeGun(25, 900, 6, 0.2f);
                 }
-                System.out.println("sent gun pickup message");
                 game.sendToAllExcept(player, gunPickupMessage);
             }
         }

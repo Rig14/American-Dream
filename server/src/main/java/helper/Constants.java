@@ -18,6 +18,6 @@ public class Constants {
     public static final int UFO_SHOOTING_INTERVAL = 2;
     public static final Dimension UFO_SIZE = new Dimension(60, 60);
 
-    public static final float GUNBOX_SPAWN_DELAY = 10000; // in milliseconds
+    public static final float GUNBOX_SPAWN_DELAY = 20000; // in milliseconds
 
 }

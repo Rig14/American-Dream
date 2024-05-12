@@ -150,7 +150,6 @@ public class Player {
             }
         }
         if (gunPickedUp && ammoCount == 0) {
-            System.out.println("gun dropped");
             gunPickedUp = false;
             ammoIncrementingTime = 0.75f;
             changeGun(10, 500, 5, 0.3f);
@@ -197,7 +196,6 @@ public class Player {
      * @param bullet bullet shot by another player that hit 'this' player.
      */
     public float handleBeingHit(BulletData bullet, String characterName, boolean gunPickedUpEnemy) {
-        System.out.println(characterName);
         if (gunPickedUpEnemy) {
             if (characterName.contains("Biden")) {
                 // sniper damage

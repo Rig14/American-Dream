@@ -187,7 +187,6 @@ public class GameScreen extends ScreenAdapter {
                 gunPickupMessage.character = player.getName();
                 AmericanDream.client.sendTCP(gunPickupMessage);
                 Audio.getInstance().playSound(Audio.SoundType.GUN_PICKUP);
-                System.out.println("send gun pickup message");
             }
         }
         collisionHandler.removeGunBoxTaken(gunBoxList, player.getName());

@@ -20,8 +20,6 @@ import java.util.Map;
 public class CollisionHandler implements ContactFilter {
     @Override
     public boolean shouldCollide(Fixture fixtureA, Fixture fixtureB) {
-        System.out.println(fixtureA.getUserData());
-        System.out.println(fixtureB.getUserData());
         if (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof GunBox) {
             // collision between player and gun box
             return false;

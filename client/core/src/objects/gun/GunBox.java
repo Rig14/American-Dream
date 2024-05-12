@@ -17,7 +17,6 @@ public class GunBox {
     public GunBox(Body body, Integer id) {
         this.body = body;
         this.id = id;
-        body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y + 30), 0);
     }
 
     public void setId(Integer id) {
@@ -69,6 +68,8 @@ public class GunBox {
     }
 
     public void render(SpriteBatch batch) {
-        batch.draw(GUNBOX_TEXTURE, getPositionScale().x - 24, getPositionScale().y - 20, 48, 42);
+        if (getPositionScale() != null) {
+            batch.draw(GUNBOX_TEXTURE, getPositionScale().x - 24, getPositionScale().y - 20, 48, 42);
+        }
     }
 }
