@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Constants {
     // debug mode
-    public static final boolean GAMEPLAY_DEBUG = true;
+    public static final boolean GAMEPLAY_DEBUG = false;
     // pixels per meter (for every meter in LibGDX box2D world there are 16 pixels on player's camera)
     public static final float PPM = 32.0f;
     public static final float GRAVITY = -15f;
@@ -32,8 +32,7 @@ public class Constants {
     public static final float RESPAWN_TIME = 0f;
 
     public static final int[] PORTS = new int[]{8080, 8081};
-    public static final int CONNECTION_TIMEOUT = 5000;
-    public static final String IP_ADDRESS = "localhost";
+    public static final String IP_ADDRESS = "193.40.255.24";
     public static final Vector2 BULLET_DIMENSIONS = new Vector2(20, 20);
     public static final int LIVES_COUNT = 3;
     public static final int FRAME_WIDTH = 64;
