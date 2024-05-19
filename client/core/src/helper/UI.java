@@ -6,8 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import static helper.Constants.FONT_SCALING_FACTOR;
@@ -23,6 +26,12 @@ public class UI {
         button.setDisabled(true);
         button.getStyle().fontColor = Color.GRAY;
         button.getStyle().overFontColor = Color.GRAY;
+    }
+
+    public static void enableButton(TextButton button) {
+        button.setDisabled(false);
+        button.getStyle().fontColor = Color.WHITE;
+        button.getStyle().overFontColor = Color.WHITE;
     }
 
     /**
@@ -58,6 +67,13 @@ public class UI {
         button.getLabel().setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         button.getStyle().up = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg")));
         button.getStyle().over = new TextureRegionDrawable(new TextureRegion(new Texture("pixel.jpg"))).tint(Color.BLACK);
+        button.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                Audio.getInstance().playSound(Audio.SoundType.BUTTON_CLICK);
+            }
+        });
         return button;
     }
 
@@ -88,5 +104,16 @@ public class UI {
         label.setFontScale(Gdx.graphics.getWidth() / (FONT_SCALING_FACTOR * size), Gdx.graphics.getHeight() / (FONT_SCALING_FACTOR * size));
         generator.dispose();
         return label;
+    }
+
+
+    public static Slider createSlider(float min, float max, float stepSize, boolean vertical) {
+        Slider.SliderStyle style = new Slider.SliderStyle();
+        style.background = new TextureRegionDrawable(new TextureRegion(new Texture("slider_background.png")));
+        style.background.setMinHeight(Gdx.graphics.getHeight() / 25f);
+        style.knob = new TextureRegionDrawable(new TextureRegion(new Texture("slider_knob.png")));
+        style.knob.setMinHeight(Gdx.graphics.getHeight() / 20f);
+        style.knob.setMinWidth(Gdx.graphics.getHeight() / 20f);
+        return new Slider(min, max, stepSize, vertical, style);
     }
 }

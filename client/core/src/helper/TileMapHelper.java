@@ -13,7 +13,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import ee.taltech.americandream.AmericanDream;
 import ee.taltech.americandream.GameScreen;
+import helper.packet.GunBoxMessage;
+import objects.gun.GunBox;
+import objects.player.AIPlayer;
 import objects.player.Player;
 
 import java.util.Objects;
@@ -24,6 +30,9 @@ public class TileMapHelper {
     private TiledMap tiledMap;
     private GameScreen gameScreen;
     private String selectedCharacter;
+    // gunbox timers for the gunbox message to work correctly
+    private float lastGunBoxSpawn = 300;
+    private float gunBoxSpawnDelay = 1;
 
     /**
      * Initialize TileMapHelper which loads the tilemap background, tile outlines and objects.
@@ -36,17 +45,19 @@ public class TileMapHelper {
     /**
      * Load tilemap from a .tmx file.
      */
-    public OrthogonalTiledMapRenderer setupMap(String fileName) {
+    public OrthogonalTiledMapRenderer setupMap(String fileName, boolean AIGame) {
         // load map
         tiledMap = new TmxMapLoader().load(fileName);
-        parseMapObjects(tiledMap.getLayers().get("objects").getObjects());
+        parseMapObjects(tiledMap.getLayers().get("objects").getObjects(), AIGame);
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
-
+    public void update(Integer gameTime) {
+        spawnGunBox(tiledMap.getLayers().get("objects").getObjects(), gameTime);
+    }
     /**
      * Load tilemap objects such as the player itself to enable collisions.
      */
-    private void parseMapObjects(MapObjects mapObjects) {
+    private void parseMapObjects(MapObjects mapObjects, boolean AIGame) {
         // parsing map objects
         for (MapObject mapObject : mapObjects) {
             // these are platforms
@@ -66,9 +77,23 @@ public class TileMapHelper {
                             rectangle.getWidth(),
                             rectangle.getHeight(),
                             false,
-                            gameScreen.getWorld()
+                            gameScreen.getWorld(),
+                            new Player(rectangle.getWidth(), rectangle.getHeight(),
+                                    gameScreen.getWorld().createBody(new BodyDef()), selectedCharacter)
                     );
                     gameScreen.setPlayer(new Player(rectangle.getWidth(), rectangle.getHeight(), body, selectedCharacter));
+                    if (AIGame) {
+                        Body AIBody = BodyHelperService.createBody(
+                                rectangle.getX() + rectangle.getWidth() / 2,
+                                rectangle.getY() + rectangle.getHeight() / 2,
+                                rectangle.getWidth(),
+                                rectangle.getHeight(),
+                                false,
+                                gameScreen.getWorld(),
+                                new AIPlayer(0, 0, gameScreen.getWorld().createBody(new BodyDef()), "")
+                        );
+                        gameScreen.setAIPlayer(new AIPlayer(rectangle.getWidth(), rectangle.getHeight(), AIBody, "AI"));
+                    }
                 }
             }
             if (mapObject.getName().equals("Center")) {
@@ -78,7 +103,36 @@ public class TileMapHelper {
             }
         }
     }
-
+    public void spawnGunBox(MapObjects mapObjects, Integer gameTime) {
+        AmericanDream.client.addListener(new Listener() {
+            @Override
+            public void received(Connection connection, Object object) {
+                if (object instanceof GunBoxMessage && (lastGunBoxSpawn - gameTime) > gunBoxSpawnDelay) {
+                    lastGunBoxSpawn = gameTime;
+                    for (int i = 0; i < mapObjects.getCount(); i++) {
+                        MapObject mapObject = mapObjects.get(i);
+                        if (mapObject instanceof RectangleMapObject) {
+                            Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
+                            String rectangleName = mapObject.getName();
+                            if (rectangleName.contains("gunbox")) {
+                                Body body = BodyHelperService.createBody(
+                                        ((GunBoxMessage) object).x,
+                                        ((GunBoxMessage) object).y,
+                                        rectangle.getWidth(),
+                                        rectangle.getHeight(),
+                                        false,
+                                        gameScreen.getWorld(),
+                                        new GunBox(gameScreen.getWorld().createBody(new BodyDef()),
+                                                ((GunBoxMessage) object).id)
+                                );
+                                gameScreen.addGunBox(new GunBox(body, ((GunBoxMessage) object).id));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
     /**
      * Create static objects such as platforms.
      */

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="66" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="25" nextobjectid="53">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="66" height="56" tilewidth="32" tileheight="32" infinite="0" nextlayerid="25" nextobjectid="55">
  <tileset firstgid="1" source="backrounds/backroundtmx/desert-background.tsx"/>
  <tileset firstgid="2761" name="desert" tilewidth="32" tileheight="32" tilecount="1024" columns="32">
   <image source="tilesets/desert-ruins.png" width="1024" height="1024"/>
@@ -22,7 +22,7 @@
  </layer>
  <layer id="21" name="buildings-close" width="66" height="56">
   <data encoding="base64" compression="zlib">
-   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
+   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
   </data>
  </layer>
  <layer id="23" name="deco" width="66" height="56">
@@ -37,7 +37,7 @@
  </layer>
  <layer id="24" name="platform" width="66" height="56">
   <data encoding="base64" compression="zlib">
-   eJzt0LsNAkEQBcHlk8FlQapgggmxcqfeEJAwtkp6/kyPAQAAAAAAALC20zbGZd957rr9+yJYw+M2xn1uZc/9/9fiDQ7vvcFHBx0mHaJDdIgO0SE6RIfoEB2iQ3SIDtEhOkSH6BAdokN0iA75ZYcvJukn4g==
+   eJzt1bsRAjEQRMHlk8FlcQECOYAJJsTKUiMPF+oMdVeNv3qOqgAAAAAAAODbaa069y7r1pfA/+2WqkNvP3Zctr4I5nDrP+Y6NrN7v/8xeYOPZzd46aDDoEPoEDqEDqFD6BA6hA6hQ+gQOoQOoUPoEDqEDqFD6BA6hA7xyw5vgbQpxQ==
   </data>
  </layer>
  <objectgroup id="2" name="objects">
@@ -63,5 +63,9 @@
   <object id="52" name="platform" x="1312" y="896">
    <polygon points="0,0 88.7327,0 88.7327,-32 0,-32"/>
   </object>
+  <object id="54" name="platform" x="1023.79" y="846.194">
+   <polygon points="0,0 96.0204,0 96.0204,-32 0,-32"/>
+  </object>
+  <object id="55" name="gunbox" x="1236" y="802" width="32" height="32"/>
  </objectgroup>
 </map>

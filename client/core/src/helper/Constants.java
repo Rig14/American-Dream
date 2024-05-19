@@ -39,7 +39,7 @@ public class Constants {
     public static final int FRAME_HEIGHT = 74;
     public static final float FRAME_DURATION = 0.3f;
 
-    public static final Dimension AI_PLAYER_SIZE = new Dimension(60, 60);
+    public static final Dimension UFO_SIZE = new Dimension(60, 60);
 
     public static final float FONT_SCALING_FACTOR = 300f;
     public static final Map<Integer, Color> REMOTE_PLAYER_COLORS = Map.of(

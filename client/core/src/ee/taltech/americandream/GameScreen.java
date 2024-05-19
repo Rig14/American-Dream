@@ -12,16 +12,26 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import helper.CollisionHandler;
+import helper.Audio;
 import helper.TileMapHelper;
 import helper.packet.GameLeaveMessage;
+import helper.packet.GunPickupMessage;
 import indicators.OffScreenIndicator;
 import indicators.hud.Hud;
 import objects.RemoteManager;
+import objects.player.AIPlayer;
+import objects.gun.GunBox;
 import objects.player.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static helper.Constants.*;
 
 public class GameScreen extends ScreenAdapter {
+    private boolean AIGame = false;
     private final RemoteManager remoteManager;
     private final Hud hud;
     private final OffScreenIndicator offScreenIndicator;
@@ -32,7 +42,10 @@ public class GameScreen extends ScreenAdapter {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TileMapHelper tileMapHelper;
     private Player player;  // local client player
+    private AIPlayer AIPlayer;
     private Vector2 mapCenterPoint;
+    private final List<GunBox> gunBoxList = new ArrayList<>();
+    private CollisionHandler collisionHandler;
 
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
@@ -40,6 +53,7 @@ public class GameScreen extends ScreenAdapter {
      * @param camera used for creating the image that the player will see on the screen
      */
     public GameScreen(Camera camera, String selectedCharacter, String selectedMap) {
+        AIGame = selectedCharacter.equals("AIGame");
         this.camera = (OrthographicCamera) camera;
         // fix #81. bug related to previous screen input processing working on this screen.
         Gdx.input.setInputProcessor(new Stage());
@@ -54,13 +68,20 @@ public class GameScreen extends ScreenAdapter {
         this.tileMapHelper = new TileMapHelper(this, selectedCharacter);
         switch (selectedMap) {
             case "Swamp":
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("first_level.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.SWAMP);
                 break;
             case "Desert":
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.DESERT);
+                break;
+            case "AiMap":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("AiMap.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.DESERT);
                 break;
             default:
-                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx");
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.CITY);
                 break;
         }
         // remote player(s) manager
@@ -69,6 +90,9 @@ public class GameScreen extends ScreenAdapter {
         // visual info for player
         this.hud = new Hud(this.batch);
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
+        this.collisionHandler = new CollisionHandler();
+        this.world.setContactFilter(collisionHandler);
+        hud.setGunPickupText(player.getName());
     }
 
     public World getWorld() {
@@ -77,6 +101,13 @@ public class GameScreen extends ScreenAdapter {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setAIPlayer(AIPlayer player) {
+        this.AIPlayer = player;
+    }
+    public void addGunBox(GunBox gunBox) {
+        gunBoxList.add(gunBox);
     }
 
     public void setMapCenterPoint(Vector2 vector2) {
@@ -102,21 +133,30 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
 
         player.render(batch);
+        if (AIGame) AIPlayer.render(batch);
         remoteManager.renderPlayers(batch, player.getDimensions(), delta);
         remoteManager.renderBullets(batch);
-        remoteManager.renderAIPlayer(batch);
+        remoteManager.renderUFO(batch);
         offScreenIndicator.renderIndicators(batch, camera, remoteManager.getAllPlayerStates());
         player.render(batch);
-
+        // render gunboxes, remove if they are null (they are null if the remove method is called in the gunbox class)
+        for (int i = 0; i < gunBoxList.size(); i++) {
+            if (gunBoxList.get(i).getBody() == null) {
+                gunBoxList.remove(gunBoxList.get(i));
+            } else {
+                gunBoxList.get(i).update();
+                gunBoxList.get(i).render(batch);
+            }
+        }
         batch.end();
 
         // for debugging
         if (GAMEPLAY_DEBUG) {
             debugRenderer.render(world, camera.combined.scl(PPM));
         }
-
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        // to
         hud.stage.draw();
     }
 
@@ -133,10 +173,12 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         // set the view of the map to the camera
         orthogonalTiledMapRenderer.setView(camera);
-
+        if (remoteManager.getGameTime().isPresent()) {
+            tileMapHelper.update(remoteManager.getGameTime().get());
+        }
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
-        remoteManager.testForHit(world);
-        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers());
+        if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState(), remoteManager.getBulletData(), player);
+        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers(), Optional.ofNullable(AIPlayer), delta);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -145,6 +187,16 @@ public class GameScreen extends ScreenAdapter {
             // send message to server to remove player from lobby
             AmericanDream.client.sendTCP(new GameLeaveMessage());
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+            GunPickupMessage gunPickupMessage = collisionHandler.removeGunBoxTouchingPlayer(player.getBody().getFixtureList(), gunBoxList);
+            if (!gunPickupMessage.ids.isEmpty()) {
+                gunPickupMessage.character = player.getName();
+                AmericanDream.client.sendTCP(gunPickupMessage);
+                Audio.getInstance().playSound(Audio.SoundType.GUN_PICKUP);
+                hud.showGunPickupLabel();
+            }
+        }
+        collisionHandler.removeGunBoxTaken(gunBoxList, player.getName());
     }
 
     /**
@@ -181,6 +233,7 @@ public class GameScreen extends ScreenAdapter {
         super.dispose();
         world.dispose();
         batch.dispose();
+        Audio.getInstance().dispose();
         debugRenderer.dispose();
     }
 }

@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import helper.Audio;
 import helper.packet.GameLeaveMessage;
 import helper.packet.LobbyDataMessage;
 
@@ -55,9 +56,9 @@ public class LobbyScreen extends ScreenAdapter {
         characterSelectionTable.setFillParent(true);
 
         // Add character selection buttons
-        TextButton character1Button = createCharacterButton("Obama", new Texture("obama.jpg"));
-        TextButton character2Button = createCharacterButton("Trump", new Texture("trump.jpg"));
-        TextButton character3Button = createCharacterButton("Biden", new Texture("biden.jpg"));
+        TextButton character1Button = createCharacterButton("Obama", new Texture("obama.jpg"), "Assault rifle");
+        TextButton character2Button = createCharacterButton("Trump", new Texture("trump.jpg"), "Submachine gun");
+        TextButton character3Button = createCharacterButton("Biden", new Texture("biden.jpg"), "Sniper");
         // Add buttons to the table
         table.add(character1Button).padLeft(10);
         table.add(character2Button).padLeft(10);
@@ -100,9 +101,11 @@ public class LobbyScreen extends ScreenAdapter {
                 }
             }
         });
+
+        Audio.getInstance().playSound(Audio.SoundType.CHOOSE_YOUR_CHARACTER);
     }
 
-    private TextButton createCharacterButton(String characterName, Texture characterTexture) {
+    private TextButton createCharacterButton(String characterName, Texture characterTexture, String specialWeapon) {
         // Create an image with the character's texture
         Image characterPreview = new Image(characterTexture);
 
@@ -110,6 +113,8 @@ public class LobbyScreen extends ScreenAdapter {
         Table characterTable = new Table();
         characterTable.add(characterPreview).size(Gdx.graphics.getWidth() / 10f, Gdx.graphics.getWidth() / 10f).padBottom(10).row();
         characterTable.add(createLabel(characterName, Color.WHITE, 2)).row();
+
+        characterTable.add(createLabel(specialWeapon, Color.YELLOW, 2)).row();
 
         TextButton characterButton = createButton("");
 
