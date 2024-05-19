@@ -4,6 +4,8 @@ import com.esotericsoftware.kryonet.Connection;
 import helper.BulletData;
 import helper.PlayerState;
 import helper.packet.GameStateMessage;
+import helper.packet.GunBoxMessage;
+import helper.packet.GunPickupMessage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public class Game extends Thread {
     private float gameTime;
     private boolean running = true;
     private boolean allJoinedMultiplayer = false;
+    private long lastGunBoxSpawnTime = 0;
+    private int gunBoxId = 0;
 
     /**
      * Create a new game instance containing specific clients.
@@ -110,6 +114,24 @@ public class Game extends Thread {
                     lobby.clearLobby();
                     this.end();
                 }
+                // spawning gunbox for weapons
+                if (System.currentTimeMillis() - lastGunBoxSpawnTime > GUNBOX_SPAWN_DELAY) {
+                    // calculate the absolute sum of x-coordinates of all players
+                    lastGunBoxSpawnTime = System.currentTimeMillis();
+                    float sumX = 0;
+                    for (Player player : allPlayers) {
+                        sumX += Math.abs(player.getState().x);
+                    }
+                    // calculate the average x-coordinate
+                    float averageX = sumX / allPlayers.length;
+                    GunBoxMessage gunBoxMessage = new GunBoxMessage();
+                    gunBoxMessage.x = averageX;
+                    gunBoxMessage.y = 1500;
+                    gunBoxMessage.id = gunBoxId++;
+                    Arrays.stream(allPlayers)
+                            .filter(player -> player.getName() != null && !player.getName().contains("AI"))
+                            .forEach(player -> player.sendGunBoxTCP(gunBoxMessage));
+                }
 
                 Thread.sleep(1000 / TICK_RATE);
 
@@ -173,7 +195,7 @@ public class Game extends Thread {
                         if (player.getName().equals(playerStates[i].name)) {
                             // register being hit, increment damage and calculate force
                             // apply force to player (state)
-                            playerStates[i].applyForce = player.handleBeingHit(bullet);  // returns force
+                            playerStates[i].applyForce = player.handleBeingHit(bullet, bullet.name, bullet.shotWithGun);  // returns force
                         }
                     }
                 }
@@ -210,5 +232,12 @@ public class Game extends Thread {
         float y = Arrays.stream(alivePlayers).reduce(0f, (acc, player) -> acc + player.getState().y, Float::sum) / alivePlayers.length;
 
         UFO = new UFO(x, y);
+    }
+    public void sendToAllExcept(Player player, GunPickupMessage gunPickupMessage) {
+        for (Player player1 : allPlayers) {
+            if (!player1.getName().equals(player.getName())) {
+                player1.sendGunPickupMessage(gunPickupMessage);
+            }
+        }
     }
 }

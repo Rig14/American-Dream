@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import ee.taltech.americandream.AmericanDream;
@@ -13,10 +14,12 @@ import helper.PlayerState;
 import helper.Textures;
 import helper.packet.GameStateMessage;
 import objects.bullet.RemoteBullet;
+import objects.gun.GunBox;
 import objects.player.RemotePlayer;
 
 import java.util.*;
 
+import static helper.Constants.GRAVITY;
 import static helper.Constants.UFO_SIZE;
 
 public class RemoteManager {
@@ -28,6 +31,7 @@ public class RemoteManager {
     private PlayerState AIPlayerState;
     private float ufoPlayerX;
     private float ufoPlayerY;
+    private float onHitForce;
 
     /**
      * Initialize RemoteManager that controls all data and functionality regarding remote players.
@@ -69,6 +73,7 @@ public class RemoteManager {
                                 localPlayerState = ps;
                                 if (ps.applyForce != 0) {
                                     Audio.getInstance().playSound(Audio.SoundType.HIT);
+                                    onHitForce = ps.applyForce;
                                 }
                             }
                         }
@@ -194,6 +199,31 @@ public class RemoteManager {
 
                 RemoteBullet.render(batch, bullet.x, bullet.y);
             }
+        }
+    }
+
+    /**
+     * Apply bullet hit knockback (horizontal gravity) to the player if the player has been hit.
+     * Float representing the force is received form the server only once, after that it's saved into the player object.
+     * Exponentially decrement the applied force every game tick.
+     * Stop applying knockback when the force becomes too small.
+     *
+     * @param world world where the player moves (used for applying gravity)
+     */
+    public void testForHit(World world, List<GunBox> gunBoxList) {
+        if (onHitForce != 0) {
+            world.setGravity(new Vector2(onHitForce, GRAVITY));
+            // make on hit force smaller
+            onHitForce *= 0.9f;
+            // is needed to reverse the gravity for the boxes to not get affected by force on the x-axis
+            for (GunBox gunBox : gunBoxList) {
+                gunBox.applyGravity(world.getGravity());
+            }
+        }
+        // reset gravity if hit force is small enough
+        if (Math.abs(onHitForce) < Math.abs(onHitForce / 10f)) {
+            world.setGravity(new Vector2(0, GRAVITY));
+            onHitForce = 0;
         }
     }
 }

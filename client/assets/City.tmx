@@ -66,5 +66,6 @@
   <object id="54" name="platform" x="1023.79" y="846.194">
    <polygon points="0,0 96.0204,0 96.0204,-32 0,-32"/>
   </object>
+  <object id="55" name="gunbox" x="1236" y="802" width="32" height="32"/>
  </objectgroup>
 </map>

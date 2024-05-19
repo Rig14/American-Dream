@@ -7,4 +7,5 @@ public class BulletData {
 
     public float speedBullet;
     public boolean isDisabled;
+    public boolean shotWithGun;
 }

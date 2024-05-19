@@ -4,14 +4,12 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import helper.BulletData;
 import helper.Direction;
+import helper.PlayerListener;
 import helper.PlayerState;
-import helper.packet.AddUfoMessage;
-import helper.packet.BulletMessage;
-import helper.packet.GameLeaveMessage;
-import helper.packet.GameStateMessage;
-import helper.packet.PlayerPositionMessage;
+import helper.packet.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,9 +31,14 @@ public class Player {
     private float bulletTimeout;
     private float velX, velY;
     private int isShooting;
-    private int ammoCount = MAX_AMMO;  // different amount could cause bugs; additional 'has game started' checking required
+    private int maxAmmo = 10;
+    private int ammoCount = maxAmmo;  // different amount could cause bugs; additional 'has game started' checking required
     private float ammoDelta = 0;
-
+    private boolean gunPickedUp = false;
+    private float bulletForce = 1000;
+    private float bulletSpeed = 5;
+    private float ammoIncrementingTime = 0.75f;
+    private float shootDelay = 0.3f;
 
     /**
      * Initialize server-side representation of a player based on the PlayerPositionMessages sent by a specific client.
@@ -56,42 +59,7 @@ public class Player {
         this.bulletTimeout = 0;
 
         // add listeners
-        connection.addListener(new Listener() {
-            @Override
-            public void disconnected(Connection connection) {
-                super.disconnected(connection);
-                onDisconnect();
-            }
-
-            public void received(Connection connection, Object object) {
-                super.received(connection, object);
-                // handle incoming data
-                if (object instanceof PlayerPositionMessage positionMessage) {
-                    if (thisIsAI && positionMessage.name.equals("AI")) {
-                        handlePositionMessage(positionMessage);
-                    } else if (!thisIsAI && !positionMessage.name.equals("AI")) {
-                        handlePositionMessage(positionMessage);
-                    }
-                } else if (object instanceof GameLeaveMessage && thisIsAI) {  // end AIGame instance
-                    game.end();
-                }
-
-                // handle bullet position message
-                if (object instanceof BulletMessage bulletMessage) {
-                    if (thisIsAI && bulletMessage.name.equals("AI")) {
-                        handleNewBullet(bulletMessage);
-                    } else if (!thisIsAI && !bulletMessage.name.equals("AI")) {
-                        handleNewBullet(bulletMessage);
-                    }
-                }
-
-                // handle adding AI player
-                if (object instanceof AddUfoMessage addAIMessage) {
-                    // handle adding AI player
-                    game.addUFO();
-                }
-            }
-        });
+        connection.addListener(new PlayerListener(this, game));
     }
 
     public int getId() {
@@ -104,6 +72,30 @@ public class Player {
 
     public List<BulletData> getPlayerBullets() {
         return playerBullets;
+    }
+
+    public float getBulletForce() {
+        return bulletForce;
+    }
+
+    public float getBulletSpeed() {
+        return bulletSpeed;
+    }
+
+    public boolean isThisIsAI() {
+        return thisIsAI;
+    }
+
+    public boolean isGunPickedUp() {
+        return gunPickedUp;
+    }
+
+    public void setGunPickedUp(boolean gunPickedUp) {
+        this.gunPickedUp = gunPickedUp;
+    }
+
+    public void setAmmoIncrementingTime(float ammoIncrementingTime) {
+        this.ammoIncrementingTime = ammoIncrementingTime;
     }
 
     /**
@@ -134,14 +126,15 @@ public class Player {
      */
     public void update(float delta) {
         // will shoot a bullet if the bulletTimeout is 0
-        if (nextBulletDirection != null && bulletTimeout >= SHOOT_DELAY && ammoCount > 0) {
+        if (nextBulletDirection != null && bulletTimeout >= shootDelay && ammoCount > 0) {
             // construct the bullet to be shot
             BulletData bulletData = new BulletData();
             bulletData.x = x + (nextBulletDirection == Direction.LEFT ? -1 : 1) * 20;
             bulletData.id = id;
             bulletData.name = name;
             bulletData.y = y;
-            bulletData.speedBullet = PISTOL_BULLET_SPEED * (nextBulletDirection == Direction.LEFT ? -1 : 1);
+            bulletData.speedBullet = bulletSpeed * (nextBulletDirection == Direction.LEFT ? -1 : 1);
+            bulletData.shotWithGun = gunPickedUp;
             playerBullets.add(bulletData);
             ammoCount--;
             // reset variables
@@ -149,11 +142,17 @@ public class Player {
             nextBulletDirection = null;
         }
         bulletTimeout += delta;
-
-        ammoDelta += delta;
-        if (ammoDelta >= AMMO_INCREMENTING_TIME && ammoCount < MAX_AMMO) {
-            ammoDelta = ammoDelta % AMMO_INCREMENTING_TIME;
-            ammoCount++;
+        if (ammoIncrementingTime != 0) {
+            ammoDelta += delta;
+            if (ammoDelta >= ammoIncrementingTime && ammoCount < maxAmmo) {
+                ammoDelta = ammoDelta % ammoIncrementingTime;
+                ammoCount++;
+            }
+        }
+        if (gunPickedUp && ammoCount == 0) {
+            gunPickedUp = false;
+            ammoIncrementingTime = 0.75f;
+            changeGun(10, 500, 5, 0.3f);
         }
 
         // remove bullets that are out of bounds
@@ -167,7 +166,7 @@ public class Player {
     /**
      * Each time a player shoots a new bullet, a BulletMessage is sent. Rest of the bullet logic is server-sided.
      */
-    private void handleNewBullet(BulletMessage bulletMessage) {
+    public void handleNewBullet(BulletMessage bulletMessage) {
         // handle bullet message
         nextBulletDirection = bulletMessage.direction;
     }
@@ -175,7 +174,7 @@ public class Player {
     /**
      * Handle incoming PlayerPositionMessages.
      */
-    private void handlePositionMessage(PlayerPositionMessage positionMessage) {
+    public void handlePositionMessage(PlayerPositionMessage positionMessage) {
         // handle position message
         x = positionMessage.x;
         y = positionMessage.y;
@@ -196,13 +195,37 @@ public class Player {
      * Calculate the force of the bullet hit and increment player's damage.
      * @param bullet bullet shot by another player that hit 'this' player.
      */
-    public float handleBeingHit(BulletData bullet) {
-        this.damage += 2;
+    public float handleBeingHit(BulletData bullet, String characterName, boolean gunPickedUpEnemy) {
+        if (gunPickedUpEnemy) {
+            if (characterName.contains("Biden")) {
+                // sniper damage
+                this.damage += 8;
+            } else if (characterName.contains("Trump")) {
+                // smg damage
+                this.damage += 2;
+            } else if (characterName.contains("Obama")) {
+                // ar damage
+                this.damage += 3;
+            }
+        } else {
+            this.damage += 2;
+        }
         // calculate force to apply to player and bullet moving direction
-        float force = PISTOL_BULLET_FORCE * (bullet.speedBullet > 0 ? 1 : -1);
+        float force = bulletForce * (bullet.speedBullet > 0 ? 1 : -1);
         // damage increases force exponentially, at 100% damage the force is 4x stronger than at 0%
+        // force *= 1 + (damage / x)
         force *= (1 + (float) damage / DAMAGE_INCREASES_PUSHBACK_COEFFICIENT);
         return force;
+    }
+
+    /**
+     * Used for changing the qualities shooting and bullets when picking up a gun.
+     */
+    public void changeGun(int ammoCount, int bulletForce, int bulletSpeed, float shootDelay) {
+        this.ammoCount = ammoCount;
+        this.bulletForce = bulletForce;
+        this.bulletSpeed = bulletSpeed;
+        this.shootDelay = shootDelay;
     }
 
     /**
@@ -220,10 +243,18 @@ public class Player {
         connection.sendTCP(gameStateMessage);
     }
 
+    public void sendGunBoxTCP(GunBoxMessage gunBoxMessage) {
+        connection.sendTCP(gunBoxMessage);
+    }
+
+    public void sendGunPickupMessage(GunPickupMessage gunPickupMessage) {
+        connection.sendTCP(gunPickupMessage);
+    }
+
     /**
      * End the game in case of a disconnect.
      */
-    private void onDisconnect() {
+    public void onDisconnect() {
         game.end();
     }
 

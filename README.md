@@ -33,6 +33,7 @@ replace $VERSION_NUMBER with the version number to run.
 * 'W' - Jump
 * 'S' (hold) - Drop through a platform
 * 'N' - Spawn AI player
+* 'J' - While pressed when inside gun box, get special weapon
 
 Sidenote: the game is also playable with a controller (screens are not navigable with a controller)
 

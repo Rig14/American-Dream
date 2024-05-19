@@ -215,6 +215,9 @@ public class Player extends GameEntity {
             // spawn UFO
             AmericanDream.client.sendTCP(new AddUfoMessage());
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+            // pickup
+        }
 
         // reset jump counter if landed (sometimes stopping in midair works as well)
         if (body.getLinearVelocity().y == 0) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="27">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="33">
  <tileset firstgid="1" source="tilesets as .tsx/test_tiles.tsx"/>
  <tileset firstgid="901" source="tilesets as .tsx/test_tiles4.tsx"/>
  <tileset firstgid="1801" source="tilesets as .tsx/test_tiles3.tsx"/>
@@ -45,6 +45,7 @@
    <polygon points="0,0 574.616,0 574.616,-32 0,-32"/>
   </object>
   <object id="20" name="bulletSpawn" x="-536" y="-496" width="2088" height="1576"/>
+  <object id="27" name="gunbox" x="434.667" y="138.667" width="32" height="32"/>
  </objectgroup>
  <layer id="4" name="Platform" width="30" height="20">
   <data encoding="csv">

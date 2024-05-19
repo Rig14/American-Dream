@@ -4,12 +4,14 @@ package indicators.hud;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import helper.Audio;
 import helper.UI;
@@ -70,6 +72,10 @@ public class Hud {
             List.of(firstRemoteLivesDisplayed, secondRemoteLivesDisplayed, thirdRemoteLivesDisplayed)
     );
     private boolean finalSoundPlayed = false;
+    private final float labelDisplayTime = 3.0f; // duration to display the label
+    private float labelTimer = 0;
+    private Label gunPickupLabel;
+
 
     /**
      * Initialize HUD.
@@ -137,6 +143,7 @@ public class Hud {
 
         // add main table to the stage
         stage.addActor(table);
+        // for showing the gun pickup info
     }
 
     /**
@@ -147,11 +154,18 @@ public class Hud {
      * @param localPlayer   local player
      * @param remotePlayers remote players; amount ranging from 0 to (lobbyMaxSize - 1)
      */
-    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers, Optional<AIPlayer> AIPlayer) {
+    public void update(Optional<Integer> time, Player localPlayer, List<RemotePlayer> remotePlayers, Optional<AIPlayer> AIPlayer, float delta) {
         updateTime(time);
         heartScaling = (float) stage.getViewport().getScreenHeight() / 25;
         // update lives, health, damage
         if (localPlayer != null) {
+            // used for showing gun pickup info
+            if (gunPickupLabel.isVisible()) {
+                labelTimer -= delta;
+                if (labelTimer <= 0) {
+                    gunPickupLabel.setVisible(false);
+                }
+            }
             // update local player
             if (!localPlayerName.getText().toString().equals(localPlayer.getName())) {
                 localPlayerName.setText(localPlayer.getName());
@@ -257,5 +271,31 @@ public class Hud {
             int seconds = time.get() % 60;
             timeCountdownLabel.setText(minutes + ":" + String.format("%02d", seconds));
         }
+    }
+    public void setGunPickupText(String characterName) {
+        String characterGun = "";
+        if (characterName != null) {
+            if (characterName.contains("Biden")) {
+                characterGun = "sniper";
+            } else if (characterName.contains("Obama")) {
+                characterGun = "assault rifle";
+            } else if (characterName.contains("Trump")) {
+                characterGun = "submachine gun";
+            }
+        }
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = new BitmapFont();
+        labelStyle.fontColor = Color.WHITE;
+
+        gunPickupLabel = new Label("Picked up " + characterGun, labelStyle);
+        gunPickupLabel.setVisible(false);
+        gunPickupLabel.setPosition(Gdx.graphics.getWidth() / 2 - gunPickupLabel.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+
+        stage.addActor(gunPickupLabel);
+    }
+    public void showGunPickupLabel() {
+        gunPickupLabel.setVisible(true);
+        labelTimer = labelDisplayTime;
     }
 }
