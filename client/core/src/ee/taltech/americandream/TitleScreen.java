@@ -71,7 +71,7 @@ public class TitleScreen extends ScreenAdapter {
                 message.lobbyId = AmericanDream.id;
                 message.AIGame = true;
                 AmericanDream.client.sendTCP(message);
-                AmericanDream.instance.setScreen(new GameScreen(camera, "AIGame", "Desert"));
+                AmericanDream.instance.setScreen(new GameScreen(camera, "AIGame", "AiMap"));
             }
         });
 
@@ -87,7 +87,7 @@ public class TitleScreen extends ScreenAdapter {
         versionContainer.setFillParent(true);
         versionContainer.top().left();
         versionContainer.pad(5);
-        Label version = createLabel("American Dream BETA-0.4", Color.GRAY, 3); // current game version number
+        Label version = createLabel("American Dream 1.0", Color.GRAY, 3); // current game version number
         versionContainer.add(version).row();
 
         // bottom content

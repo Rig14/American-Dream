@@ -189,7 +189,7 @@ public class Hud {
                 }
                 gameOverLabel.setColor(Color.RED);
                 gameOverLabel.setFontScale(1);
-                // check if all remote players are defeated  &&  the game has already started  || AIPlayer has 0 luves
+                // check if all remote players are defeated  &&  the game has already started  || AIPlayer has 0 lives
             } else if ((!remotePlayers.isEmpty() &&
                     remotePlayers.stream().allMatch(x -> Objects.equals(x.getLivesCount(), 0))) ||
                     AIPlayer.isPresent() && Objects.equals(AIPlayer.get().getLivesCount(), 0)) {

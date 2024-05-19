@@ -45,6 +45,7 @@ public class Game extends Thread {
         for (int i = 0; i < connections.length; i++) {
             alivePlayers[i] = new Player(connections[i], this, connections[i].getID(), false);
         }
+        // replace 2nd player with AIPlayer
         if (AIGame) alivePlayers[1] = new Player(connections[1], this, connections[1].getID(), true);
 
         allPlayers = alivePlayers.clone();
@@ -66,7 +67,7 @@ public class Game extends Thread {
 
                 // update UFO
                 if (UFO != null) {
-                    UFO.update(1000f / TICK_RATE / 1000f, alivePlayers);
+                    UFO.update(1000f / TICK_RATE / 1000f, alivePlayers, gameTime);
                 }
 
                 // construct game state message

@@ -75,6 +75,10 @@ public class GameScreen extends ScreenAdapter {
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("Desert.tmx", AIGame);
                 Audio.getInstance().playMusic(Audio.MusicType.DESERT);
                 break;
+            case "AiMap":
+                this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("AiMap.tmx", AIGame);
+                Audio.getInstance().playMusic(Audio.MusicType.DESERT);
+                break;
             default:
                 this.orthogonalTiledMapRenderer = tileMapHelper.setupMap("City.tmx", AIGame);
                 Audio.getInstance().playMusic(Audio.MusicType.CITY);

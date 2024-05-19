@@ -17,7 +17,7 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
 
-    version = 'BETA-0.4'
+    version = '1.0'
     ext {
         appName = "American Dream"
         gdxVersion = '1.12.1'

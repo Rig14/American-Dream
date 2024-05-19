@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class GameEntity {
-    protected float x, y, velX, velY, speed;
+    protected float thisX, thisY, velX, velY, speed;
     protected float width, height;
     protected Body body;
 
@@ -21,8 +21,8 @@ public abstract class GameEntity {
      * @param body object that moves around in the map/world and collides with other bodies
      */
     public GameEntity(float width, float height, Body body) {
-        this.x = body.getPosition().x;
-        this.y = body.getPosition().y;
+        this.thisX = body.getPosition().x;
+        this.thisY = body.getPosition().y;
         this.width = width;
         this.height = height;
         this.body = body;
