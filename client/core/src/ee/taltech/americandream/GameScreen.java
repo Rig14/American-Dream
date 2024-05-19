@@ -46,7 +46,7 @@ public class GameScreen extends ScreenAdapter {
     private Vector2 mapCenterPoint;
     private final List<GunBox> gunBoxList = new ArrayList<>();
     private CollisionHandler collisionHandler;
-    private GunBox onStageGunBox;
+
     /**
      * Initialize new game screen with its camera, spriteBatch (for object rendering), tileMap and other content.
      *
@@ -88,6 +88,7 @@ public class GameScreen extends ScreenAdapter {
         this.offScreenIndicator = new OffScreenIndicator(player.getDimensions());
         this.collisionHandler = new CollisionHandler();
         this.world.setContactFilter(collisionHandler);
+        hud.setGunPickupText(player.getName());
     }
 
     public World getWorld() {
@@ -151,6 +152,7 @@ public class GameScreen extends ScreenAdapter {
         }
         // create hud and add it to the GameScreen
         this.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        // to
         hud.stage.draw();
     }
 
@@ -172,7 +174,7 @@ public class GameScreen extends ScreenAdapter {
         }
         player.update(delta, mapCenterPoint, remoteManager.getLocalPlayerState());
         if (AIGame) AIPlayer.update(delta, mapCenterPoint, remoteManager.getAIPlayerState(), remoteManager.getBulletData(), player);
-        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers(), Optional.ofNullable(AIPlayer));
+        hud.update(remoteManager.getGameTime(), player, remoteManager.getRemotePlayers(), Optional.ofNullable(AIPlayer), delta);
 
         // if escape is pressed, the game will close
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -187,6 +189,7 @@ public class GameScreen extends ScreenAdapter {
                 gunPickupMessage.character = player.getName();
                 AmericanDream.client.sendTCP(gunPickupMessage);
                 Audio.getInstance().playSound(Audio.SoundType.GUN_PICKUP);
+                hud.showGunPickupLabel();
             }
         }
         collisionHandler.removeGunBoxTaken(gunBoxList, player.getName());
