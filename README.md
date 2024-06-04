@@ -2,10 +2,16 @@
 
 A 2D game similar to Super Smash Bros but with the addition of guns and the American Dream
 
+# Images
+
+![title](./Readme-Files/title.png)
+![game](./Readme-Files/game1.png)
+![game](./Readme-Files/game2.png)
+![ai](./Readme-Files/ai.png)
+
 ### Running the game
 
-Running the game is as simple as running the client jar file in jars folder. The server is already running on a remote
-server.
+Running the game is as simple as running the client jar file in jars folder. Server can be run in the same way.
 
 ```bash
 java -jar desktop-$VERSION_NUMBER.jar
